@@ -95,11 +95,12 @@ class NavedYawrap(Yawrap):
         return sub_
 
     @contextmanager
-    def bookmark(self, id_, nav_name='', type_='div'):
-        nav_name = nav_name or id_
+    def bookmark(self, id_, name_in_nav='', type_='div', *p, **k):
+        """ as regular doc.tag, but also manages navigation stuff """
+        name_in_nav = name_in_nav or id_
         id_ = id_.replace(' ', '_')
-        self._bookmarks.append((id_, nav_name))
-        with self.tag(type_, id=id_):
+        self._bookmarks.append((id_, name_in_nav))
+        with self.tag(type_, *p, id=id_, **k):
             yield
 
     def _render_page(self):
@@ -124,34 +125,34 @@ class NavedYawrap(Yawrap):
     def _insert_nav(self, doc):
         nav_structure = self._get_nav_structure()
         with doc.tag('nav', klass='nav_main_panel'):
-            self.render_subs_of(nav_structure, doc)
+            self._render_nav_subs(nav_structure, doc)
 
     def _get_nav_structure(self, sub=None):
         current = sub or self._get_root()
         its_children = tuple(child._get_nav_structure(child) for child in current._subs)
         return NavEntry(current, current._bookmarks, its_children)
 
-    def render_subs_of(self, structure_element, doc):
+    def _render_nav_subs(self, structure_element, doc):
         curr_dir = os.path.dirname(self.target_file)
-        current, bookmarks, subs = structure_element
+        current = structure_element.element
         link = os.path.relpath(current.target_file, curr_dir)
 
         with doc.tag('div', klass='nav_group_div'):
             if current == self:
                 doc.attr(klass='nav_group_div active')
 
-            with doc.tag('div'):
-                with doc.tag('a', href=link):
+            with doc.tag('div', klass='nav_page'):
+                with doc.tag('a', href=link, klass='nav_page_link'):
                     if current.target_file == self.target_file:
-                        doc.attr(klass='nav_group_div active')
+                        doc.attr(klass='active')
                     doc.text(current.nav_title or link)
 
                 if current == self:
-                    doc.attr(klass='nav_current_with_bookmarks')
-                    for bookmark, bookmark_name in bookmarks:
+                    doc.attr(klass='nav_page with_bookmarks')
+                    for bookmark, bookmark_name in structure_element.bookmarks:
                         bookmark_link = "%s#%s" % (link, bookmark)
-                        with doc.tag('a', klass='nav_bookmark', href=bookmark_link):
+                        with doc.tag('a', klass='nav_bookmark_link', href=bookmark_link):
                             doc.text(bookmark_name)
 
-            for sub in subs:
-                self.render_subs_of(sub, doc)
+            for sub in structure_element.children:
+                self._render_nav_subs(sub, doc)

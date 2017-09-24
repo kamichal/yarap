@@ -52,15 +52,20 @@ body {
     overflow: auto;
 }
 .nav_group_div {
-    margin: 1px;
+    margin: 3px;
     padding: 0px;
 }
-.nav_current_with_bookmarks {
+.nav_group_div.active {
+    background: #fdf8fa;
+    border-radius: 8px;
+    border: 2px solid #4CAF50;
+}
+.nav_page.with_bookmarks {
     border: 1px solid #DDD;
     border-radius: 6px;
     background: #fff;
 }
-a.nav_bookmark {
+a.nav_bookmark_link {
     margin: 0px 0px 0px 16px;
 }
 .nav_group_div a {
@@ -107,11 +112,18 @@ body {
     padding: 8px 16px;
     text-decoration: none;
 }
+
 .nav_group_div a.active {
     background-color: #4CAF50;
     color: white;
 }
-
+.nav_group_div.active {
+    background-color: #fdf8fa;
+    color: white;
+}
+.nav_page.with_bookmarks {
+    background: #DDD;
+}
 .nav_group_div a:hover:not(.active) {
     background-color: #555;
     color: white;
@@ -158,7 +170,7 @@ def test_navigation(nav_class, root_dir_name, out_dir):
         for bidx in xrange(len(LOREM_IPSUMS)):
             bookmark_name = 'chapter %s' % (bidx + 1)
             with jarap_.bookmark(bookmark_name, type_='h3'):
-                jarap_.text('Thats the chapter # %s' % (bidx + 1))
+                jarap_.text("That's chapter # %s" % (bidx + 1))
             with jarap_.tag('p'):
                 jarap_.text(LOREM_IPSUMS[bidx])
 
