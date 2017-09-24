@@ -5,11 +5,12 @@ Created on 23 Sep 2017
 @author: kamichal
 '''
 
+from collections import namedtuple
 from contextlib import contextmanager
-import yattag
 import os
 import weakref
-from collections import namedtuple
+import yattag
+
 
 NavEntry = namedtuple('NavEntry', 'element, bookmarks, children')
 
@@ -85,12 +86,12 @@ class NavedYawrap(Yawrap):
     def __init__(self, target_file, title='', parent=None, nav_title=''):
         super(NavedYawrap, self).__init__(target_file, title, parent)
         self.nav_title = nav_title or title
-        self._separate_subs = []
+        self._subs = []
         self._bookmarks = []
 
     def sub(self, target_file, title=''):
         sub_ = type(self)(target_file, title, weakref.ref(self))
-        self._separate_subs.append(sub_)
+        self._subs.append(sub_)
         return sub_
 
     @contextmanager
@@ -104,7 +105,7 @@ class NavedYawrap(Yawrap):
     def _render_page(self):
         page_doc = yattag.SimpleDoc()
         with self._page_structure(page_doc):
-            if self._separate_subs or self._parent:
+            if self._subs or self._parent:
                 self._insert_nav(page_doc)
             with page_doc.tag('div', klass='main_content_body'):
                 page_doc.asis(self._get_body_render())
@@ -112,7 +113,7 @@ class NavedYawrap(Yawrap):
 
     def render_all_files(self):
         self.render()
-        for sub in self._separate_subs:
+        for sub in self._subs:
             sub.render_all_files()
 
     def _get_root(self):
@@ -120,32 +121,37 @@ class NavedYawrap(Yawrap):
             return self._parent()._get_root()
         return self
 
-    def _get_nav_structure(self, sub=None):
-        root = sub or self._get_root()
-        its_children = tuple(child._get_nav_structure(child) for child in root._separate_subs)
-        return NavEntry(root, root._bookmarks, its_children)
-
     def _insert_nav(self, doc):
         nav_structure = self._get_nav_structure()
-        curr_dir = os.path.dirname(self.target_file)
+        with doc.tag('nav', klass='nav_main_panel'):
+            self.render_subs_of(nav_structure, doc)
 
-        def render_subs_of(structure_element):
-            current, bookmarks, subs = structure_element
-            with doc.tag('div', klass='nav_group_div'):
-                if current == self:
-                    doc.attr(klass='nav_group_div active')
-                link = os.path.relpath(current.target_file, curr_dir)
+    def _get_nav_structure(self, sub=None):
+        current = sub or self._get_root()
+        its_children = tuple(child._get_nav_structure(child) for child in current._subs)
+        return NavEntry(current, current._bookmarks, its_children)
+
+    def render_subs_of(self, structure_element, doc):
+        curr_dir = os.path.dirname(self.target_file)
+        current, bookmarks, subs = structure_element
+        link = os.path.relpath(current.target_file, curr_dir)
+
+        with doc.tag('div', klass='nav_group_div'):
+            if current == self:
+                doc.attr(klass='nav_group_div active')
+
+            with doc.tag('div'):
                 with doc.tag('a', href=link):
                     if current.target_file == self.target_file:
                         doc.attr(klass='nav_group_div active')
                     doc.text(current.nav_title or link)
-                for bookmark, bookmark_name in bookmarks:
-                    bookmark_link = "%s#%s" % (link, bookmark)
-                    with doc.tag('a', href=bookmark_link):
-                        doc.text(bookmark_name)
 
-                for sub in subs:
-                    render_subs_of(sub)
+                if current == self:
+                    doc.attr(klass='nav_current_with_bookmarks')
+                    for bookmark, bookmark_name in bookmarks:
+                        bookmark_link = "%s#%s" % (link, bookmark)
+                        with doc.tag('a', klass='nav_bookmark', href=bookmark_link):
+                            doc.text(bookmark_name)
 
-        with doc.tag('nav', klass='nav_main_panel'):
-            render_subs_of(nav_structure)
+            for sub in subs:
+                self.render_subs_of(sub, doc)

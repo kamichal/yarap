@@ -16,6 +16,26 @@ def flatten(nav_entry):
     for i in nav_entry.children:
         for j in flatten(i):
             yield j
+LOREM_IPSUMS = ["""\
+Ferri affert expetenda ei duo, vel cu legimus splendide. Oblique dignissim elaboraret vix cu,
+eos errem graeco ponderum ut, id quidam semper melius mei. Tantas munere ornatus an vel.
+Sit simul tempor tibique cu.
+His te erat etiam phaedrum, qui graece dicunt sensibus te, qui ad salutandi periculis.
+At quaeque sensibus sed, persius dolorum usu ea, apeirian urbanitas ius te. Eos doctus
+virtute ne, id qui choro possit graeco. Ei duo dolor expetendis scribentur, ut decore
+labitur consetetur pri. Summo ludus referrentur cu sit, elitr periculis voluptaria vix ei.
+Vix soluta facilis repudiandae ne. Ius graecis fabellas ad, duo percipitur instructior an.""", """\
+Placerat gloriatur mei ea. Mel id alienum pertinacia, ne per viris choro mnesarchum, ad inani
+consul his. Error audiam explicari quo an, mea corpora invenire ex. Id luptatum dissentiet eam.
+Utroque adolescens ut pro, te vel labitur iudicabit. Dicant putent tractatos duo in.""", """\
+Atqui animal utamur ea nam, nam id quodsi ornatus probatus. Lorem nostrud in mei.
+Ne mei etiam ignota. Ut dico veritus pri, facilisis corrumpit vis ei.
+Est utroque consulatu ne, deleniti perfecto ocurreret id duo. Tibique accusam in mea.
+Ex pro delenit persequeris, qui magna maluisset definitionem id.
+Has postulant omittantur ad.""", """\
+Mundi principes eum ea, velit sapientem theophrastus vel at. Malis facer ad vel, cetero delicata
+id usu. Alterum liberavisse ea vis. Mea ignota possim ex, vim sale iusto in. Ferri justo consul
+eum ut, usu corpora ocurreret et, mea ut malis dolore viderer."""]
 
 StyledNavrapBodyCss = """
 body {
@@ -35,10 +55,13 @@ body {
     margin: 1px;
     padding: 0px;
 }
-.nav_group_div.active {
+.nav_current_with_bookmarks {
     border: 1px solid #DDD;
     border-radius: 6px;
     background: #fff;
+}
+a.nav_bookmark {
+    margin: 0px 0px 0px 16px;
 }
 .nav_group_div a {
     padding: 8px 16px;
@@ -47,6 +70,7 @@ body {
     text-decoration: none;
 }
 .nav_group_div a.active {
+    border-radius: 6px;
     background-color: #4CAF50;
     color: white;
 }
@@ -131,6 +155,13 @@ def test_navigation(nav_class, root_dir_name, out_dir):
         with jarap_.tag('p'):
             jarap_.text("I'm located at {}.".format(rel_loc))
 
+        for bidx in xrange(len(LOREM_IPSUMS)):
+            bookmark_name = 'chapter %s' % (bidx + 1)
+            with jarap_.bookmark(bookmark_name, type_='h3'):
+                jarap_.text('Thats the chapter # %s' % (bidx + 1))
+            with jarap_.tag('p'):
+                jarap_.text(LOREM_IPSUMS[bidx])
+
     def create_sub(jarap_, new_file, text, title=''):
         files.append(new_file)
         new_jarap = jarap_.sub(new_file, title)
@@ -186,8 +217,7 @@ def test_navigation(nav_class, root_dir_name, out_dir):
         nav_def = soup.html.body.find_all('nav', class_="nav_main_panel")
         assert len(nav_def) == 1
         links = nav_def[0].find_all('a')
-        bookmarks_count = 1
-        assert len(links) == len(files) + bookmarks_count
+        assert len(links) >= len(files)
         basenames = map(os.path.basename, files)
         assert all(os.path.basename(l['href']) and os.path.basename(l['href']).split('#')[0] in basenames
                    for l in links)
