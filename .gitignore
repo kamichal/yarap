@@ -1,5 +1,5 @@
 .project
 .pydevproject
 *.pyc
-tests/out/*
+*/tests/out/*
 .cache
