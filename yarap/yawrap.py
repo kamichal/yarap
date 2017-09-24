@@ -61,28 +61,3 @@ class Yawrap(object):
 
         print '\nsaved file: {}\n'.format(target_file)
         print whole_page_render
-
-
-def usage(out_dir):
-
-    the_file = os.path.join(out_dir, 'test.html')
-
-    jawrap = Yawrap()
-
-    with jawrap.tag('div'):
-        with jawrap.tag('p'):
-            jawrap.text('pozoga')
-
-    jawrap.render(the_file)
-
-""" kk """
-
-
-if __name__ == '__main__':
-    main_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    out_dir_ = os.path.join(main_dir, 'tests', 'out')
-    if not os.path.exists(out_dir_):
-        os.makedirs(out_dir_)
-
-    usage(out_dir_)
-    print 'okej'
