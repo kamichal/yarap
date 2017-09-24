@@ -19,15 +19,47 @@ def out_dir():
 
 
 def test_1(out_dir):
+    assert str(Yawrap()) == ''
+    render = Yawrap().render()
+    assert render == """\
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <body></body>
+</html>"""
 
-    the_file = os.path.join(out_dir, 'test_1.html')
 
-    jawrap = Yawrap()
+def test_2(out_dir):
+    the_file = os.path.join(out_dir, 'test_2.html')
+
+    jawrap = Yawrap('ol rajt!')
+    jawrap.css("body {padding: 12px;}")
 
     with jawrap.tag('div'):
         with jawrap.tag('p'):
-            jawrap.text('pozoga')
+            jawrap.text('Nothing much here.')
 
-    jawrap.render(the_file)
+    assert str(jawrap) == """\
+<div>
+  <p>Nothing much here.</p>
+</div>"""
 
+    render = jawrap.render()
+    jawrap.render_to_file(the_file)
+    assert render == """\
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ol rajt!</title>
+    <style>body {padding: 12px;}</style>
+  </head>
+  <body>
+    <div>
+      <p>Nothing much here.</p>
+    </div>
+  </body>
+</html>"""
     assert os.path.isfile(the_file)
