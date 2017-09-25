@@ -95,12 +95,13 @@ class NavedYawrap(Yawrap):
         return sub_
 
     @contextmanager
-    def bookmark(self, id_, name_in_nav='', type_='div', *p, **k):
+    def bookmark(self, id_, name_in_nav='', type_='div', *args, **kwargs):
         """ as regular doc.tag, but also manages navigation stuff """
+        assert 'id' not in kwargs, 'Duplicated id attribute.'
         name_in_nav = name_in_nav or id_
         id_ = id_.replace(' ', '_')
         self._bookmarks.append((id_, name_in_nav))
-        with self.tag(type_, *p, id=id_, **k):
+        with self.tag(type_, *args, id=id_, **kwargs):
             yield
 
     def _render_page(self):

@@ -9,6 +9,7 @@ import os
 import pytest
 
 from yarap.yawrap import NavedYawrap
+from random import choice
 
 
 def flatten(nav_entry):
@@ -16,6 +17,8 @@ def flatten(nav_entry):
     for i in nav_entry.children:
         for j in flatten(i):
             yield j
+
+
 LOREM_IPSUMS = ["""\
 Ferri affert expetenda ei duo, vel cu legimus splendide. Oblique dignissim elaboraret vix cu,
 eos errem graeco ponderum ut, id quidam semper melius mei. Tantas munere ornatus an vel.
@@ -40,13 +43,15 @@ eum ut, usu corpora ocurreret et, mea ut malis dolore viderer."""]
 StyledNavrapBodyCss = """
 body {
     margin: 0;
+    padding: 8px;
+    background: #fdfafa;
 }
 .nav_main_panel {
     margin : 0;
-    padding: 10;
+    padding: 16px 3px 3px 16px;
     list-style-type: none;
-    width: 25%;
-    background-color: #f1f1f1;
+    width: 300px;
+    background-color: #fdfafa;
     position: fixed;
     height: 100%;
     overflow: auto;
@@ -58,12 +63,15 @@ body {
 .nav_group_div.active {
     background: #fdf8fa;
     border-radius: 8px;
-    border: 2px solid #4CAF50;
 }
 .nav_page.with_bookmarks {
-    border: 1px solid #DDD;
     border-radius: 6px;
     background: #fff;
+}
+
+.nav_page.with_bookmarks a.nav_bookmark_link:hover{
+    background: #eee;
+    color: #000;
 }
 a.nav_bookmark_link {
     margin: 0px 0px 0px 16px;
@@ -76,18 +84,19 @@ a.nav_bookmark_link {
 }
 .nav_group_div a.active {
     border-radius: 6px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: #c4eec4;
+    color: #000;
 }
 .nav_group_div a:hover:not(.active) {
     border-radius: 6px;
-    background-color: #555;
+    background-color: #777;
     color: white;
 }
 .main_content_body {
-    margin-left:25%;
+    margin: 20px 16px 20px 335px;
+    border: 1px solid #ddd;
     padding:1px 16px;
-    height:1000px;
+
 }
 """
 
@@ -172,7 +181,8 @@ def test_navigation(nav_class, root_dir_name, out_dir):
             with jarap_.bookmark(bookmark_name, type_='h3'):
                 jarap_.text("That's chapter # %s" % (bidx + 1))
             with jarap_.tag('p'):
-                jarap_.text(LOREM_IPSUMS[bidx])
+                lorem_index = choice(range(len(LOREM_IPSUMS)))
+                jarap_.text(LOREM_IPSUMS[lorem_index])
 
     def create_sub(jarap_, new_file, text, title=''):
         files.append(new_file)
