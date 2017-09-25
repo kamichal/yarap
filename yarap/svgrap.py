@@ -66,14 +66,22 @@ class Svgrap(yattag.SimpleDoc):
             ff.write('<?xml version="1.0" encoding="UTF-8" ?>\n')
             ff.write(self._render_svg())
 
+    def render_impl(self, painter):
+        pass
+
     def _render_svg(self, parent_doc=None):
-        parent_doc = parent_doc or yattag.SimpleDoc()
-        if not isinstance(parent_doc, yattag.SimpleDoc):
+        target_doc = parent_doc or yattag.SimpleDoc()
+        if not isinstance(target_doc, yattag.SimpleDoc):
             raise ValueError('Expected yattag.SimpleDoc instance.')
 
-        with self._svg_structure(parent_doc, *self.args, **self.kwargs):
-            parent_doc.asis(self.getvalue())
-        return yattag.indent(parent_doc.getvalue())
+        with self._svg_structure(target_doc, *self.args, **self.kwargs):
+            target_doc.asis(self.getvalue())
+
+        if parent_doc:
+            " make it happen "
+            pass
+        else:
+            return yattag.indent(target_doc.getvalue())
 
     @contextmanager
     def _svg_structure(self, parent_doc, *args, **kwargs):
