@@ -40,7 +40,9 @@ Mundi principes eum ea, velit sapientem theophrastus vel at. Malis facer ad vel,
 id usu. Alterum liberavisse ea vis. Mea ignota possim ex, vim sale iusto in. Ferri justo consul
 eum ut, usu corpora ocurreret et, mea ut malis dolore viderer."""]
 
-StyledNavrapBodyCss = """
+
+class StyledNavrap(NavedYawrap):
+    css = """
 body {
     margin: 0;
     padding: 8px;
@@ -103,7 +105,8 @@ a.nav_bookmark_link {
 """
 
 
-W3StyledNavrapBodyCss = """
+class W3StyledNavrap(NavedYawrap):
+    css = """
 body {
     margin: 0;
 }
@@ -147,17 +150,9 @@ body {
 """
 
 
-class StyledNavrap(NavedYawrap):
-    css = StyledNavrapBodyCss
-
-
-class W3StyledNavrap(NavedYawrap):
-    css = W3StyledNavrapBodyCss
-
-
 NAV_TEST_PARAMS = [(NavedYawrap, 'minimal', 'subs_plain'),
-                 (StyledNavrap, 'styled', 'subs_StyledNavrap'),
-                 (W3StyledNavrap, 'W3 styled', 'subs_W3StyledNavrap')]
+                   (StyledNavrap, 'styled', 'subs_StyledNavrap'),
+                   (W3StyledNavrap, 'W3 styled', 'subs_W3StyledNavrap')]
 
 
 @pytest.mark.parametrize('nav_class, style_name, root_dir_name', NAV_TEST_PARAMS)
@@ -182,7 +177,7 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
             with j.tag('ul'):
                 for other_class, other_name, other_dir in NAV_TEST_PARAMS:
                     other_index = os.path.join(out_dir, other_dir, 'index.html')
-                    rel_link = os.path.relpath(other_index, out_dir)
+                    rel_link = os.path.relpath(other_index, test_out_dir)
                     with j.tag('li'):
                         with j.tag('p'):
                             j.text(other_name)

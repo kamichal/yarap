@@ -49,7 +49,7 @@ class Yawrap(yattag.Doc):
         """ Saves page in current state to target file. """
         dir_ = os.path.dirname(self._target_file)
         if not os.path.isdir(dir_):
-            assert not os.path.isfile(self._target_file)
+            assert not os.path.isfile(dir_)
             os.makedirs(dir_)
 
         with open(self._target_file, 'wt') as ff:
