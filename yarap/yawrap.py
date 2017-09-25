@@ -15,23 +15,48 @@ import yattag
 NavEntry = namedtuple('NavEntry', 'element, bookmarks, children')
 
 
-class Yawrap(object):
+def assert_keys_not_in(keys, args, kwargs):
+    keys = keys if isinstance(keys, (list, tuple)) else [keys]
+    for key in keys:
+        defined_keys = kwargs.keys() + map(lambda x: x[0], filter(lambda y: isinstance(y, tuple), args))
+        if key in defined_keys:
+            raise ValueError("Duplicated '{}' attribute.".format(key))
+
+
+class Yawrap(yattag.Doc):
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     _js = []
     css = ''
 
-    def __init__(self, target_file, title='', parent=None):
-        self.target_file = target_file
+    def __init__(self, target_file, title='', parent=None, defaults=None, errors=None,
+                 error_wrapper=('<span class="error">', '</span>'), stag_end=' />'):
+
+        super(Yawrap, self).__init__(defaults, errors, error_wrapper, stag_end)
+        self._target_file = target_file
         self.title = title
         self._parent = parent
-        self.doc, self.tag, self.text, self.line = yattag.SimpleDoc().ttl()
-
-    def _get_body_render(self):
-        return yattag.indent(self.doc.getvalue())
+        self._target_dir = os.path.dirname(target_file)
 
     @contextmanager
-    def _page_structure(self, page_doc):
+    def local_link(self, target, *args, **kwargs):
+        rel_location = os.path.relpath(target, self._target_dir)
+        assert_keys_not_in('href', args, kwargs)
+        with self.tag('a', href=rel_location, *args, **kwargs):
+            yield rel_location
+
+    def render(self):
+        """ Saves page in current state to target file. """
+        dir_ = os.path.dirname(self._target_file)
+        if not os.path.isdir(dir_):
+            assert not os.path.isfile(self._target_file)
+            os.makedirs(dir_)
+
+        with open(self._target_file, 'wt') as ff:
+            ff.write(self._render_page())
+
+    @contextmanager
+    def _html_page_structure(self, page_doc):
         page_doc.asis('<!doctype html>')
         with page_doc.tag('html', **self.html_d):
             with page_doc.tag('head'):
@@ -51,19 +76,12 @@ class Yawrap(object):
 
     def _render_page(self):
         page_doc = yattag.SimpleDoc()
-        with self._page_structure(page_doc):
+        with self._html_page_structure(page_doc):
             page_doc.asis(self._get_body_render())
         return yattag.indent(page_doc.getvalue())
 
-    def render(self):
-        """ Saves page in current state to target file. """
-        dir_ = os.path.dirname(self.target_file)
-        if not os.path.isdir(dir_):
-            assert not os.path.isfile(self.target_file)
-            os.makedirs(dir_)
-
-        with open(self.target_file, 'wt') as ff:
-            ff.write(self._render_page())
+    def _get_body_render(self):
+        return yattag.indent(self.getvalue())
 
 
 BASIC_NAV_CSS = """\
@@ -83,8 +101,9 @@ BASIC_NAV_CSS = """\
 class NavedYawrap(Yawrap):
     css = BASIC_NAV_CSS
 
-    def __init__(self, target_file, title='', parent=None, nav_title=''):
-        super(NavedYawrap, self).__init__(target_file, title, parent)
+    def __init__(self, target_file, title='', parent=None, nav_title='', defaults=None, errors=None,
+                 error_wrapper=('<span class="error">', '</span>'), stag_end=' />'):
+        super(NavedYawrap, self).__init__(target_file, title, parent, defaults, errors, error_wrapper, stag_end)
         self.nav_title = nav_title or title
         self._subs = []
         self._bookmarks = []
@@ -97,7 +116,9 @@ class NavedYawrap(Yawrap):
     @contextmanager
     def bookmark(self, id_, name_in_nav='', type_='div', *args, **kwargs):
         """ as regular doc.tag, but also manages navigation stuff """
-        assert 'id' not in kwargs, 'Duplicated id attribute.'
+        assert_keys_not_in('id', args, kwargs)
+        assert id_ and isinstance(id_, (str, unicode)), "Invalid id: '%s'" % id_
+        assert id_ not in map(lambda x: x[0], self._bookmarks), "Bookmark ids collision. '%s' is already defined" % id_
         name_in_nav = name_in_nav or id_
         id_ = id_.replace(' ', '_')
         self._bookmarks.append((id_, name_in_nav))
@@ -106,7 +127,7 @@ class NavedYawrap(Yawrap):
 
     def _render_page(self):
         page_doc = yattag.SimpleDoc()
-        with self._page_structure(page_doc):
+        with self._html_page_structure(page_doc):
             if self._subs or self._parent:
                 self._insert_nav(page_doc)
             with page_doc.tag('div', klass='main_content_body'):
@@ -134,9 +155,8 @@ class NavedYawrap(Yawrap):
         return NavEntry(current, current._bookmarks, its_children)
 
     def _render_nav_subs(self, structure_element, doc):
-        curr_dir = os.path.dirname(self.target_file)
         current = structure_element.element
-        link = os.path.relpath(current.target_file, curr_dir)
+        link = os.path.relpath(current._target_file, self._target_dir)
 
         with doc.tag('div', klass='nav_group_div'):
             if current == self:
@@ -144,7 +164,7 @@ class NavedYawrap(Yawrap):
 
             with doc.tag('div', klass='nav_page'):
                 with doc.tag('a', href=link, klass='nav_page_link'):
-                    if current.target_file == self.target_file:
+                    if current._target_file == self._target_file:
                         doc.attr(klass='active')
                     doc.text(current.nav_title or link)
 
