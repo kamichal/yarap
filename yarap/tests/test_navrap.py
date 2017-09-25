@@ -48,33 +48,34 @@ body {
 }
 .nav_main_panel {
     margin : 0;
-    padding: 16px 3px 3px 16px;
+    padding: 16px 2px 0px 0px;
     list-style-type: none;
-    width: 300px;
+    width: 320px;
     background-color: #fdfafa;
     position: fixed;
     height: 100%;
     overflow: auto;
 }
 .nav_group_div {
-    margin: 3px;
+    margin: 0px 0px 0px 10px;
     padding: 0px;
 }
 .nav_group_div.active {
     background: #fdf8fa;
-    border-radius: 8px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
 }
 .nav_page.with_bookmarks {
     border-radius: 6px;
-    background: #fff;
+    background: #eee;
 }
 
 .nav_page.with_bookmarks a.nav_bookmark_link:hover{
-    background: #eee;
+    background: #fafafa;
     color: #000;
 }
 a.nav_bookmark_link {
-    margin: 0px 0px 0px 16px;
+    margin: 0px 3px;
 }
 .nav_group_div a {
     padding: 8px 16px;
@@ -83,18 +84,19 @@ a.nav_bookmark_link {
     text-decoration: none;
 }
 .nav_group_div a.active {
-    border-radius: 6px;
-    background-color: #c4eec4;
+    border-radius: 4px;
+    background-color: #4CAF50;
     color: #000;
 }
 .nav_group_div a:hover:not(.active) {
-    border-radius: 6px;
+    border-radius: 4px;
     background-color: #777;
     color: white;
 }
 .main_content_body {
     margin: 20px 16px 20px 335px;
     border: 1px solid #ddd;
+    border-radius: 6px;
     padding:1px 16px;
 
 }
@@ -153,36 +155,49 @@ class W3StyledNavrap(NavedYawrap):
     css = W3StyledNavrapBodyCss
 
 
-NAV_TEST_PARAMS = [(NavedYawrap, 'subs_plain'),
-                   (StyledNavrap, 'subs_StyledNavrap'),
-                   (W3StyledNavrap, 'subs_W3StyledNavrap')
-                   ]
+NAV_TEST_PARAMS = [(NavedYawrap, 'minimal', 'subs_plain'),
+                 (StyledNavrap, 'styled', 'subs_StyledNavrap'),
+                 (W3StyledNavrap, 'W3 styled', 'subs_W3StyledNavrap')]
 
 
-@pytest.mark.parametrize('nav_class, root_dir_name', NAV_TEST_PARAMS)
-def test_navigation(nav_class, root_dir_name, out_dir):
+@pytest.mark.parametrize('nav_class, style_name, root_dir_name', NAV_TEST_PARAMS)
+def test_navigation(nav_class, style_name, root_dir_name, out_dir):
 
     test_out_dir = os.path.join(out_dir, root_dir_name)
 
     index_file = os.path.join(test_out_dir, 'index.html')
+
     files = [index_file]
 
-    def make_content(jarap_, text):
-        rel_loc = os.path.relpath(jarap_.target_file, out_dir)
-        with jarap_.tag('h2'):
-            jarap_.text(text)
-        with jarap_.tag('p'):
-            jarap_.text("And I'm enjoying the navigation.")
-        with jarap_.tag('p'):
-            jarap_.text("I'm located at {}.".format(rel_loc))
+    def make_content(j, text):
+        rel_loc = os.path.relpath(j._target_file, out_dir)
+        with j.tag('h2'):
+            j.text(text)
+        with j.tag('p'):
+            j.text("And I'm enjoying the navigation with {} css.".format(style_name))
+        with j.tag('p'):
+            j.text("I'm located at {}.".format(rel_loc))
+        with j.tag('p'):
+            j.text("Would you check also other styles? Check:")
+            with j.tag('ul'):
+                for other_class, other_name, other_dir in NAV_TEST_PARAMS:
+                    other_index = os.path.join(out_dir, other_dir, 'index.html')
+                    rel_link = os.path.relpath(other_index, out_dir)
+                    with j.tag('li'):
+                        with j.tag('p'):
+                            j.text(other_name)
+                            j.stag('br')
+                            j.text(other_class.__name__ + ' ')
+                            with j.local_link(other_index):
+                                j.text(rel_link)
 
         for bidx in xrange(len(LOREM_IPSUMS)):
             bookmark_name = 'chapter %s' % (bidx + 1)
-            with jarap_.bookmark(bookmark_name, type_='h3'):
-                jarap_.text("That's chapter # %s" % (bidx + 1))
-            with jarap_.tag('p'):
+            with j.bookmark(bookmark_name, type_='h3'):
+                j.text("That's chapter # %s" % (bidx + 1))
+            with j.tag('p'):
                 lorem_index = choice(range(len(LOREM_IPSUMS)))
-                jarap_.text(LOREM_IPSUMS[lorem_index])
+                j.text(LOREM_IPSUMS[lorem_index])
 
     def create_sub(jarap_, new_file, text, title=''):
         files.append(new_file)
