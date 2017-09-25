@@ -142,15 +142,15 @@ class SvgClassBase(object):
 
     def save_to_file(self, target_file, *args, **kwargs):
         empty_doc = yattag.SimpleDoc()
-        empty_doc.asis(self.__class__.svg_standalone_xml_header)
         svg_code = self._create_svg_code(empty_doc, *args, **kwargs)
         with open(make_place(target_file), 'wt') as ff:
+            ff.write(self.__class__.svg_standalone_xml_header)
             ff.write(svg_code)
 
-    def _create_svg_code(self, target_doc, *args, **kwargs):
-        with svg_structure(target_doc, svg_tag_attributes=self.__class__.svg_d):
-            self.render_impl(target_doc)
-        return yattag.indent(target_doc.getvalue())
+    def _create_svg_code(self, *args, **kwargs):
+        with svg_structure(self._parent_doc, svg_tag_attributes=self.__class__.svg_d):
+            self.render_impl(self._parent_doc)
+        return yattag.indent(self._parent_doc.getvalue())
 
     def render_impl(self, painter, *args, **kwargs):
         " embed implement it in a derived class "
@@ -158,5 +158,6 @@ class SvgClassBase(object):
 
     @classmethod
     def embed_svg(cls, target_doc):
+        """ not tested yet """
         assert_it_is_yattag(target_doc)
         cls._create_svg_code(target_doc)

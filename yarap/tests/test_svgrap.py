@@ -93,7 +93,7 @@ def test_classlike_svg_empty_svg(out_dir):
 
     svg = EmptySvg(empty_page)
 
-    svg_code = svg._create_svg_code(empty_page)
+    svg_code = svg._create_svg_code()
     assert svg_code == '<svg version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>'
 
     file_ = os.path.join(out_dir, 'svg_1.svg')
@@ -106,6 +106,7 @@ def test_classlike_svg_empty_svg(out_dir):
     print content
     assert content == """\
 <?xml version="1.0" encoding="UTF-8" ?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg"></svg>"""
 
 
@@ -118,7 +119,7 @@ def test_classlike_svg_simple_svg_1(out_dir):
 
     svg = MySvg(empty_page)
 
-    svg_code = svg._create_svg_code(empty_page)
+    svg_code = svg._create_svg_code()
     assert svg_code == """\
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg">
   <rect y="25" x="25" stroke="pink" height="200" width="200" />
@@ -134,6 +135,9 @@ def test_classlike_svg_simple_svg_1(out_dir):
     print content
     assert content == """\
 <?xml version="1.0" encoding="UTF-8" ?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <rect y="25" x="25" stroke="pink" height="200" width="200" />
+</svg>
 <svg version="1.1" xmlns="http://www.w3.org/2000/svg">
   <rect y="25" x="25" stroke="pink" height="200" width="200" />
 </svg>"""
