@@ -6,64 +6,41 @@ Created on 24 Sep 2017
 '''
 from bs4 import BeautifulSoup
 import os
+import pytest
 
 from yarap.yawrap import Yawrap
 
 
-def test_1(out_dir):
-    jarap = Yawrap('')
-    assert jarap._get_body_render() == ''
+def test_linking_a_local_file(out_dir):
+    dummy_file = os.path.join(out_dir, 'some.html')
+    dummy_target = os.path.join(out_dir, 'anything', 'index.html')
+
+    jarap = Yawrap(dummy_target)
+    with jarap.local_link(dummy_file):
+        jarap.text('the target')
     render = jarap._render_page()
-    assert render == """\
-<!doctype html>
-<html lang="en-US">
-  <head>
-    <meta charset="UTF-8" />
-  </head>
-  <body></body>
-</html>"""
+    soup = BeautifulSoup(render, "lxml")
+    link = soup.html.body.a
+    assert link
+    assert link['href'] == '../some.html'
+    assert link.text == 'the target'
 
 
-YawrapWithCssStyle = '.some {margin: 2px;}'
+def test_basic(out_dir):
+    the_file = os.path.join(out_dir, 'test_basic.html')
 
-
-class YawrapWithCss(Yawrap):
-    css = YawrapWithCssStyle
-
-
-def test_css(out_dir):
-    jarap = YawrapWithCss('')
-
-    assert jarap._get_body_render() == ''
-    render = jarap._render_page()
-    soup = BeautifulSoup(render)
-    style = soup.html.head.style
-    assert len(style) == 1
-    assert style.text == YawrapWithCssStyle
-
-
-def test_2(out_dir):
-    the_file = os.path.join(out_dir, 'test_2.html')
-
-    jawrap = Yawrap(the_file, 'ol rajt!')
-
+    jawrap = Yawrap(the_file, 'pleasure')
     with jawrap.tag('div'):
         with jawrap.tag('p'):
             jawrap.text('Nothing much here.')
 
-    assert jawrap._get_body_render() == """\
-<div>
-  <p>Nothing much here.</p>
-</div>"""
-
     render = jawrap._render_page()
-    jawrap.render()
     assert render == """\
 <!doctype html>
 <html lang="en-US">
   <head>
     <meta charset="UTF-8" />
-    <title>ol rajt!</title>
+    <title>pleasure</title>
   </head>
   <body>
     <div>
@@ -71,5 +48,3 @@ def test_2(out_dir):
     </div>
   </body>
 </html>"""
-    assert os.path.isfile(the_file)
-

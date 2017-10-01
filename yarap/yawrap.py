@@ -11,8 +11,33 @@ import os
 import weakref
 import yattag
 
-
+from utils import fix_yattag, dictionize_css, form_css
 NavEntry = namedtuple('NavEntry', 'element, bookmarks, children')
+
+DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
+
+fix_yattag(yattag)
+
+
+@contextmanager
+def svg_structure(painter,
+                  svg_tag_attributes=DEFAULT_SVG_TAG_ATTRIBUTES,
+                  svg_styles_as_str="",
+                  *args,
+                  **kwargs):
+
+    kwargs.update(svg_tag_attributes)
+    svg_defs = None
+    with painter.tag('svg', *args, **kwargs):
+        if svg_styles_as_str:
+            with painter.tag('style', type="text/css"):
+                painter.cdata(svg_styles_as_str)
+        if svg_defs:
+            with painter.tag('defs', type="text/css"):
+                for id_, svg_def in svg_defs.iteritems():
+                    with painter.tag('g', id=id_):
+                        painter.asis(svg_def)
+        yield
 
 
 def assert_keys_not_in(keys, args, kwargs):
@@ -23,11 +48,20 @@ def assert_keys_not_in(keys, args, kwargs):
             raise ValueError("Duplicated '{}' attribute.".format(key))
 
 
+def make_place(target_file):
+    dir_ = os.path.dirname(target_file)
+    if not os.path.isdir(dir_):
+        assert not os.path.isfile(dir_)
+        os.makedirs(dir_)
+    return target_file
+
+
 class Yawrap(yattag.Doc):
+    css = ''
+    js = []
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
-    _js = []
-    css = ''
+    svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
 
     def __init__(self, target_file, title='', parent=None, defaults=None, errors=None,
                  error_wrapper=('<span class="error">', '</span>'), stag_end=' />'):
@@ -37,6 +71,9 @@ class Yawrap(yattag.Doc):
         self.title = title
         self._parent = parent
         self._target_dir = os.path.dirname(target_file)
+        self._additional_js = []
+        self._additional_css = {}
+        self.external_csss = set()
 
     @contextmanager
     def local_link(self, target, *args, **kwargs):
@@ -47,16 +84,34 @@ class Yawrap(yattag.Doc):
 
     def render(self):
         """ Saves page in current state to target file. """
-        dir_ = os.path.dirname(self._target_file)
-        if not os.path.isdir(dir_):
-            assert not os.path.isfile(dir_)
-            os.makedirs(dir_)
-
-        with open(self._target_file, 'wt') as ff:
+        with open(make_place(self._target_file), 'wt') as ff:
             ff.write(self._render_page())
 
     @contextmanager
+    def svg(self, svg_styles_as_str='', *args, **svg_tag_attributes):
+        svg_tag_attributes.update(self.svg_d)
+        with svg_structure(self, svg_tag_attributes, svg_styles_as_str, *args, **svg_tag_attributes):
+            yield
+
+    def add_css(self, css_rules):
+        if not isinstance(css_rules, dict):
+            assert isinstance(css_rules, str)
+            css_rules = dictionize_css(css_rules)
+        self._additional_css.update(css_rules)
+
+    def link_local_css_file(self, target_css_file_path):
+        rel_location = os.path.relpath(os.path.abspath(target_css_file_path), self._target_dir)
+        self.external_csss.add(rel_location)
+
+    def link_external_css_file(self, target_css_url):
+        self.external_csss.add(target_css_url)
+
+    @contextmanager
     def _html_page_structure(self, page_doc):
+        page_css = dictionize_css(self.css).copy()
+        page_css.update(self._additional_css)
+        page_js = self._additional_js + self.js
+
         page_doc.asis('<!doctype html>')
         with page_doc.tag('html', **self.html_d):
             with page_doc.tag('head'):
@@ -65,12 +120,14 @@ class Yawrap(yattag.Doc):
                 if self.title:
                     with page_doc.tag('title'):
                         page_doc.text(self.title)
-                for js in self._js:
+                for js in page_js:
                     with page_doc.tag('script'):
                         page_doc.text(js)
-                if self.css:
+                if page_css:
                     with page_doc.tag('style'):
-                        page_doc.text(self.css)
+                        page_doc.text(form_css(page_css, indent_level=3))
+                for ext_css in self.external_csss:
+                    page_doc.stag("link", rel="stylesheet", type="text/css", href=ext_css)
             with page_doc.tag('body'):
                 yield
 

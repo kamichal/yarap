@@ -4,3 +4,5 @@
 *.pyc
 */tests/out/*
 .cache
+htmlcov/*
+.coverage

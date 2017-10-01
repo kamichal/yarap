@@ -150,17 +150,86 @@ body {
 """
 
 
-NAV_TEST_PARAMS = [(NavedYawrap, 'minimal', 'subs_plain'),
-                   (StyledNavrap, 'styled', 'subs_StyledNavrap'),
-                   (W3StyledNavrap, 'W3 styled', 'subs_W3StyledNavrap')]
+plain_info = 'Minimal version. Almost no CSS has been used'
+styled_info = 'Manually styled navigation, without referencing external CSS.'
+w3_info = 'W3 styled page.'
+
+NAV_TEST_PARAMS = [(NavedYawrap, plain_info, 'subs_plain'),
+                   (StyledNavrap, styled_info, 'subs_StyledNavrap'),
+                   (W3StyledNavrap, w3_info, 'subs_W3StyledNavrap')]
+
+
+def painter_def_test1(painter_doc, points="50,150 50,200 200,200 200,100"):
+    painter_doc.stag('rect', x="25", y="25", width="200", height="200", klass='the_rect')
+    painter_doc.stag('circle', cx="125", cy="125", r="75", fill="orange")
+    painter_doc.stag('polyline', points=points, stroke="red", fill="none", stroke_width=4)
+    painter_doc.stag('line', x1="50", y1="50", x2="200", y2="200", stroke="blue", stroke_width="4")
+
+
+def styles_listing_w3_plugin(host_doc, out_dir, current_test_out_dir):
+    host_doc.link_external_css_file("https://www.w3schools.com/w3css/4/w3.css")
+
+    style = """\
+    a.div_link {
+        text-decoration: none;
+    }
+    """
+    host_doc.add_css(style)
+    with host_doc.tag('div', klass='w3-container'):
+        with host_doc.tag('div', klass='w3-container w3-blue'):
+            with host_doc.tag('h3'):
+                host_doc.text("Other versions")
+
+        with host_doc.tag('div', klass='w3-container w3-leftbar'):
+            with host_doc.tag('p'):
+                host_doc.text(
+                    "This div is placed here using kind of plugin. "
+                    "In short you define one function, that can be called on any Yawrap. "
+                    "It fills the content and adds a CSS style definition to that site. "
+                    "This one uses external styles from W3 Schools. "
+                    "Unfortunatelly this makes the whole page looking different than the ones that does't have it. "
+                    "It is supposed to look almost the same way in each pages of different styles.")
+
+            with host_doc.tag('h4'):
+                host_doc.text("Would you check also other styles? Check:")
+
+            for other_class, other_name, other_dir in NAV_TEST_PARAMS:
+                other_index = os.path.join(out_dir, other_dir, 'index.html')
+                rel_link = os.path.relpath(other_index, current_test_out_dir)
+
+                with host_doc.local_link(other_index, klass='div_link'):
+                    with host_doc.tag('div', klass="w3-panel w3-card"):
+                        with host_doc.tag('p'):
+                            host_doc.text(other_name)
+                            host_doc.stag('br')
+                            host_doc.text(other_class.__name__ + ' ')
+                            host_doc.text(rel_link)
+
+
+def other_styles_listing_plugin(host_doc, out_dir, current_test_out_dir):
+    style = """\
+    """
+    with host_doc.tag('p'):
+        host_doc.text("Would you check also other styles? Check:")
+        with host_doc.tag('ul', klass='other_styles'):
+            for other_class, other_name, other_dir in NAV_TEST_PARAMS:
+                other_index = os.path.join(out_dir, other_dir, 'index.html')
+                rel_link = os.path.relpath(other_index, current_test_out_dir)
+                with host_doc.tag('li'):
+                    with host_doc.tag('p'):
+                        host_doc.text(other_name)
+                        host_doc.stag('br')
+                        host_doc.text(other_class.__name__ + ' ')
+                        with host_doc.local_link(other_index):
+                            host_doc.text(rel_link)
 
 
 @pytest.mark.parametrize('nav_class, style_name, root_dir_name', NAV_TEST_PARAMS)
 def test_navigation(nav_class, style_name, root_dir_name, out_dir):
 
     test_out_dir = os.path.join(out_dir, root_dir_name)
-
     index_file = os.path.join(test_out_dir, 'index.html')
+    subs_dir = 'test_subs_subdir'
 
     files = [index_file]
 
@@ -172,19 +241,11 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
             j.text("And I'm enjoying the navigation with {} css.".format(style_name))
         with j.tag('p'):
             j.text("I'm located at {}.".format(rel_loc))
-        with j.tag('p'):
-            j.text("Would you check also other styles? Check:")
-            with j.tag('ul'):
-                for other_class, other_name, other_dir in NAV_TEST_PARAMS:
-                    other_index = os.path.join(out_dir, other_dir, 'index.html')
-                    rel_link = os.path.relpath(other_index, test_out_dir)
-                    with j.tag('li'):
-                        with j.tag('p'):
-                            j.text(other_name)
-                            j.stag('br')
-                            j.text(other_class.__name__ + ' ')
-                            with j.local_link(other_index):
-                                j.text(rel_link)
+
+        with j.bookmark('some svg', type_='h3'):
+            j.text('Here comes some SVG')
+        with j.svg(width=250, height=250, svg_styles_as_str=""".the_rect {fill: lime; stroke-width: 4; stroke: pink;}"""):
+            painter_def_test1(j)
 
         for bidx in xrange(len(LOREM_IPSUMS)):
             bookmark_name = 'chapter %s' % (bidx + 1)
@@ -201,11 +262,16 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
         return new_jarap
 
     parent = nav_class(index_file, 'Index')
-    make_content(parent, "I'm a parent")
+    with parent.tag('h3'):
+        parent.text("Index")
+    with parent.tag('p'):
+        parent.text("Hi, I'm a parent document in this structure. You can check how the navigation works.")
+
+    styles_listing_w3_plugin(parent, out_dir, test_out_dir)
     with parent.tag('p'):
         parent.text("that's nice")
 
-    child_file0 = os.path.join(test_out_dir, 'test_subs_child0.html')
+    child_file0 = os.path.join(test_out_dir, 'child0.html')
     child0 = create_sub(parent, child_file0, "I'm a child 0. I have a nav-title",
                         'titled child 0')
 
@@ -214,17 +280,17 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
     with child0.tag('p'):
         child0.text('A paragraph marked with a header with bookmark.')
 
-    child_file1 = os.path.join(test_out_dir, 'test_subs_child1.html')
+    child_file1 = os.path.join(test_out_dir, 'child1.html')
     child1 = create_sub(parent, child_file1, "I'm a child 1")
 
-    child_file2 = os.path.join(test_out_dir, 'test_subs_subdir', 'test_subs_child2.html')
+    child_file2 = os.path.join(test_out_dir, subs_dir, 'child2.html')
     child2 = create_sub(child1, child_file2, "I'm a child 2. No title")
     for i in xrange(3):
-        f = os.path.join(test_out_dir, 'test_subs_subdir', 'another_sub', '%s.html' % i)
-        create_sub(child2, f, "I'm a child %s of child 2" % i)
+        f = os.path.join(test_out_dir, subs_dir, 'another_sub', '%s.html' % i)
+        create_sub(child2, f, "I'm a child %s of child 2" % i, "CH%03d" % i)
 
-    child_file3 = os.path.join(test_out_dir, 'test_subs_subdir', 'test_subs_child3.html')
-    child3 = create_sub(parent, child_file3, "I'm a child 3. I don't have a title.")
+    child_file3 = os.path.join(test_out_dir, subs_dir, 'child3.html')
+    child3 = create_sub(parent, child_file3, "I'm a child 3.", "another one")
 
     parent.render_all_files()
     assert all(os.path.isfile(f) for f in files)
@@ -239,11 +305,11 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
         with open(file_, 'rt') as ff:
             content = ff.read()
 
-        soup = BeautifulSoup(content)
+        soup = BeautifulSoup(content, "lxml")
         assert soup.html
         assert soup.html.head
         assert soup.html.body
-        if nav_class.css:
+        if parent.css:
             assert len(soup.html.head.style) == 1
 
         nav_def = soup.html.body.find_all('nav', class_="nav_main_panel")
