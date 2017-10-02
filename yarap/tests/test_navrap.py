@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import os
 import pytest
 
-from yarap.yawrap import NavedYawrap
+from yarap.navrap import NavedYawrap
 from random import choice
 from contextlib import contextmanager
 from yarap.utils import dictionize_css

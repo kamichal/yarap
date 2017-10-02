@@ -2,7 +2,8 @@ from bs4 import BeautifulSoup
 import os
 import pytest
 
-from yarap.yawrap import Yawrap, NavedYawrap
+from yarap.yawrap import Yawrap
+from yarap.navrap import NavedYawrap
 
 
 CssStyle1 = '.some {margin: 2px;}'

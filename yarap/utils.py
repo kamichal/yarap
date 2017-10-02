@@ -6,6 +6,7 @@ Created on 30 wrz 2017
 @author: kamichal
 '''
 import re
+import os
 
 
 KNOWN_SUBSTITUTES = {
@@ -41,6 +42,23 @@ def fix_yattag(yattag_module):
         return result
 
     yattag_module.simpledoc._attributes = _attributes2
+
+
+
+def make_place(target_file):
+    dir_ = os.path.dirname(target_file)
+    if not os.path.isdir(dir_):
+        assert not os.path.isfile(dir_)
+        os.makedirs(dir_)
+    return target_file
+
+
+def assert_keys_not_in(keys, args, kwargs):
+    keys = keys if isinstance(keys, (list, tuple)) else [keys]
+    for key in keys:
+        defined_keys = kwargs.keys() + map(lambda x: x[0], filter(lambda y: isinstance(y, tuple), args))
+        if key in defined_keys:
+            raise ValueError("Duplicated '{}' attribute.".format(key))
 
 
 def dictionize_css(input_css):
