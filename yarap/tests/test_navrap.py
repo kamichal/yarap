@@ -10,6 +10,8 @@ import pytest
 
 from yarap.yawrap import NavedYawrap
 from random import choice
+from contextlib import contextmanager
+from yarap.utils import dictionize_css
 
 
 def flatten(nav_entry):
@@ -66,6 +68,8 @@ body {
     background: #fdf8fa;
     border: 1px solid #ddd;
     border-radius: 6px;
+    -moz-box-shadow: 0 0 4px 1px #BBB;
+    -webkit-box-shadow: 0 0 4px 1px #BBB;
 }
 .nav_page.with_bookmarks {
     border-radius: 6px;
@@ -89,6 +93,8 @@ a.nav_bookmark_link {
     border-radius: 4px;
     background-color: #4CAF50;
     color: #000;
+    -moz-box-shadow: 0 0 13px 0px #282 inset;
+    -webkit-box-shadow: 0 0 13px 0px #282 inset;
 }
 .nav_group_div a:hover:not(.active) {
     border-radius: 4px;
@@ -97,10 +103,7 @@ a.nav_bookmark_link {
 }
 .main_content_body {
     margin: 20px 16px 20px 335px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
     padding:1px 16px;
-
 }
 """
 
@@ -109,6 +112,7 @@ class W3StyledNavrap(NavedYawrap):
     css = """
 body {
     margin: 0;
+    font-family: Verdana, sans-serif;
 }
 .nav_main_panel {
     list-style-type: none;
@@ -150,7 +154,7 @@ body {
 """
 
 
-plain_info = 'Minimal version. Almost no CSS has been used'
+plain_info = "Minimal version. No CSS has been used (besides what's comming from plugin)."
 styled_info = 'Manually styled navigation, without referencing external CSS.'
 w3_info = 'W3 styled page.'
 
@@ -159,69 +163,141 @@ NAV_TEST_PARAMS = [(NavedYawrap, plain_info, 'subs_plain'),
                    (W3StyledNavrap, w3_info, 'subs_W3StyledNavrap')]
 
 
-def painter_def_test1(painter_doc, points="50,150 50,200 200,200 200,100"):
+def draw_sample_svg(painter_doc, points="50,150 50,200 200,200 200,100"):
     painter_doc.stag('rect', x="25", y="25", width="200", height="200", klass='the_rect')
     painter_doc.stag('circle', cx="125", cy="125", r="75", fill="orange")
     painter_doc.stag('polyline', points=points, stroke="red", fill="none", stroke_width=4)
     painter_doc.stag('line', x1="50", y1="50", x2="200", y2="200", stroke="blue", stroke_width="4")
 
 
-def styles_listing_w3_plugin(host_doc, out_dir, current_test_out_dir):
-    host_doc.link_external_css_file("https://www.w3schools.com/w3css/4/w3.css")
+@contextmanager
+def add_tooltip(target_doc, popup_width=280, type_='span', *args, **kwargs):
+    import yattag
 
-    style = """\
-    a.div_link {
-        text-decoration: none;
-    }
-    """
-    host_doc.add_css(style)
-    with host_doc.tag('div', klass='w3-container'):
-        with host_doc.tag('div', klass='w3-container w3-blue'):
-            with host_doc.tag('h3'):
-                host_doc.text("Other versions")
+    target_doc.add_css({
+        ".tooltip": {
+            "position": "relative",
+            "display": "inline-block",
+        },
+        ".tooltip .tooltip_popup": {
+            'padding': '16px',
+            'background-color': "#121",
+            'border-radius': '6px',
+            'color': '#fff',
+            "top": "100%",
+            "left": "50%",
+            "width": "{}px".format(popup_width),
+            "margin-left": "-{}px".format(popup_width / 2),
+            'visibility': 'hidden',
+            'position': 'absolute',
+            'z-index': '1'
+        },
+        ".tooltip:hover .tooltip_popup": {
+            'visibility': 'visible'
+        },
+        ".tooltip .tooltip_popup::after": {
+            "content": "' '",
+            "position": "absolute",
+            "bottom": "100%",
+            "left": "50%",
+            "margin-left": "-5px",
+            "border-width": "5px",
+            "border-style": "solid",
+            "border-color": "transparent transparent black transparent"
+        }
+    })
 
-        with host_doc.tag('div', klass='w3-container w3-leftbar'):
-            with host_doc.tag('p'):
-                host_doc.text(
-                    "This div is placed here using kind of plugin. "
-                    "In short you define one function, that can be called on any Yawrap. "
-                    "It fills the content and adds a CSS style definition to that site. "
-                    "This one uses external styles from W3 Schools. "
-                    "Unfortunatelly this makes the whole page looking different than the ones that does't have it. "
-                    "It is supposed to look almost the same way in each pages of different styles.")
+    popup_doc = yattag.SimpleDoc()
 
-            with host_doc.tag('h4'):
-                host_doc.text("Would you check also other styles? Check:")
-
-            for other_class, other_name, other_dir in NAV_TEST_PARAMS:
-                other_index = os.path.join(out_dir, other_dir, 'index.html')
-                rel_link = os.path.relpath(other_index, current_test_out_dir)
-
-                with host_doc.local_link(other_index, klass='div_link'):
-                    with host_doc.tag('div', klass="w3-panel w3-card"):
-                        with host_doc.tag('p'):
-                            host_doc.text(other_name)
-                            host_doc.stag('br')
-                            host_doc.text(other_class.__name__ + ' ')
-                            host_doc.text(rel_link)
+    with target_doc.tag(type_, klass="tooltip", *args, **kwargs):
+        yield popup_doc
+        with target_doc.tag('span', klass=".{}_popup".format("tooltip")[1:]):
+            target_doc.asis(popup_doc.getvalue())
 
 
 def other_styles_listing_plugin(host_doc, out_dir, current_test_out_dir):
     style = """\
+    .main_container {
+        background: #FFD;
+        margin: 12px 26px;
+        padding: 0px;
+        -moz-box-shadow: 2px 2px 5px 2px #AAA;
+        -webkit-box-shadow: 2px 2px 5px 2px #AAA;
+        font-family: Verdana, sans-serif;
+    }
+    .main_container h4 {
+        margin: 9px;
+    }
+    .container {
+        padding: 2px 18px;
+    }
+    a.div_link {
+        text-decoration: none;
+    }
+    .blue {
+        background: #6699ff;
+    }
+    .leftbar {
+        border-left: solid 7px #6699ff;
+    }
+    .info_card {
+        color: #000;
+        margin: 3px 10px;
+        display: inline-block;
+        padding: 4px 26px;
+        -moz-box-shadow: 0 0 7px 0 #999 inset;
+        -webkit-box-shadow: 0 0 7px 0 #999 inset;
+    }
+    .info_card:hover {
+        background: #9CF
+    }
     """
-    with host_doc.tag('p'):
-        host_doc.text("Would you check also other styles? Check:")
-        with host_doc.tag('ul', klass='other_styles'):
-            for other_class, other_name, other_dir in NAV_TEST_PARAMS:
+
+    plugin_info = """\
+This div is placed here using kind of plugin. It's a stand-alone python function,
+that can be called with Yawrap handle and any other arguments you desire. Of course you write it yourself.""", """\
+It can add content, add CSS rules or insert a JS to that site. There is no need to define them
+in a page (i.e. Yawrap class) that uses it. However of course those will appear in the final page - merged
+with its native rules.""", """\
+It is supposed to look almost the same way in each pages of different styles unless plugin's CSS selectors
+collide with host page selectors.""", """\
+Advantage of using such stuff is ability to joining CSS and HTML of a plugin in one place of source.
+It's easy to maintain. It's reusable by separation from page class definition. It can be used totally dynamic.
+"""
+
+    host_doc.add_css(style)
+    with host_doc.tag('div', klass='main_container'):
+        with host_doc.tag('div', klass='container blue'):
+            with host_doc.tag('h4'):
+                host_doc.text("Other versions")
+
+        with host_doc.tag('div', klass='container leftbar'):
+            for info in plugin_info:
+                with host_doc.tag('p'):
+                    host_doc.text(info)
+
+            with host_doc.tag('h4'):
+                host_doc.text("Check also other styles:")
+            for other_class, info, other_dir in NAV_TEST_PARAMS:
                 other_index = os.path.join(out_dir, other_dir, 'index.html')
                 rel_link = os.path.relpath(other_index, current_test_out_dir)
-                with host_doc.tag('li'):
-                    with host_doc.tag('p'):
-                        host_doc.text(other_name)
-                        host_doc.stag('br')
-                        host_doc.text(other_class.__name__ + ' ')
-                        with host_doc.local_link(other_index):
-                            host_doc.text(rel_link)
+
+                with host_doc.local_link(other_index, klass='div_link'):
+                    with add_tooltip(host_doc, 340) as popup:
+                        popup.text(rel_link)
+                        with popup.tag('p'):
+                            popup.text(info)
+                        with host_doc.tag('div', klass="info_card"):
+                            host_doc.text(other_class.__name__ + ' ')
+
+
+def insert_lorem_ipsums(target_doc):
+    for bidx in xrange(len(LOREM_IPSUMS)):
+        bookmark_name = 'chapter %s' % (bidx + 1)
+        with target_doc.bookmark(bookmark_name, type_='h3'):
+            target_doc.text("That's chapter # %s" % (bidx + 1))
+        with target_doc.tag('p'):
+            target_doc.text(choice(LOREM_IPSUMS))
 
 
 @pytest.mark.parametrize('nav_class, style_name, root_dir_name', NAV_TEST_PARAMS)
@@ -238,22 +314,14 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
         with j.tag('h2'):
             j.text(text)
         with j.tag('p'):
-            j.text("And I'm enjoying the navigation with {} css.".format(style_name))
+            j.text("And I'm enjoying the navigation with {}".format(style_name))
         with j.tag('p'):
             j.text("I'm located at {}.".format(rel_loc))
 
-        with j.bookmark('some svg', type_='h3'):
-            j.text('Here comes some SVG')
-        with j.svg(width=250, height=250, svg_styles_as_str=""".the_rect {fill: lime; stroke-width: 4; stroke: pink;}"""):
-            painter_def_test1(j)
-
-        for bidx in xrange(len(LOREM_IPSUMS)):
-            bookmark_name = 'chapter %s' % (bidx + 1)
-            with j.bookmark(bookmark_name, type_='h3'):
-                j.text("That's chapter # %s" % (bidx + 1))
-            with j.tag('p'):
-                lorem_index = choice(range(len(LOREM_IPSUMS)))
-                j.text(LOREM_IPSUMS[lorem_index])
+        with add_tooltip(j, 100) as popup:
+            j.text("Hoverable")
+            with popup.tag('div'):
+                popup.text("I'm a popup")
 
     def create_sub(jarap_, new_file, text, title=''):
         files.append(new_file)
@@ -267,12 +335,12 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
     with parent.tag('p'):
         parent.text("Hi, I'm a parent document in this structure. You can check how the navigation works.")
 
-    styles_listing_w3_plugin(parent, out_dir, test_out_dir)
+    other_styles_listing_plugin(parent, out_dir, test_out_dir)
     with parent.tag('p'):
         parent.text("that's nice")
 
     child_file0 = os.path.join(test_out_dir, 'child0.html')
-    child0 = create_sub(parent, child_file0, "I'm a child 0. I have a nav-title",
+    child0 = create_sub(parent, child_file0, "I'm a child 0. I have a nav-title, no children-pages",
                         'titled child 0')
 
     with child0.bookmark('the bookmark', type_='h3'):
@@ -280,8 +348,14 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
     with child0.tag('p'):
         child0.text('A paragraph marked with a header with bookmark.')
 
+    with child0.bookmark('some svg', type_='h3'):
+        child0.text('Here comes some SVG')
+    with child0.svg(width=250, height=250, svg_styles_as_str=""".the_rect {fill: lime; stroke-width: 4; stroke: pink;}"""):
+        draw_sample_svg(child0)
+
     child_file1 = os.path.join(test_out_dir, 'child1.html')
-    child1 = create_sub(parent, child_file1, "I'm a child 1")
+    child1 = create_sub(parent, child_file1, "I'm a child 1, I have several bookmarks and some children.")
+    insert_lorem_ipsums(child1)
 
     child_file2 = os.path.join(test_out_dir, subs_dir, 'child2.html')
     child2 = create_sub(child1, child_file2, "I'm a child 2. No title")

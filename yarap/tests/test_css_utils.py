@@ -36,9 +36,9 @@ RAW_CSSs = """\
         margin-left: 25%;
         padding: 1px 16px;
       }""", """\
-.a_div a {  display:  block; color: #000; padding: 8px 16px;text-decoration: none;}
+.a_div a /* !@# comment */{  display:  block; color: #000; padding: 8px 16px;text-decoration: none;}
 .a_div a.active {background-color: #4CAF50;color:white;}
-.a_div.active{background-color: #fdf8fa;color: white;}.a_div_b.with_bookmarks{background: #DDD;}
+.a_div.active{background-color: #fdf8fa;/* !@# comment */color: white;}.a_div_b.with_bookmarks{background: #DDD;}
 .a_div a:hover:not(.active){background-color:#555;color: white;}
 .main_content_body{margin-left:25%;padding:1px 16px;height:1000px;}
 """

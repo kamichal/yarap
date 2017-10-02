@@ -5,6 +5,7 @@ Created on 30 wrz 2017
 
 @author: kamichal
 '''
+import re
 
 
 KNOWN_SUBSTITUTES = {
@@ -46,6 +47,9 @@ def dictionize_css(input_css):
     if isinstance(input_css, dict):
         return input_css
     assert isinstance(input_css, str)
+
+    comment_prog = re.compile(r"(\/\*.*\*\/)")
+    input_css = comment_prog.sub("", input_css)
 
     def iterate_rules(in_css):
         while in_css:
