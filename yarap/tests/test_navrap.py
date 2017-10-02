@@ -5,13 +5,12 @@ Created on 24 Sep 2017
 @author: kamichal
 '''
 from bs4 import BeautifulSoup
+from contextlib import contextmanager
 import os
 import pytest
+from random import choice
 
 from yarap.navrap import NavedYawrap
-from random import choice
-from contextlib import contextmanager
-from yarap.utils import dictionize_css
 
 
 def flatten(nav_entry):

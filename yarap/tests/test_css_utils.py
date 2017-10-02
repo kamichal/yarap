@@ -9,6 +9,7 @@ import pytest
 
 from yarap.utils import dictionize_css, form_css
 
+
 RAW_CSSs = """\
       .a_div a {
         color: #000;

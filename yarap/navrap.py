@@ -1,11 +1,12 @@
 from collections import namedtuple
 from contextlib import contextmanager
+import os
 import weakref
 import yattag
 
 from yarap.utils import assert_keys_not_in, fix_yattag
 from yarap.yawrap import Yawrap
-import os
+
 
 fix_yattag(yattag)
 

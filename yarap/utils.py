@@ -5,8 +5,8 @@ Created on 30 wrz 2017
 
 @author: kamichal
 '''
-import re
 import os
+import re
 
 
 KNOWN_SUBSTITUTES = {
