@@ -8,9 +8,9 @@ from bs4 import BeautifulSoup
 from contextlib import contextmanager
 import os
 import pytest
-from random import choice
 
-from yarap.navrap import NavedYawrap
+from yawrap import NavedYawrap
+
 
 def flatten(nav_entry):
     yield nav_entry.element

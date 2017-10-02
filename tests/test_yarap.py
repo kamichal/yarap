@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 import os
 import pytest
 
-from yarap.yawrap import Yawrap
+from yawrap import Yawrap
 
 
 def test_linking_a_local_file(out_dir):

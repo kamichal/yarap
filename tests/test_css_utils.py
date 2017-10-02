@@ -7,7 +7,7 @@ Created on 30 wrz 2017
 '''
 import pytest
 
-from yarap.utils import dictionize_css, form_css
+from yawrap.utils import dictionize_css, form_css
 
 
 RAW_CSSs = """\

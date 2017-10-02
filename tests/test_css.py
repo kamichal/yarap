@@ -2,8 +2,7 @@ from bs4 import BeautifulSoup
 import os
 import pytest
 
-from yarap.navrap import NavedYawrap
-from yarap.yawrap import Yawrap
+from yawrap import Yawrap, NavedYawrap
 
 
 CssStyle1 = '.some {margin: 2px;}'
@@ -128,4 +127,3 @@ def test_link_ext_style(yawrap_class_with_naved):
     assert link['href'] == 'http://css.org/great.css'
     assert link['type'] == 'text/css'
     assert link['rel'] == ['stylesheet']  # list? wtf soup?
-
