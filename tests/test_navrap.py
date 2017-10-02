@@ -12,34 +12,11 @@ from random import choice
 
 from yarap.navrap import NavedYawrap
 
-
 def flatten(nav_entry):
     yield nav_entry.element
     for i in nav_entry.children:
         for j in flatten(i):
             yield j
-
-
-LOREM_IPSUMS = ["""\
-Ferri affert expetenda ei duo, vel cu legimus splendide. Oblique dignissim elaboraret vix cu,
-eos errem graeco ponderum ut, id quidam semper melius mei. Tantas munere ornatus an vel.
-Sit simul tempor tibique cu.
-His te erat etiam phaedrum, qui graece dicunt sensibus te, qui ad salutandi periculis.
-At quaeque sensibus sed, persius dolorum usu ea, apeirian urbanitas ius te. Eos doctus
-virtute ne, id qui choro possit graeco. Ei duo dolor expetendis scribentur, ut decore
-labitur consetetur pri. Summo ludus referrentur cu sit, elitr periculis voluptaria vix ei.
-Vix soluta facilis repudiandae ne. Ius graecis fabellas ad, duo percipitur instructior an.""", """\
-Placerat gloriatur mei ea. Mel id alienum pertinacia, ne per viris choro mnesarchum, ad inani
-consul his. Error audiam explicari quo an, mea corpora invenire ex. Id luptatum dissentiet eam.
-Utroque adolescens ut pro, te vel labitur iudicabit. Dicant putent tractatos duo in.""", """\
-Atqui animal utamur ea nam, nam id quodsi ornatus probatus. Lorem nostrud in mei.
-Ne mei etiam ignota. Ut dico veritus pri, facilisis corrumpit vis ei.
-Est utroque consulatu ne, deleniti perfecto ocurreret id duo. Tibique accusam in mea.
-Ex pro delenit persequeris, qui magna maluisset definitionem id.
-Has postulant omittantur ad.""", """\
-Mundi principes eum ea, velit sapientem theophrastus vel at. Malis facer ad vel, cetero delicata
-id usu. Alterum liberavisse ea vis. Mea ignota possim ex, vim sale iusto in. Ferri justo consul
-eum ut, usu corpora ocurreret et, mea ut malis dolore viderer."""]
 
 
 class StyledNavrap(NavedYawrap):
@@ -290,17 +267,17 @@ It's easy to maintain. It's reusable by separation from page class definition. I
                             host_doc.text(other_class.__name__ + ' ')
 
 
-def insert_lorem_ipsums(target_doc):
-    for bidx in xrange(len(LOREM_IPSUMS)):
-        bookmark_name = 'chapter %s' % (bidx + 1)
+def insert_lorem_ipsums(target_doc, lorem_ipsums):
+    for bidx, lorem in enumerate(lorem_ipsums, 1):
+        bookmark_name = 'chapter %s' % bidx
         with target_doc.bookmark(bookmark_name, type_='h3'):
-            target_doc.text("That's chapter # %s" % (bidx + 1))
+            target_doc.text("That's chapter # %s" % bidx)
         with target_doc.tag('p'):
-            target_doc.text(choice(LOREM_IPSUMS))
+            target_doc.text(lorem)
 
 
 @pytest.mark.parametrize('nav_class, style_name, root_dir_name', NAV_TEST_PARAMS)
-def test_navigation(nav_class, style_name, root_dir_name, out_dir):
+def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums):
 
     test_out_dir = os.path.join(out_dir, root_dir_name)
     index_file = os.path.join(test_out_dir, 'index.html')
@@ -354,7 +331,7 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir):
 
     child_file1 = os.path.join(test_out_dir, 'child1.html')
     child1 = create_sub(parent, child_file1, "I'm a child 1, I have several bookmarks and some children.")
-    insert_lorem_ipsums(child1)
+    insert_lorem_ipsums(child1, lorem_ipsums)
 
     child_file2 = os.path.join(test_out_dir, subs_dir, 'child2.html')
     child2 = create_sub(child1, child_file2, "I'm a child 2. No title")
