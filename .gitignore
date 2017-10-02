@@ -2,7 +2,7 @@
 .pydevproject
 .settings
 *.pyc
-*/tests/out/*
+tests/out/*
 .cache
 htmlcov/*
 .coverage
