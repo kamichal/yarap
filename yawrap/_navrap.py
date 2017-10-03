@@ -54,6 +54,11 @@ class NavedYawrap(Yawrap):
         with self.tag(type_, *args, id=id_, **kwargs):
             yield
 
+    def render_all_files(self):
+        self.render()
+        for sub in self._subs:
+            sub.render_all_files()
+
     def _render_page(self):
         page_doc = yattag.SimpleDoc()
         with self._html_page_structure(page_doc):
@@ -62,11 +67,6 @@ class NavedYawrap(Yawrap):
             with page_doc.tag('div', klass='main_content_body'):
                 page_doc.asis(self._get_body_render())
         return yattag.indent(page_doc.getvalue())
-
-    def render_all_files(self):
-        self.render()
-        for sub in self._subs:
-            sub.render_all_files()
 
     def _get_root(self):
         if self._parent:

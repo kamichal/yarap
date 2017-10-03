@@ -7,6 +7,7 @@ Created on 30 wrz 2017
 '''
 import os
 import re
+from yattag.simpledoc import ATTR_NO_VALUE
 
 
 KNOWN_SUBSTITUTES = {
@@ -23,26 +24,23 @@ KNOWN_SUBSTITUTES = {
 }
 
 
+def _attributes2(args, kwargs):
+
+    def tr(arg):
+        if isinstance(arg, tuple):
+            return arg
+        elif isinstance(arg, str):
+            return (arg, ATTR_NO_VALUE)
+        else:
+            raise ValueError("Couldn't make a XML or HTML attribute/value pair out of %s." % repr(arg))
+
+    result = dict(map(tr, args))
+    result.update({KNOWN_SUBSTITUTES.get(k, k): v for k, v in kwargs.iteritems()})
+    return result
+
+
 def fix_yattag(yattag_module):
-    def fix_keys(dict_):
-        return {KNOWN_SUBSTITUTES.get(k, k): v for k, v in dict_.iteritems()}
-
-    def _attributes2(args, kwargs):
-
-        def tr(arg):
-            if isinstance(arg, tuple):
-                return arg
-            elif isinstance(arg, str):
-                return (arg, yattag_module.simpledoc.ATTR_NO_VALUE)
-            else:
-                raise ValueError("Couldn't make a XML or HTML attribute/value pair out of %s." % repr(arg))
-
-        result = dict(map(tr, args))
-        result.update({KNOWN_SUBSTITUTES.get(k, k): v for k, v in kwargs.iteritems()})
-        return result
-
     yattag_module.simpledoc._attributes = _attributes2
-
 
 
 def make_place(target_file):

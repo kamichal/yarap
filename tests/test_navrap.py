@@ -326,7 +326,7 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums)
 
     with child0.bookmark('some svg', type_='h3'):
         child0.text('Here comes some SVG')
-    with child0.svg(width=250, height=250, svg_styles_as_str=""".the_rect {fill: lime; stroke-width: 4; stroke: pink;}"""):
+    with child0.svg(width=250, height=250, svg_styles_as_str=".the_rect {fill: lime; stroke-width: 4; stroke: pink;}"):
         draw_sample_svg(child0)
 
     child_file1 = os.path.join(test_out_dir, 'child1.html')

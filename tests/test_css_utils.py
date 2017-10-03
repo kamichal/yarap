@@ -86,18 +86,16 @@ def test_forming_css_with_empty_rule():
     assert '  selector {}' == form_css({'selector': {}})
 
 
-@pytest.mark.parametrize('input_css', RAW_CSSs)
+@pytest.mark.parametrize('input_css', RAW_CSSs, ids=map(str, range(len(RAW_CSSs))))
 def test_analyzing_css(input_css):
     assert STRUCTURIZED_CSS == dictionize_css(input_css)
 
 
-@pytest.mark.parametrize('input_css', RAW_CSSs)
+@pytest.mark.parametrize('input_css', RAW_CSSs, ids=map(str, range(len(RAW_CSSs))))
 def test_forming_css(input_css):
     structured_css = dictionize_css(input_css)
 
     result = form_css(structured_css, indent_level=3)
-
     assert result == RAW_CSSs[0]
-    print result
     restructured_css = dictionize_css(result)
     assert restructured_css == structured_css
