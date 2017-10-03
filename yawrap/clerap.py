@@ -9,8 +9,8 @@ fix_yattag(yattag)
 class Ya5(yattag.SimpleDoc):
     version = H5
 
-    def __init__(self):
-        super(Ya5, self).__init__(">")
+    def __init__(self, stag_end=">"):
+        super(Ya5, self).__init__(stag_end)
 
         def create_contextual(elm):
             def _tag(*args, **kwargs):
@@ -34,8 +34,10 @@ class Ya5(yattag.SimpleDoc):
         for elem in EMPTY_ELEMENTS[self.version]:
             setattr(self, elem.tag, create_empty(elem))
 
+
 class Ya4(Ya5):
     version = H4
+
 
 def test_1():
 
