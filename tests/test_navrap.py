@@ -23,12 +23,13 @@ class StyledNavrap(NavedYawrap):
     css = """
 body {
     margin: 0;
-    padding: 8px;
+    padding: 0px;
     background: #fdfafa;
+    font-family: Verdana, sans-serif;
 }
 .nav_main_panel {
     margin : 0;
-    padding: 16px 2px 0px 0px;
+    padding: 0px 2px 0px 0px;
     list-style-type: none;
     width: 320px;
     background-color: #fdfafa;
@@ -60,7 +61,7 @@ a.nav_bookmark_link {
     margin: 0px 3px;
 }
 .nav_group_div a {
-    padding: 8px 16px;
+    padding: 5px 10px;
     display: block;
     color: #000;
     text-decoration: none;
@@ -78,8 +79,8 @@ a.nav_bookmark_link {
     color: white;
 }
 .main_content_body {
-    margin: 20px 16px 20px 335px;
-    padding:1px 16px;
+    margin: 0px 16px 0px 335px;
+    padding:6px 16px;
 }
 """
 
@@ -340,7 +341,13 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums)
         create_sub(child2, f, "I'm a child %s of child 2" % i, "CH%03d" % i)
 
     child_file3 = os.path.join(test_out_dir, subs_dir, 'child3.html')
-    child3 = create_sub(parent, child_file3, "I'm a child 3.", "another one")
+    child3 = create_sub(parent, child_file3, "I'm a child 3.", "many bookmarks")
+
+    for bix in xrange(1, 101):
+        bookmark_name = 'bookmark %s' % bix
+        with child3.bookmark(bookmark_name, type_='h3'):
+            child3.text("That's chapter # %s" % bix)
+        child3.text('contents of chapter %s' % bix)
 
     parent.render_all_files()
     assert all(os.path.isfile(f) for f in files)

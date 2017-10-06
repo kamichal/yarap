@@ -64,7 +64,7 @@ class NavedYawrap(Yawrap):
         with self._html_page_structure(page_doc):
             if self._subs or self._parent:
                 self._insert_nav(page_doc)
-            with page_doc.tag('div', klass='main_content_body'):
+            with page_doc.tag('main', klass='main_content_body'):
                 page_doc.asis(self._get_body_render())
         return yattag.indent(page_doc.getvalue())
 
