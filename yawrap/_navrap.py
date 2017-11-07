@@ -5,7 +5,8 @@ import weakref
 import yattag
 
 from ._yawrap import Yawrap
-from utils import assert_keys_not_in, fix_yattag
+from .utils import assert_keys_not_in, fix_yattag
+from .six import str_types
 
 
 fix_yattag(yattag)
@@ -46,7 +47,7 @@ class NavedYawrap(Yawrap):
     def bookmark(self, id_, name_in_nav='', type_='div', *args, **kwargs):
         """ as regular doc.tag, but also manages navigation stuff """
         assert_keys_not_in('id', args, kwargs)
-        assert id_ and isinstance(id_, (str, unicode)), "Invalid id: '%s'" % id_
+        assert id_ and isinstance(id_, str_types), "Invalid id: '%s'" % id_
         assert id_ not in map(lambda x: x[0], self._bookmarks), "Bookmark ids collision. '%s' is already defined" % id_
         name_in_nav = name_in_nav or id_
         id_ = id_.replace(' ', '_')

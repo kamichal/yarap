@@ -35,7 +35,7 @@ def _attributes2(args, kwargs):
             raise ValueError("Couldn't make a XML or HTML attribute/value pair out of %s." % repr(arg))
 
     result = dict(map(tr, args))
-    result.update({KNOWN_SUBSTITUTES.get(k, k): v for k, v in kwargs.iteritems()})
+    result.update({KNOWN_SUBSTITUTES.get(k, k): v for k, v in kwargs.items()})
     return result
 
 
@@ -54,7 +54,7 @@ def make_place(target_file):
 def assert_keys_not_in(keys, args, kwargs):
     keys = keys if isinstance(keys, (list, tuple)) else [keys]
     for key in keys:
-        defined_keys = kwargs.keys() + map(lambda x: x[0], filter(lambda y: isinstance(y, tuple), args))
+        defined_keys = list(kwargs.keys()) + list(map(lambda x: x[0], filter(lambda y: isinstance(y, tuple), args)))
         if key in defined_keys:
             raise ValueError("Duplicated '{}' attribute.".format(key))
 
@@ -102,9 +102,9 @@ def form_css(structured_css, indent_level=1):
     def_tpl = "{ind}{bind}{property}: {value};"
 
     def rules():
-        for selector, definitions in sorted(structured_css.iteritems()):
+        for selector, definitions in sorted(structured_css.items()):
             defs = '\n'.join(def_tpl.format(ind=indent, bind=base_indent, property=prop, value=val)
-                             for prop, val in sorted(definitions.iteritems()))
+                             for prop, val in sorted(definitions.items()))
             if defs:
                 defs = "\n{}\n{ind}".format(defs, ind=indent)
             yield template.format(ind=indent, selector=selector, definitions=defs)

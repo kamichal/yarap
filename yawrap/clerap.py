@@ -1,7 +1,7 @@
 import yattag
 
-from utils import fix_yattag
-from elements_def import H4, H5, CONTEXT_ELEMENTS, EMPTY_ELEMENTS
+from .utils import fix_yattag
+from .elements_def import H4, H5, CONTEXT_ELEMENTS, EMPTY_ELEMENTS
 
 fix_yattag(yattag)
 

@@ -10,6 +10,7 @@ import os
 import pytest
 
 from yawrap import NavedYawrap
+from yawrap.six import str_types
 
 
 def flatten(nav_entry):
@@ -336,26 +337,26 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums)
 
     child_file2 = os.path.join(test_out_dir, subs_dir, 'child2.html')
     child2 = create_sub(child1, child_file2, "I'm a child 2. No title")
-    for i in xrange(3):
+    for i in range(3):
         f = os.path.join(test_out_dir, subs_dir, 'another_sub', '%s.html' % i)
         create_sub(child2, f, "I'm a child %s of child 2" % i, "CH%03d" % i)
 
     child_file3 = os.path.join(test_out_dir, subs_dir, 'child3.html')
     child3 = create_sub(parent, child_file3, "I'm a child 3.", "many bookmarks")
 
-    for bix in xrange(1, 101):
+    for bix in range(1, 101):
         bookmark_name = 'bookmark %s' % bix
         with child3.bookmark(bookmark_name, type_='h3'):
             child3.text("That's chapter # %s" % bix)
         child3.text('contents of chapter %s' % bix)
 
     parent.render_all_files()
-    assert all(os.path.isfile(f) for f in files)
+    assert all([os.path.isfile(f) for f in files])
 
     assert child3._get_root() == parent
 
     flatten_structure = list(flatten(child2._get_nav_structure()))
-    assert all(isinstance(j, nav_class) for j in flatten_structure)
+    assert all([isinstance(j, nav_class) for j in flatten_structure])
     assert len(flatten_structure) == len(files)
 
     for file_ in files:
@@ -373,6 +374,6 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums)
         assert len(nav_def) == 1
         links = nav_def[0].find_all('a')
         assert len(links) >= len(files)
-        basenames = map(os.path.basename, files)
+        basenames = list(map(os.path.basename, files))
         assert all(os.path.basename(l['href']) and os.path.basename(l['href']).split('#')[0] in basenames
                    for l in links)

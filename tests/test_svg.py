@@ -16,4 +16,4 @@ def test_basic_svg(out_dir):
         draw_sample_svg(jarap)
 
     html = jarap.render()
-    print html
+    print(html)

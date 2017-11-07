@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import os
 import yattag
 
-from utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
+from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
@@ -32,7 +32,7 @@ def svg_structure(painter,
                 painter.cdata(svg_styles_as_str)
         if svg_defs:
             with painter.tag('defs', type="text/css"):
-                for id_, svg_def in svg_defs.iteritems():
+                for id_, svg_def in svg_defs.items():
                     with painter.tag('g', id=id_):
                         painter.asis(svg_def)
         yield
