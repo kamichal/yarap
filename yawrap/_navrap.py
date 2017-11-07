@@ -4,7 +4,7 @@ import os
 import weakref
 import yattag
 
-from yawrap import Yawrap
+from ._yawrap import Yawrap
 from utils import assert_keys_not_in, fix_yattag
 
 

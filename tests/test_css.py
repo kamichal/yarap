@@ -59,7 +59,7 @@ def test_empty_doc(yawrap_class_with_naved):
     <meta charset="UTF-8" />
   </head>
   <body>
-    <div class="main_content_body"></div>
+    <main class="main_content_body"></main>
   </body>
 </html>"""
     else:
