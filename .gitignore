@@ -6,3 +6,13 @@ tests/out/*
 .cache
 htmlcov/*
 .coverage
+.tox
+
+.Python
+env/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.installed.cfg
+*.egg
