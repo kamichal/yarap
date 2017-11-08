@@ -19,3 +19,8 @@ pipelines:
         script:
           - pip install -U tox
           - tox -e py35
+    -step:
+        name: coverage2.7
+        script:
+          - pip install -U tox
+          - tox -e coverage
