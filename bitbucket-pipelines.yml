@@ -1,4 +1,4 @@
-image: maven:3.3.9
+image: python:2.7
 
 pipelines:
   default:
@@ -6,7 +6,13 @@ pipelines:
         caches:
           - pip
         script:
-          - apt-get update
-          - apt-get install -y python2 python3 pip
           - pip install -U tox
-          - tox
+          - tox -e py27
+    - step:
+        image: python:3.4
+        caches:
+          - pip3
+        script:
+          - pip3 install -U tox
+          - tox -e py34,coverage
+
