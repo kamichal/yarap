@@ -3,13 +3,19 @@ image: python:2.7
 pipelines:
   default:
     - step:
-        caches:
-          - pip
+        name: Python2.7
         script:
           - pip install -U tox
           - tox -e py27
     - step:
-        image: python:3.4
+        name: Python3.4
+        image: python3.4
         script:
-          - pip3 install -U tox
-          - tox -e py34,coverage
+          - pip install -U tox
+          - tox -e py34
+    - step:
+        name: Python3.5
+        image: python3.5
+        script:
+          - pip install -U tox
+          - tox -e py35
