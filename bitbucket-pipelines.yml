@@ -9,13 +9,13 @@ pipelines:
           - tox -e py27
     - step:
         name: Python3.4
-        image: python3.4
+        image: python:3.4
         script:
           - pip install -U tox
           - tox -e py34
     - step:
         name: Python3.5
-        image: python3.5
+        image: python:3.5
         script:
           - pip install -U tox
           - tox -e py35
