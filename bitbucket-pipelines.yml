@@ -1,4 +1,4 @@
-image: python:3.5.1
+image: parsys/python2-python3-pil-supervisord-redis
 
 pipelines:
   default:
