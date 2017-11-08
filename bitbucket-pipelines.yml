@@ -10,9 +10,6 @@ pipelines:
           - tox -e py27
     - step:
         image: python:3.4
-        caches:
-          - pip3
         script:
           - pip3 install -U tox
           - tox -e py34,coverage
-
