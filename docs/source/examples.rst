@@ -7,14 +7,14 @@ Examples
    root_dir = os.path.dirname(os.path.abspath('.'))
    sys.path.insert(0, root_dir)
 
-   
-This is a tiny example. Such a code is sufficient to generate a html page:
+
+This is a tiny example. Such a code is sufficient to generate an html page:
 
 .. doctest::
 
     >>> from yawrap import Yawrap
 
-    >>> jawrap = Yawrap('/tmp/example_1.html', 'pleasure')
+    >>> jawrap = Yawrap('/tmp/example_1.html', 'the title')
     >>> with jawrap.tag('div'):
     ...     with jawrap.tag('p'):
     ...         jawrap.text('Nothing much here.')
@@ -26,13 +26,12 @@ page in a target file specified in `Yawrap` constructor:
 .. doctest::
 
    >>> jawrap.render()
-   >>> with open('/tmp/example_1.html', 'rt') as page:
-   ...     print page.read()
+   >>> print open('/tmp/example_1.html', 'rt').read()
    <!doctype html>
    <html lang="en-US">
      <head>
        <meta charset="UTF-8" />
-       <title>pleasure</title>
+       <title>the title</title>
      </head>
      <body>
        <div>
@@ -40,3 +39,7 @@ page in a target file specified in `Yawrap` constructor:
        </div>
      </body>
    </html>
+
+.. note::
+    That
+   
