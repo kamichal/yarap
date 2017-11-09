@@ -24,3 +24,9 @@ pipelines:
         script:
           - pip install -U tox
           - tox -e coverage
+    - step:
+        name: doctest
+        script:
+          - pip install -U tox
+          - tox -e coverage
+    
