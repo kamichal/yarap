@@ -69,7 +69,6 @@ class Yawrap(yattag.Doc):
         raw_html = self._render_page()
         with open(make_place(self._target_file), 'wt') as ff:
             ff.write(raw_html)
-        return raw_html
 
     @contextmanager
     def svg(self, svg_styles_as_str='', *args, **svg_tag_attributes):

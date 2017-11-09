@@ -15,5 +15,5 @@ def test_basic_svg(out_dir):
     with jarap.svg(width=260, height=260, svg_styles_as_str=".the_rect {fill: lime; stroke-width: 4; stroke: pink;}"):
         draw_sample_svg(jarap)
 
-    html = jarap.render()
+    html = jarap._render_page()
     print(html)
