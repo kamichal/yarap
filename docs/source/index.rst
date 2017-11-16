@@ -2,26 +2,70 @@
    sphinx-quickstart on Wed Nov  8 22:51:37 2017.
 
 
-yawrap - yet another wrapper
-============================
+Yawrap Documentation
+====================
 
-Yawrap is a pseudo static html (actually a xml) builder.
+Yawrap is a powerful, lightweight  `semi-static html` builder working in ``python2.7``,
+``python3.4`` and ``python.3.5``.
 
+The name comes from something like `Yet Another Wrapper (of html tags)` and has its coincidence to yattag package.
 
 yattag
 ------
 
-Yawrap core is `yattag <https://pypi.python.org/pypi/yattag>`_  library written by Benjamin Le Forestier.
+Yawrap core is `yattag <https://pypi.python.org/pypi/yattag>`_ . It's a ultra-lightweight library written 
+by Benjamin Le Forestier. The yattag is very well documented and 
+its strongly recommend to read its awsome `quick reference <http://www.yattag.org/>`_.
 
-The yattag is very well documented and I strongly recommend reading its `quick reference <http://www.yattag.org/>`_.
+Yattags's main functionality is care of proper opening and closing html tags.
+Hovewer if you use `yattag` you probably noticed that in order to create a nice html page, you have to write a lot 
+of code that is not the content of your page and each time you have to care for the same aspects of the page 
+- such as proper ``html head/body`` structure.
 
-Unfortunately when I asked Benjamin for extending yattag functionality,
-he suggested to make it a separate package, so that's how the yawrap was born.
+
+Yawrap features
+---------------
+
+Here is a list of things that ``yawrap`` serves for supplementing ``yattag`` functionality. 
+
+* **CSS & JS support**
+   Append internal CSS styles or JS at any point of document definition. Allows for conditional additions of CSS or JS. 
+   ...and you don't have to care about when to insert its definition. Even if you already finished defining the body
+   and you define JS after that - it will be placed in ``/html/head/``.
+   
+   You can also easily link style sheet or java script from external file (local or from web).
+
+* **SVG support**
+   Don't care about defining SVG structure, just write its main contents. Yawrap will take care about the whole rest.
+   Also typical SVG attributes which are problematic from python keyword-arguments point of view have it's
+   convenience feature.
+
+* **Linking local files**
+   You can reference local files by passing its absolute path on python side and it will appear under links 
+   relative to the current document. And you don't have to `calculate the paths`.  
+
+* **Defining page 'style' on python class level**
+   Page styles can be defined by deriving Yawrap classes. This makes possibility to get the styles 
+   shared / inherited / overrided in pythonic way.
+
+* **Multi-page structure**
+   Define multiple pages in complex directory structure and don't care about the paths. 
+   Not existing directories will be automatically created, you just define the path of target file.
+
+* **Automatic navigation**
+   That's ultra-nice. **Probably the cutest yawrap's feature.** Create multiple pages and see how yawrap 
+   joins them in navigation panel created for each generated page. Everything happens behind the curtains. 
+
+   The only one thing you need to do is to care for the navigation's ``CSS`` style (if you don't like the
+   default style provided by Yawrap).
+
+* **Bookmarking**
+   Create intra-page bookmarks with just one command during document definition and see how they are inserted 
+   in correct subsection of the page navigation.
 
 
-
-Usage
-=====
+Basic Usage
+-----------
 
 This is a tiny example. Such a code is sufficient to generate an html page:
 
@@ -30,14 +74,14 @@ This is a tiny example. Such a code is sufficient to generate an html page:
     >>> from yawrap import Yawrap
     >>> out_file = '/tmp/example_0.html'
 
-    >>> jawrap = Yawrap(out_file)
+    >>> jawrap = Yawrap(out_file)             # passing target file location is mandatory
 
-    >>> with jawrap.tag('p'):
-    ...     jawrap.text('Hello yawrap!')
+    >>> with jawrap.tag('p'):                 # add a paragraph
+    ...     jawrap.text('Hello yawrap!')      # and its content
 
-    >>> jawrap.render()
+    >>> jawrap.render()                       # creates the /tmp/example_0.html file
 
-    >>> print(open(out_file, 'rt').read())
+    >>> print(open(out_file, 'rt').read())    # view the created file
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -48,45 +92,6 @@ This is a tiny example. Such a code is sufficient to generate an html page:
       </body>
     </html>
 
-After executing that - calling `render()` function will store the 
-page in a target file specified in `Yawrap` constructor ``/tmp/example_0.html``:
-
-Yawrap Parameters
-=================
-
-The basic object is :class:`yawrap.Yawrap`. Its constuctor is called by::
-
-    Yawrap(target_file, title='', parent=None, defaults=None, errors=None,
-           error_wrapper=('<span class="error">', '</span>'), stag_end=' />')
-
-
-target_tile : str
-    Path to the file that is supposed to be writen with html contents. Its directory will be created if is not existing.
-
-parent : <yawrap.Yawrap object>
-    Optional reference to another Yawrap class instance. It's parent object in documents tree.
-    Is used only in derived classes.
-
-
-Parameters inherited from ``yattag.Doc()``
-------------------------------------------
-
-defaults : dict
-    Optional dictionnary of values used to fill yattag's html forms.
-
-errors : dict
-    Optional dictionnary of errors used to fill yattag's html forms.
-
-error_wrapper : tuple(str, str)
-    Couple of openning and clossing tags that will wrap errors occured during yattag's form generation. 
-    The default is: ``<span class="error">`` and ``</span>``.
-
-stag_end : str
-    Empty tag closing style. One of:  ``' />'``, ``'/>'``, or ``'>'``. 
-    E.g. for ``br`` will result: ``'<br />'`` by default, you can change it to ``'<br/>'`` or ``'<br>'``.
-
-for more info, please visit: `Yattag - HTML forms rendering <http://www.yattag.org/#html-forms-rendering>`_.
-
 
 
 Contents:
@@ -94,6 +99,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
    
+   usage
    css_support
    examples
 

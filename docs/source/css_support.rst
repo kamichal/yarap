@@ -7,7 +7,14 @@ CSS Support
    root_dir = os.path.dirname(os.path.abspath('.'))
    sys.path.insert(0, root_dir)
 
-Yawrap has it's basic support of cascade style sheets. 
+Yawrap has it's basic support of cascade style sheets. During creation of html page you can 
+append styles definition as strings or dictionaries. It will appear in ``/html/head/style`` section 
+of current yawrap document. Also linking css file as external file is possible. 
+
+.. note ::
+    
+    The ``class`` keyword, widely used in ``html/css`` will cause python's syntax error if used as keyword argument, 
+    so you can define it by typing ``klass`` instead. Yattag will convert it to ``class`` automatically. 
 
 Internal CSS as str
 -------------------
@@ -23,9 +30,7 @@ Internal CSS as str
     ...         jawrap.text('CSS in yawrap.')
 
     >>> jawrap.add_css('''
-    ... .content {
-    ...    margin: 2px;
-    ... }
+    ... .content { margin: 2px; }
     ... .content:hover {
     ...    background-color: #DAF;
     ... }''')
@@ -59,6 +64,8 @@ The passed CSS can be a string without any formatting. It will be reformatted du
 Internal CSS as python's dict
 -----------------------------
 
+The argument passed to :func:`add_css` can be a regular python dictionary definins css.  
+
 .. doctest::
 
     >>> css_dict = {
@@ -70,6 +77,7 @@ Internal CSS as python's dict
     ...     'border': '1px solid black'
     ...   }
     ... }
+    >>> # reusing jawrap instance from subsection above.
     >>> jawrap.add_css(css_dict)
     >>> jawrap.render()
 
