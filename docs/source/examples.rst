@@ -26,7 +26,7 @@ page in a target file specified in `Yawrap` constructor:
 .. doctest::
 
    >>> jawrap.render()
-   >>> print open('/tmp/example_1.html', 'rt').read()
+   >>> print(open('/tmp/example_1.html', 'rt').read())
    <!doctype html>
    <html lang="en-US">
      <head>

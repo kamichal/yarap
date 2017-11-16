@@ -7,7 +7,7 @@ from yawrap import Yawrap, NavedYawrap
 
 CssStyle1 = '.some {margin: 2px;}'
 CssStyle2 = '\n\n\n.other {\n padding: 0;\n}\n'
-CssStyleExpected = """\
+CssStyleExpected = """
       .other {
         padding: 0;
       }

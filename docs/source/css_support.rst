@@ -1,0 +1,151 @@
+CSS Support
+===========
+
+.. testsetup:: *
+
+   import os, sys
+   root_dir = os.path.dirname(os.path.abspath('.'))
+   sys.path.insert(0, root_dir)
+
+Yawrap has it's basic support of cascade style sheets. 
+
+Internal CSS as str
+-------------------
+
+.. doctest::
+
+    >>> from yawrap import Yawrap
+    >>> out_file = '/tmp/css_1.html'
+    >>> jawrap = Yawrap(out_file)
+
+    >>> with jawrap.tag('div', klass='content'):
+    ...     with jawrap.tag('span'):    
+    ...         jawrap.text('CSS in yawrap.')
+
+    >>> jawrap.add_css('''
+    ... .content {
+    ...    margin: 2px;
+    ... }
+    ... .content:hover {
+    ...    background-color: #DAF;
+    ... }''')
+    >>> jawrap.render()
+
+    >>> print(open(out_file, 'rt').read())
+    <!doctype html>
+    <html lang="en-US">
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          .content {
+            margin: 2px;
+          }
+          .content:hover {
+            background-color: #DAF;
+          }</style>
+      </head>
+      <body>
+        <div class="content">
+          <span>CSS in yawrap.</span>
+        </div>
+      </body>
+    </html>
+
+The method :func:`add_css` appends CSS definitions to page head section.
+It can be called several times, output CSS will be sorted and nicely joined.
+
+The passed CSS can be a string without any formatting. It will be reformatted during page generation.
+
+Internal CSS as python's dict
+-----------------------------
+
+.. doctest::
+
+    >>> css_dict = {
+    ...   '.content': {
+    ...     'color': '#321',
+    ...     'padding': '1px 16px'
+    ...   },
+    ...   'span': {
+    ...     'border': '1px solid black'
+    ...   }
+    ... }
+    >>> jawrap.add_css(css_dict)
+    >>> jawrap.render()
+
+    >>> print(open(out_file, 'rt').read())
+    <!doctype html>
+    <html lang="en-US">
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          .content {
+            color: #321;
+            padding: 1px 16px;
+          }
+          .content:hover {
+            background-color: #DAF;
+          }
+          span {
+            border: 1px solid black;
+          }</style>
+      </head>
+      <body>
+        <div class="content">
+          <span>CSS in yawrap.</span>
+        </div>
+      </body>
+    </html>
+
+Note the previous ``.content`` selector's definition is overwritten with new one.
+
+External CSS from local file
+----------------------------
+
+It's also possible to link style sheet from local file, specifying it's path relative to target html file,
+even if the ``css`` path is given as absolute.
+
+.. doctest::
+
+    >>> from yawrap import Yawrap
+    >>> out_file = '/tmp/css_2.html'
+    >>> jawrap = Yawrap(out_file)
+    >>> jawrap.text('CSS from local file.')
+    >>> jawrap.link_local_css_file('/tmp/files/my.css')
+    >>> jawrap.render()
+
+    >>> print(open(out_file, 'rt').read())  # doctest: +SKIP
+    <!doctype html>
+    <html lang="en-US">
+      <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="files/my.css" type="text/css" />
+      </head>
+      <body>CSS from local file.</body>
+    </html>
+
+
+External CSS from web
+---------------------
+
+Using global CSS from some resources can be obtained by calling :func:`link_external_css_file`.
+.. doctest::
+
+    >>> from yawrap import Yawrap
+    >>> out_file = '/tmp/css_3.html'
+    >>> jawrap = Yawrap(out_file)
+    >>> jawrap.text('CSS from web.')
+    >>> jawrap.link_external_css_file("https://www.w3schools.com/w3css/4/w3.css")
+    >>> jawrap.render()
+
+    >>> print(open(out_file, 'rt').read())  # doctest: +SKIP
+    <!doctype html>
+    <html lang="en-US">
+      <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css" />
+      </head>
+      <body>CSS from web.</body>
+    </html>
+
+

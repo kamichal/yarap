@@ -108,7 +108,7 @@ class Yawrap(yattag.Doc):
                         page_doc.text(js)
                 if page_css:
                     with page_doc.tag('style'):
-                        page_doc.text(form_css(page_css, indent_level=3))
+                        page_doc.asis(form_css(page_css, indent_level=3))
                 for ext_css in self.external_csss:
                     page_doc.stag("link", rel="stylesheet", type="text/css", href=ext_css)
             with page_doc.tag('body'):

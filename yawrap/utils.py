@@ -98,7 +98,7 @@ def form_css(structured_css, indent_level=1):
     base_indent = ' ' * 2
     indent = base_indent * indent_level
 
-    template = "{ind}{selector} {{{definitions}}}"
+    template = "\n{ind}{selector} {{{definitions}}}"
     def_tpl = "{ind}{bind}{property}: {value};"
 
     def rules():
@@ -109,4 +109,4 @@ def form_css(structured_css, indent_level=1):
                 defs = "\n{}\n{ind}".format(defs, ind=indent)
             yield template.format(ind=indent, selector=selector, definitions=defs)
 
-    return '\n'.join(rules())
+    return ''.join(rules())

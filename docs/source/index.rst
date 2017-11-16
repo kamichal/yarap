@@ -1,6 +1,7 @@
 .. yawrap documentation master file, created by
    sphinx-quickstart on Wed Nov  8 22:51:37 2017.
 
+
 yawrap - yet another wrapper
 ============================
 
@@ -27,15 +28,16 @@ This is a tiny example. Such a code is sufficient to generate an html page:
 .. doctest::
 
     >>> from yawrap import Yawrap
+    >>> out_file = '/tmp/example_0.html'
 
-    >>> jawrap = Yawrap('/tmp/example_0.html')
+    >>> jawrap = Yawrap(out_file)
 
     >>> with jawrap.tag('p'):
     ...     jawrap.text('Hello yawrap!')
 
     >>> jawrap.render()
 
-    >>> print open('/tmp/example_0.html', 'rt').read()
+    >>> print(open(out_file, 'rt').read())
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -92,6 +94,7 @@ Contents:
 .. toctree::
    :maxdepth: 2
    
+   css_support
    examples
 
 
