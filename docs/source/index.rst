@@ -5,30 +5,38 @@
 Yawrap Documentation
 ====================
 
-Yawrap is a powerful, lightweight  `semi-static html` builder working in ``python2.7``,
+Yawrap is a powerful, lightweight  `pseudo-static HTML` builder working in ``python2.7``,
 ``python3.4`` and ``python.3.5``.
 
-The name comes from something like `Yet Another Wrapper (of html tags)` and has its coincidence to yattag package.
+The name comes from something like `Yet Another Wrapper (of HTML tags)` and has its coincidence to yattag package.
 
-yattag
-------
+The git repository can be found at https://bitbucket.org/gandowin/yarap
 
-Yawrap core is `yattag <https://pypi.python.org/pypi/yattag>`_ . It's a ultra-lightweight library written 
-by Benjamin Le Forestier. The yattag is very well documented and 
-its strongly recommend to read its awsome `quick reference <http://www.yattag.org/>`_.
+yattag's heritage
+-----------------
 
-Yattags's main functionality is care of proper opening and closing html tags.
-Hovewer if you use `yattag` you probably noticed that in order to create a nice html page, you have to write a lot 
-of code that is not the content of your page and each time you have to care for the same aspects of the page 
-- such as proper ``html head/body`` structure.
+Yawrap's core is `yattag <https://pypi.python.org/pypi/yattag>`_ . It's a ultra-lightweight library written 
+by `Benjamin Le Forestier <http://leforestier.org/python-developer>`_. 
+Yattags's main functionality is care of proper opening and closing HTML (actually XML) tags.
+However if you use `yattag` you probably noticed that in order to create a nice HTML page, you have to write a lot 
+of code that is not exactly the content of your page and each time you have to care for the same aspects of the page 
+- such as proper ``html head/body`` structure, links, navigation ect...
+Yawrap extends yattag's functionality `(and adds some more)`. 
+
+.. note::
+
+    Yawrap classes are derived from 
+    Yattag's ``Doc()`` class. So you can use e.g. its ``tag``, ``line``, ``text``, methods in the same way.
+    Yattag is well documented and its strongly recommend to read its awesome 
+    `quick reference <http://www.yattag.org/>`_.
 
 
 Yawrap features
 ---------------
 
-Here is a list of things that ``yawrap`` serves for supplementing ``yattag`` functionality. 
+Here is a list of things that ``yawrap`` offers:
 
-* **CSS & JS support**
+* :ref:`CSS  <css-support>` & :ref:`JS <js-support>` support
    Append internal CSS styles or JS at any point of document definition. Allows for conditional additions of CSS or JS. 
    ...and you don't have to care about when to insert its definition. Even if you already finished defining the body
    and you define JS after that - it will be placed in ``/html/head/``.
@@ -57,7 +65,7 @@ Here is a list of things that ``yawrap`` serves for supplementing ``yattag`` fun
    joins them in navigation panel created for each generated page. Everything happens behind the curtains. 
 
    The only one thing you need to do is to care for the navigation's ``CSS`` style (if you don't like the
-   default style provided by Yawrap).
+   default navigation style provided by Yawrap).
 
 * **Bookmarking**
    Create intra-page bookmarks with just one command during document definition and see how they are inserted 
@@ -67,7 +75,7 @@ Here is a list of things that ``yawrap`` serves for supplementing ``yattag`` fun
 Basic Usage
 -----------
 
-This is a tiny example. Such a code is sufficient to generate an html page:
+This is a tiny example. Such a code is sufficient to generate an HTML page:
 
 .. doctest::
 
@@ -101,6 +109,7 @@ Contents:
    
    usage
    css_support
+   js_support
    examples
 
 

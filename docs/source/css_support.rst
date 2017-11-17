@@ -1,3 +1,5 @@
+.. _css-support:
+
 CSS Support
 ===========
 
@@ -9,7 +11,7 @@ CSS Support
 
 Yawrap has it's basic support of cascade style sheets. During creation of html page you can 
 append styles definition as strings or dictionaries. It will appear in ``/html/head/style`` section 
-of current yawrap document. Also linking css file as external file is possible. 
+of current yawrap document. Also linking CSS as external file is possible. 
 
 .. note ::
     
@@ -137,6 +139,7 @@ External CSS from web
 ---------------------
 
 Using global CSS from some resources can be obtained by calling :func:`link_external_css_file`.
+
 .. doctest::
 
     >>> from yawrap import Yawrap
@@ -156,4 +159,55 @@ Using global CSS from some resources can be obtained by calling :func:`link_exte
       <body>CSS from web.</body>
     </html>
 
+
+CSS defined on class level
+--------------------------
+
+You can derive own class from ``Yawrap`` or ``Navrap`` class and define its CSS that will be inherited 
+in its subclasses. You have to define `css` class attribute either as a string or a dictionary.
+
+.. doctest::
+
+    >>> from yawrap import Yawrap
+    >>> out_file = '/tmp/css_4.html'
+
+    >>> class MyStyledPage(Yawrap):
+    ...     css = '''
+    ... body { 
+    ...   margin: 0px;
+    ...   padding: 13px 14px;
+    ... }
+    ... .content {
+    ...    color: #BAC;
+    ...    margin: 2px;
+    ... }'''
+
+    >>> myStyled = MyStyledPage(out_file)
+    >>> with myStyled.tag('div', klass='content'):
+    ...     myStyled.text('Deriving CSS.')
+
+    >>> myStyled.render()
+
+    >>> print(open(out_file, 'rt').read())
+    <!doctype html>
+    <html lang="en-US">
+      <head>
+        <meta charset="UTF-8" />
+        <style>
+          .content {
+            color: #BAC;
+            margin: 2px;
+          }
+          body {
+            margin: 0px;
+            padding: 13px 14px;
+          }</style>
+      </head>
+      <body>
+        <div class="content">Deriving CSS.</div>
+      </body>
+    </html>
+
+Adding CSS is still possible, but to instance of the derived class (to ``myStyled`` above), not 
+to the class definition (here ``MyStyledPage``), so the appended CSS will not be inherited.
 
