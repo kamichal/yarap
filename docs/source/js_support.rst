@@ -1,4 +1,11 @@
 
+.. testsetup:: *
+
+   import os, sys
+   root_dir = os.path.dirname(os.path.abspath('.'))
+   sys.path.insert(0, root_dir)
+
+
 .. _js-support:
 
 JavaScript support
@@ -20,3 +27,161 @@ Appending js to ``Yawrap`` or ``Navrap`` instances can be done appending string-
     Yawrap has a class-level atribute being a list named ``js``. It is supposed to contain JavaScript code as strings.
     Similary as with CSS, you can derive from ``Yawrap`` class and also define the class-level JS that will be 
     inherited by its subclasses unless you override it.
+
+
+Using jQuery
+-------------
+
+Simple example detailing how to create simple W3-jQuery example from 
+https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
+
+.. doctest::
+
+    >>> from yawrap import Yawrap
+    >>> out_file = '/tmp/js_1.html'
+
+    >>> jw = Yawrap(out_file, 'jQuery W3 example.')
+    >>> jw.link_external_js_file("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")  # source jQuery
+    >>> jw.add_js("""
+    ...     $(document).ready(function(){
+    ...         $("button").click(function(){
+    ...             $("#div1").fadeToggle();
+    ...             $("#div2").fadeToggle("slow");
+    ...             $("#div3").fadeToggle(3000);
+    ...         });
+    ...     });
+    ... """)
+
+    >>> with jw.tag('p'):
+    ...     jw.text("Demonstrate fadeToggle() with different speed parameters.")
+
+    >>> with jw.tag('button'):
+    ...     jw.text("Click to fade in/out boxes")
+
+    >>> # helper function
+    >>> def create_box(name, add_style):
+    ...     with jw.tag('div', id=name, style="width:80px; height: 80px; " + add_style):
+    ...         pass
+    ...     jw.stag('br')
+
+    >>> create_box('div1', "background-color:red;")
+    >>> create_box('div2', "background-color:green;")
+    >>> create_box('div3', "background-color:blue;")
+
+    >>> jw.render()
+
+    >>> print(open(out_file, 'rt').read())  # doctest: +SKIP
+    <!doctype html>
+    <html lang="en-US">
+      <head>
+        <meta charset="UTF-8" />
+        <title>jQuery W3 example.</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script>
+        $(document).ready(function(){
+            $("button").click(function(){
+                $("#div1").fadeToggle();
+                $("#div2").fadeToggle("slow");
+                $("#div3").fadeToggle(3000);
+            });
+        });
+    </script>
+      </head>
+      <body>
+        <p>Demonstrate fadeToggle() with different speed parameters.</p>
+        <button>Click to fade in/out boxes</button>
+        <div id="div1" style="width:80px; height: 80px; background-color:red;"></div>
+        <br />
+        <div id="div2" style="width:80px; height: 80px; background-color:green;"></div>
+        <br />
+        <div id="div3" style="width:80px; height: 80px; background-color:blue;"></div>
+        <br />
+      </body>
+    </html>
+
+
+Sharing scripts across multiple pages
+-------------------------------------
+
+Similar effect as above but with reusable java scripts (and probably CSS) can be obtained by defining them 
+as class level attributes like this:
+
+.. doctest::
+
+    >>> from yawrap import Yawrap
+    >>> out_file1 = '/tmp/js_2a.html'
+    >>> out_file2 = '/tmp/js_2b.html'
+
+    >>> class MyJsPage(Yawrap):
+    ...     linked_js = ["https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"]
+    ...     css = """
+    ...       .box { 
+    ...         width:80px;
+    ...         height: 80px;
+    ...       }"""
+    ...     js = ["""
+    ...       $(document).ready(function(){
+    ...           $("button").click(function(){
+    ...               $("#div1").fadeToggle();
+    ...               $("#div2").fadeToggle("slow");
+    ...               $("#div3").fadeToggle(3000);
+    ...           });
+    ...       });
+    ...     """]
+
+    >>> def create_box2(jw, name, add_style):
+    ...     with jw.tag('div', id=name, klass="box", style=add_style):
+    ...         pass
+    ...     jw.stag('br')
+
+    >>> def create_my_js_page(out_file):
+    ...     jw = MyJsPage(out_file, 'jQuery W3 example, js defined as class attribute.')
+
+    ...     with jw.tag('p'):
+    ...         jw.text("Demonstrate fadeToggle() with different speed parameters.")
+
+    ...     with jw.tag('button'):
+    ...         jw.text("Click to fade in/out boxes")
+
+    ...     create_box2(jw, 'div1', "background-color:red;")
+    ...     create_box2(jw, 'div2', "background-color:green;")
+    ...     create_box2(jw, 'div3', "background-color:blue;")     
+
+    ...     jw.render()
+
+    >>> create_my_js_page(out_file1)
+    >>> create_my_js_page(out_file2)
+
+    >>> print(open(out_file1, 'rt').read())   # doctest: +SKIP
+    <!doctype html>
+    <html lang="en-US">
+      <head>
+        <meta charset="UTF-8" />
+        <title>jQuery W3 example, js defined as class attribute.</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script>
+          $(document).ready(function(){
+              $("button").click(function(){
+                  $("#div1").fadeToggle();
+                  $("#div2").fadeToggle("slow");
+                  $("#div3").fadeToggle(3000);
+              });
+          });
+        </script>
+        <style>
+          .box {
+            height: 80px;
+            width: 80px;
+          }</style>
+      </head>
+      <body>
+        <p>Demonstrate fadeToggle() with different speed parameters.</p>
+        <button>Click to fade in/out boxes</button>
+        <div id="div1" style="background-color:red;" class="box"></div>
+        <br />
+        <div id="div2" style="background-color:green;" class="box"></div>
+        <br />
+        <div id="div3" style="background-color:blue;" class="box"></div>
+        <br />
+      </body>
+    </html>
