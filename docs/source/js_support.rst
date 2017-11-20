@@ -35,42 +35,46 @@ Using jQuery
 Simple example detailing how to create simple W3-jQuery example from 
 https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
 
-.. doctest::
+.. testcode::
 
-    >>> from yawrap import Yawrap
-    >>> out_file = '/tmp/js_1.html'
+    from bs4 import BeautifulSoup
+   
+    def soup(html_page):   # helper function for later assertions
+        return BeautifulSoup(html_page, "lxml")
 
-    >>> jw = Yawrap(out_file, 'jQuery W3 example.')
-    >>> jw.link_external_js_file("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")  # source jQuery
-    >>> jw.add_js("""
-    ...     $(document).ready(function(){
-    ...         $("button").click(function(){
-    ...             $("#div1").fadeToggle();
-    ...             $("#div2").fadeToggle("slow");
-    ...             $("#div3").fadeToggle(3000);
-    ...         });
-    ...     });
-    ... """)
+    from yawrap import Yawrap
+    out_file = '/tmp/js_1.html'
 
-    >>> with jw.tag('p'):
-    ...     jw.text("Demonstrate fadeToggle() with different speed parameters.")
+    jw = Yawrap(out_file, 'jQuery W3 example.')
+    jw.link_external_js_file("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")  # source jQuery
+    jw.add_js("""
+        $(document).ready(function(){
+            $("button").click(function(){
+                $("#div1").fadeToggle();
+                $("#div2").fadeToggle("slow");
+                $("#div3").fadeToggle(3000);
+            });
+        });
+    """)
 
-    >>> with jw.tag('button'):
-    ...     jw.text("Click to fade in/out boxes")
+    with jw.tag('p'):
+        jw.text("Demonstrate fadeToggle() with different speed parameters.")
 
-    >>> # helper function
-    >>> def create_box(name, add_style):
-    ...     with jw.tag('div', id=name, style="width:80px; height: 80px; " + add_style):
-    ...         pass
-    ...     jw.stag('br')
+    with jw.tag('button'):
+        jw.text("Click to fade in/out boxes")
 
-    >>> create_box('div1', "background-color:red;")
-    >>> create_box('div2', "background-color:green;")
-    >>> create_box('div3', "background-color:blue;")
+    # helper function
+    def create_box(name, add_style):
+        with jw.tag('div', id=name, style="width:80px; height: 80px; " + add_style):
+            pass
+        jw.stag('br')
 
-    >>> jw.render()
+    create_box('div1', "background-color:red;")
+    create_box('div2', "background-color:green;")
+    create_box('div3', "background-color:blue;")
 
-    >>> print(open(out_file, 'rt').read())  # doctest: +SKIP
+    jw.render()
+    expected = """\
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -97,62 +101,72 @@ https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
         <div id="div3" style="width:80px; height: 80px; background-color:blue;"></div>
         <br />
       </body>
-    </html>
+    </html>"""
+
+    assert soup(open(out_file, 'rt').read()) == soup(expected)
+
+The last assertion returns:
 
 
 Sharing scripts across multiple pages
 -------------------------------------
 
-Similar effect as above but with reusable java scripts (and probably CSS) can be obtained by defining them 
+Similar effect as above but with reusable java scripts and CSS can be obtained by defining them 
 as class level attributes like this:
 
-.. doctest::
+.. testcode::
 
-    >>> from yawrap import Yawrap
-    >>> out_file1 = '/tmp/js_2a.html'
-    >>> out_file2 = '/tmp/js_2b.html'
+    from bs4 import BeautifulSoup
+    from yawrap import Yawrap
+ 
+    out_file1 = '/tmp/js_2a.html'
+    out_file2 = '/tmp/js_2b.html'
 
-    >>> class MyJsPage(Yawrap):
-    ...     linked_js = ["https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"]
-    ...     css = """
-    ...       .box { 
-    ...         width:80px;
-    ...         height: 80px;
-    ...       }"""
-    ...     js = ["""
-    ...       $(document).ready(function(){
-    ...           $("button").click(function(){
-    ...               $("#div1").fadeToggle();
-    ...               $("#div2").fadeToggle("slow");
-    ...               $("#div3").fadeToggle(3000);
-    ...           });
-    ...       });
-    ...     """]
+    class MyJsPage(Yawrap):
+        linked_js = ["https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"]
+        css = """
+          .box { 
+            width:80px;
+            height: 80px;
+          }"""
+        js = ["""
+          $(document).ready(function(){
+              $("button").click(function(){
+                  $("#div1").fadeToggle();
+                  $("#div2").fadeToggle("slow");
+                  $("#div3").fadeToggle(3000);
+              });
+          });
+        """]
 
-    >>> def create_box2(jw, name, add_style):
-    ...     with jw.tag('div', id=name, klass="box", style=add_style):
-    ...         pass
-    ...     jw.stag('br')
+        def __init__(self, out_file):
+            title = 'jQuery W3 example, js defined as class attribute.'
+            Yawrap.__init__(self, out_file, title)
 
-    >>> def create_my_js_page(out_file):
-    ...     jw = MyJsPage(out_file, 'jQuery W3 example, js defined as class attribute.')
+            with self.tag('p'):
+                self.text("Demonstrate fadeToggle() with different speed parameters.")
 
-    ...     with jw.tag('p'):
-    ...         jw.text("Demonstrate fadeToggle() with different speed parameters.")
+            with self.tag('button'):
+                self.text("Click to fade in/out boxes")
 
-    ...     with jw.tag('button'):
-    ...         jw.text("Click to fade in/out boxes")
+            self.create_box2('div1', "background-color:red;")
+            self.create_box2('div2', "background-color:green;")
+            self.create_box2('div3', "background-color:blue;")
 
-    ...     create_box2(jw, 'div1', "background-color:red;")
-    ...     create_box2(jw, 'div2', "background-color:green;")
-    ...     create_box2(jw, 'div3', "background-color:blue;")     
+        def create_box2(self, name, add_style):
+            with self.tag('div', id=name, klass="box", style=add_style):
+                pass
+            self.stag('br')
+       
 
-    ...     jw.render()
+    MyJsPage(out_file1).render()
+    MyJsPage(out_file2).render()
+   
+    # helper function for assertions
+    def soup(html_page):
+        return BeautifulSoup(html_page, "lxml")
 
-    >>> create_my_js_page(out_file1)
-    >>> create_my_js_page(out_file2)
-
-    >>> print(open(out_file1, 'rt').read())   # doctest: +SKIP
+    expected = soup("""\
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -177,11 +191,22 @@ as class level attributes like this:
       <body>
         <p>Demonstrate fadeToggle() with different speed parameters.</p>
         <button>Click to fade in/out boxes</button>
-        <div id="div1" style="background-color:red;" class="box"></div>
+        <div style="background-color:red;" id="div1" class="box"></div>
         <br />
-        <div id="div2" style="background-color:green;" class="box"></div>
+        <div style="background-color:green;" id="div2" class="box"></div>
         <br />
-        <div id="div3" style="background-color:blue;" class="box"></div>
+        <div style="background-color:blue;" id="div3" class="box"></div>
         <br />
       </body>
-    </html>
+    </html>""")
+    
+    
+    print(soup(open(out_file1, 'rt').read()) == expected, 
+          soup(open(out_file2, 'rt').read()) == expected)
+
+.. testoutput::
+
+   (True, True)
+
+Such a overloading of class attributes is useful using ``Navrap`` class. Some of its methods creates sub-pages 
+being an instances of parent class, giving them the same JS and CSS.

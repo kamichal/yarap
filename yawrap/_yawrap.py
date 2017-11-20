@@ -47,7 +47,7 @@ class Yawrap(yattag.Doc):
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
 
     def __init__(self, target_file, title='', parent=None, defaults=None, errors=None,
-                 error_wrapper=('<span class="error">', '</span>'), stag_end=' />'):
+                 error_wrapper=('<span class="error">', '</span>'), stag_end='/>'):
 
         super(Yawrap, self).__init__(defaults, errors, error_wrapper, stag_end)
         self._target_file = target_file
