@@ -41,6 +41,7 @@ def svg_structure(painter,
 class Yawrap(yattag.Doc):
     css = ''
     js = []
+    linked_js = []
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
@@ -54,6 +55,7 @@ class Yawrap(yattag.Doc):
         self._parent = parent
         self._target_dir = os.path.dirname(target_file)
         self._additional_js = []
+        self._additional_linked_js = []
         self._additional_css = {}
         self.external_csss = set()
 
@@ -82,9 +84,15 @@ class Yawrap(yattag.Doc):
             css_rules = dictionize_css(css_rules)
         self._additional_css.update(css_rules)
 
+    def add_js(self, js_script):
+        self._additional_js.append(js_script)
+
     def link_local_css_file(self, target_css_file_path):
         rel_location = os.path.relpath(os.path.abspath(target_css_file_path), self._target_dir)
         self.external_csss.add(rel_location)
+
+    def link_external_js_file(self, target_js_url):
+        self._additional_linked_js.append(target_js_url)
 
     def link_external_css_file(self, target_css_url):
         self.external_csss.add(target_css_url)
@@ -94,6 +102,7 @@ class Yawrap(yattag.Doc):
         page_css = dictionize_css(self.css).copy()
         page_css.update(self._additional_css)
         page_js = self._additional_js + self.js
+        linked_js = self._additional_linked_js + self.linked_js
 
         page_doc.asis('<!doctype html>')
         with page_doc.tag('html', **self.html_d):
@@ -103,9 +112,12 @@ class Yawrap(yattag.Doc):
                 if self.title:
                     with page_doc.tag('title'):
                         page_doc.text(self.title)
+                for js_link in linked_js:
+                    with page_doc.tag("script", src=js_link):
+                        pass
                 for js in page_js:
                     with page_doc.tag('script'):
-                        page_doc.text(js)
+                        page_doc.asis(js)
                 if page_css:
                     with page_doc.tag('style'):
                         page_doc.asis(form_css(page_css, indent_level=3))
