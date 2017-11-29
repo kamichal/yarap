@@ -8,7 +8,7 @@ htmlcov/*
 .coverage
 .tox
 docs/build
-
+build
 .Python
 env/
 develop-eggs/
