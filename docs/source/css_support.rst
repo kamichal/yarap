@@ -21,24 +21,29 @@ of current yawrap document. Also linking CSS as external file is possible.
 Internal CSS as str
 -------------------
 
-.. doctest::
+.. testcode::
 
-    >>> from yawrap import Yawrap
-    >>> out_file = '/tmp/css_1.html'
-    >>> jawrap = Yawrap(out_file)
+    from yawrap import Yawrap
+    out_file = '/tmp/css_1.html'
+    jawrap = Yawrap(out_file)
 
-    >>> with jawrap.tag('div', klass='content'):
-    ...     with jawrap.tag('span'):    
-    ...         jawrap.text('CSS in yawrap.')
+    with jawrap.tag('div', klass='content'):
+        with jawrap.tag('span'):    
+            jawrap.text('CSS in yawrap.')
 
-    >>> jawrap.add_css('''
-    ... .content { margin: 2px; }
-    ... .content:hover {
-    ...    background-color: #DAF;
-    ... }''')
-    >>> jawrap.render()
+    jawrap.add_css('''
+    .content { margin: 2px; }
+    .content:hover {
+       background-color: #DAF;
+    }''')
+    jawrap.render()
 
-    >>> print(open(out_file, 'rt').read())
+    print(open(out_file, 'rt').read())
+
+That outputs: 
+
+.. testoutput::
+
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -68,22 +73,27 @@ Internal CSS as python's dict
 
 The argument passed to :func:`add_css` can be a regular python dictionary definins css.  
 
-.. doctest::
+.. testcode::
 
-    >>> css_dict = {
-    ...   '.content': {
-    ...     'color': '#321',
-    ...     'padding': '1px 16px'
-    ...   },
-    ...   'span': {
-    ...     'border': '1px solid black'
-    ...   }
-    ... }
-    >>> # reusing jawrap instance from subsection above.
-    >>> jawrap.add_css(css_dict)
-    >>> jawrap.render()
+    css_dict = {
+      '.content': {
+        'color': '#321',
+        'padding': '1px 16px'
+      },
+      'span': {
+        'border': '1px solid black'
+      }
+    }
+    # reusing jawrap instance from subsection above.
+    jawrap.add_css(css_dict)
+    jawrap.render()
 
-    >>> print(open(out_file, 'rt').read())
+    print(open(out_file, 'rt').read())
+
+Will give:
+
+.. testoutput::
+
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -115,41 +125,53 @@ External CSS from local file
 It's also possible to link style sheet from local file, specifying it's path relative to target html file,
 even if the ``css`` path is given as absolute.
 
-.. doctest::
+.. testcode::
 
-    >>> from yawrap import Yawrap
-    >>> out_file = '/tmp/css_2.html'
-    >>> jawrap = Yawrap(out_file)
-    >>> jawrap.text('CSS from local file.')
-    >>> jawrap.link_local_css_file('/tmp/files/my.css')
-    >>> jawrap.render()
+    from yawrap import Yawrap
+    out_file = '/tmp/css_2.html'
 
-    >>> print(open(out_file, 'rt').read())  # doctest: +SKIP
+    jawrap = Yawrap(out_file)
+    jawrap.text('CSS from local file.')
+    jawrap.link_local_css_file('/tmp/files/my.css')
+    jawrap.render()
+
+    file_content = open(out_file, 'rt').read()
+
+    expected_result = """\
     <!doctype html>
     <html lang="en-US">
       <head>
         <meta charset="UTF-8" />
-        <link rel="stylesheet" href="files/my.css" type="text/css" />
+        <link rel="stylesheet" type="text/css" href="files/my.css" />
       </head>
       <body>CSS from local file.</body>
-    </html>
+    </html>"""
 
+    from bs4 import BeautifulSoup
+    print(BeautifulSoup(file_content, "lxml") == BeautifulSoup(expected_result, "lxml"))
+
+.. testoutput::
+
+    True
 
 External CSS from web
 ---------------------
 
 Using global CSS from some resources can be obtained by calling :func:`link_external_css_file`.
 
-.. doctest::
+.. testcode::
 
-    >>> from yawrap import Yawrap
-    >>> out_file = '/tmp/css_3.html'
-    >>> jawrap = Yawrap(out_file)
-    >>> jawrap.text('CSS from web.')
-    >>> jawrap.link_external_css_file("https://www.w3schools.com/w3css/4/w3.css")
-    >>> jawrap.render()
-
-    >>> print(open(out_file, 'rt').read())  # doctest: +SKIP
+    from yawrap import Yawrap
+    out_file = '/tmp/css_3.html'
+    
+    jawrap = Yawrap(out_file)
+    jawrap.text('CSS from web.')
+    jawrap.link_external_css_file("https://www.w3schools.com/w3css/4/w3.css")
+    
+    jawrap.render()
+    file_content = open(out_file, 'rt').read()
+    
+    expected_result = """\
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -157,8 +179,14 @@ Using global CSS from some resources can be obtained by calling :func:`link_exte
         <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css" />
       </head>
       <body>CSS from web.</body>
-    </html>
+    </html>"""
 
+    from bs4 import BeautifulSoup
+    print(BeautifulSoup(file_content, "lxml") == BeautifulSoup(expected_result, "lxml"))
+
+.. testoutput::
+
+    True
 
 CSS defined on class level
 --------------------------
@@ -166,29 +194,31 @@ CSS defined on class level
 You can derive own class from ``Yawrap`` or ``Navrap`` class and define its CSS that will be inherited 
 in its subclasses. You have to define `css` class attribute either as a string or a dictionary.
 
-.. doctest::
+.. testcode::
 
-    >>> from yawrap import Yawrap
-    >>> out_file = '/tmp/css_4.html'
+    from yawrap import Yawrap
+    out_file = '/tmp/css_4.html'
 
-    >>> class MyStyledPage(Yawrap):
-    ...     css = '''
-    ... body { 
-    ...   margin: 0px;
-    ...   padding: 13px 14px;
-    ... }
-    ... .content {
-    ...    color: #BAC;
-    ...    margin: 2px;
-    ... }'''
+    class MyStyledPage(Yawrap):
+        css = '''
+    body { 
+      margin: 0px;
+      padding: 13px 14px;
+    }
+    .content {
+       color: #BAC;
+       margin: 2px;
+    }'''
 
-    >>> myStyled = MyStyledPage(out_file)
-    >>> with myStyled.tag('div', klass='content'):
-    ...     myStyled.text('Deriving CSS.')
+    myStyled = MyStyledPage(out_file)
+    with myStyled.tag('div', klass='content'):
+        myStyled.text('Deriving CSS.')
 
-    >>> myStyled.render()
+    myStyled.render()
 
-    >>> print(open(out_file, 'rt').read())
+    file_content = open(out_file, 'rt').read()
+    
+    expected_result = """\
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -206,7 +236,14 @@ in its subclasses. You have to define `css` class attribute either as a string o
       <body>
         <div class="content">Deriving CSS.</div>
       </body>
-    </html>
+    </html>"""
+
+    from bs4 import BeautifulSoup
+    print(BeautifulSoup(file_content, "lxml") == BeautifulSoup(expected_result, "lxml"))
+
+.. testoutput::
+
+    True
 
 Adding CSS is still possible, but to instance of the derived class (to ``myStyled`` above), not 
 to the class definition (here ``MyStyledPage``), so the appended CSS will not be inherited.

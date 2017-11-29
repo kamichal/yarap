@@ -10,6 +10,7 @@ import os
 import yattag
 
 from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
+from .six import str_types
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
@@ -42,6 +43,7 @@ class Yawrap(yattag.Doc):
     css = ''
     js = []
     linked_js = []
+    linked_css = []
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
@@ -80,16 +82,22 @@ class Yawrap(yattag.Doc):
 
     def add_css(self, css_rules):
         if not isinstance(css_rules, dict):
-            assert isinstance(css_rules, str)
+            assert isinstance(css_rules, str_types)
             css_rules = dictionize_css(css_rules)
         self._additional_css.update(css_rules)
 
     def add_js(self, js_script):
+        assert isinstance(js_script, str_types)
         self._additional_js.append(js_script)
 
+    def _get_rel_path(self, target_local_file):
+        return os.path.relpath(os.path.abspath(target_local_file), self._target_dir)
+
     def link_local_css_file(self, target_css_file_path):
-        rel_location = os.path.relpath(os.path.abspath(target_css_file_path), self._target_dir)
-        self.external_csss.add(rel_location)
+        self.external_csss.add(self._get_rel_path(target_css_file_path))
+
+    def link_local_js_file(self, target_js_file_path):
+        self._additional_linked_js.add(self._get_rel_path(target_js_file_path))
 
     def link_external_js_file(self, target_js_url):
         self._additional_linked_js.append(target_js_url)

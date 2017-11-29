@@ -9,6 +9,7 @@ import os
 import re
 from yattag.simpledoc import ATTR_NO_VALUE
 
+from .six import str_types
 
 KNOWN_SUBSTITUTES = {
     'klass': 'class',
@@ -29,7 +30,7 @@ def _attributes2(args, kwargs):
     def tr(arg):
         if isinstance(arg, tuple):
             return arg
-        elif isinstance(arg, str):
+        elif isinstance(arg, str_types):
             return (arg, ATTR_NO_VALUE)
         else:
             raise ValueError("Couldn't make a XML or HTML attribute/value pair out of %s." % repr(arg))
@@ -62,7 +63,10 @@ def assert_keys_not_in(keys, args, kwargs):
 def dictionize_css(input_css):
     if isinstance(input_css, dict):
         return input_css
-    assert isinstance(input_css, str)
+    assert isinstance(input_css, str_types)
+    input_css = input_css.strip()
+    if input_css and any(bracket not in input_css for bracket in ("{", "}")):
+        raise ValueError("That's most probably not a CSS code: {}".format(input_css))
 
     comment_prog = re.compile(r"(\/\*.*\*\/)")
     input_css = comment_prog.sub("", input_css)
