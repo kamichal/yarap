@@ -17,3 +17,5 @@ eggs/
 *.egg-info/
 .installed.cfg
 *.egg
+.pypirc
+
