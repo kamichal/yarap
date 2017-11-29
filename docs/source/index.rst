@@ -56,7 +56,7 @@ Here is a list of things that ``yawrap`` offers:
    Page styles can be defined by deriving Yawrap classes. This makes possibility to get the styles 
    shared / inherited / override in well known `pythonic` way.
 
-* **Multi-page structure**
+* :ref:`Multi-page structure <multi-page>`
    Define multiple pages in complex directory structure and don't care about the paths. 
    Not existing directories will be automatically created, you just define the path of target file.
 

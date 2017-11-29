@@ -1,5 +1,7 @@
-Multiple-page structure
-=======================
+.. _multi-page:
+
+Multiple-page structure with navigation
+=======================================
 
 It's easy to navigate between several files in different paths, using ``sub()`` method of NavedYawrap instance.
 Each call of ``sub()`` returns instance of given NavedYawrap class, with same styles and scripts as the parent one.
@@ -100,6 +102,8 @@ The first document (``home`` in this example) will be the the `root` of the docu
         </main>
       </body>
     </html>"""))
+
+gives:
 
 .. testoutput::
 
