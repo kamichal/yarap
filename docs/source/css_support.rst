@@ -188,6 +188,7 @@ Using global CSS from some resources can be obtained by calling :func:`link_exte
 
     True
 
+
 CSS defined on class level
 --------------------------
 

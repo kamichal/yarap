@@ -107,9 +107,10 @@ https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
 
 The last assertion returns:
 
+.. _css-class-level:
 
-Sharing scripts across multiple pages
--------------------------------------
+Sharing scripts and styles across multiple pages
+------------------------------------------------
 
 Similar effect as above but with reusable java scripts and CSS can be obtained by defining them 
 as class level attributes like this:

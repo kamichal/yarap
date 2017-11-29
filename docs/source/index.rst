@@ -36,7 +36,7 @@ Yawrap features
 
 Here is a list of things that ``yawrap`` offers:
 
-* :ref:`CSS  <css-support>` & :ref:`JS <js-support>` support
+* :ref:`CSS <css-support>` & :ref:`JS <js-support>` support
    Append internal CSS styles or JS at any point of document definition. Allows for conditional additions of CSS or JS. 
    ...and you don't have to care about when to insert its definition. Even if you already finished defining the body
    and you define JS after that - it will be placed in ``/html/head/``.
@@ -52,9 +52,9 @@ Here is a list of things that ``yawrap`` offers:
    You can reference local files by passing its absolute path on python side and it will appear under links 
    relative to the current document. And you don't have to `calculate the paths`.  
 
-* **Defining page 'style' on python class level**
+* :ref:`Defining page style and scripts on python class level <css-class-level>`
    Page styles can be defined by deriving Yawrap classes. This makes possibility to get the styles 
-   shared / inherited / overrided in pythonic way.
+   shared / inherited / override in well known `pythonic` way.
 
 * **Multi-page structure**
    Define multiple pages in complex directory structure and don't care about the paths. 
@@ -110,6 +110,7 @@ Contents:
    usage
    css_support
    js_support
+   navrap
    examples
 
 
