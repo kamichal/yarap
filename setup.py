@@ -3,21 +3,22 @@ from setuptools import setup, find_packages
 long_description = open('README.rst').read()
 
 setup(
-    name = 'yawrap',
-    version = '0.1',
-    author = 'Michal Kaczmarczyk',
-    author_email = 'michal.s.kaczmarczyk@gmail.com',
-    maintainer = 'Michal Kaczmarczyk',
-    maintainer_email = 'michal.s.kaczmarczyk@gmail.com',
-    license = 'MIT license',
-    url = 'https://bitbucket.org/gandowin/yarap/',
-    description = 'yawrap: simple generator of complex html reports, yattag extension',
-    long_description = long_description,
-    packages = find_packages(),
-    requires = ['yattag'],
-    install_requires = ['yattag'],
-    keywords = 'static html generator',
-    classifiers = [
+    name='yawrap',
+    version='0.1',
+    author='Michal Kaczmarczyk',
+    author_email='michal.s.kaczmarczyk@gmail.com',
+    maintainer='Michal Kaczmarczyk',
+    maintainer_email='michal.s.kaczmarczyk@gmail.com',
+    license='MIT license',
+    url='https://bitbucket.org/gandowin/yarap/',
+    description='yawrap: simple generator of complex '
+        'html reports, yattag extension',
+    long_description=long_description,
+    packages=find_packages(),
+    requires=['yattag'],
+    install_requires=['yattag'],
+    keywords='static html generator',
+    classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'Intended Audience :: Telecommunications Industry',
