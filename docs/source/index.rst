@@ -10,7 +10,22 @@ Yawrap is a powerful, lightweight  `pseudo-static HTML` builder working in ``pyt
 
 The name comes from something like `Yet Another Wrapper (of HTML tags)` and has its coincidence to yattag package.
 
-The git repository can be found at https://bitbucket.org/gandowin/yarap
+
+======== ======================================================
+resource link
+======== ======================================================
+Repo:    https://bitbucket.org/gandowin/yarap
+Docs:    http://yawrap.readthedocs.io
+Pypi:    https://pypi.python.org/pypi/yawrap
+email:   `Michał Kaczmarczyk <mailto:michal.skaczmarczy.k@gmail.com?Subject=Yawrap>`_
+======== ======================================================
+
+
+
+.. image:: https://readthedocs.org/projects/yawrap/badge/?version=latest
+    :target: http://yawrap.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
 
 yattag's heritage
 -----------------
