@@ -7,6 +7,7 @@ Created on 24 Sep 2017
 from bs4 import BeautifulSoup
 import os
 
+from _test_utils import assert_html_equal
 from yawrap import Yawrap
 from yawrap._formatter import HtmlFormatter
 
@@ -35,7 +36,7 @@ def test_basic(out_dir):
             jawrap.text('Nothing much here.')
 
     render = jawrap._render_page()
-    assert render == """\
+    assert_html_equal(render, """\
 <!doctype html>
 <html lang="en-US">
   <head>
@@ -47,7 +48,7 @@ def test_basic(out_dir):
       <p>Nothing much here.</p>
     </div>
   </body>
-</html>"""
+</html>""")
 
 
 def test_overloading(tmpdir):
@@ -68,7 +69,7 @@ def test_overloading(tmpdir):
 
     a.render()
 
-    assert out_file.read() == """\
+    assert_html_equal(out_file.read(), """\
 <!doctype html>
 <html lang="en-US">
   <head>
@@ -82,7 +83,7 @@ def test_overloading(tmpdir):
   <body>
     <p>that's my wrap</p>
   </body>
-</html>"""
+</html>""")
 
 
 def test_overloading_2(tmpdir):
@@ -160,4 +161,4 @@ def test_overloading_2(tmpdir):
       </body>
     </html>"""
 
-    assert BeautifulSoup(out_file.read(), "lxml") == BeautifulSoup(expected_page, "lxml")
+    assert_html_equal(out_file.read(), expected_page)

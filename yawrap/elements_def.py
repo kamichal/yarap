@@ -146,12 +146,12 @@ HTML_ELEMENTS = [
     ES("object", HB, N, "Defines an embedded object"),
     ES("param", HB, E, "Defines a parameter for an object")]
 
-HTML4_ELEMENTS = filter(lambda e: e.standard == H4 or e.standard == HB, HTML_ELEMENTS)
-HTML5_ELEMENTS = filter(lambda e: e.standard == H5 or e.standard == HB, HTML_ELEMENTS)
+HTML4_ELEMENTS = [e for e in HTML_ELEMENTS if e.standard == H4 or e.standard == HB]
+HTML5_ELEMENTS = [e for e in HTML_ELEMENTS if e.standard == H5 or e.standard == HB]
 
 HTML_TAGS = {
-    H4: map(lambda e: e.tag, HTML4_ELEMENTS),
-    H5: map(lambda e: e.tag, HTML5_ELEMENTS)
+    H4: [e.tag for e in HTML4_ELEMENTS],
+    H5: [e.tag for e in HTML5_ELEMENTS],
 }
 CONTEXT_ELEMENTS = {
     H4: [ER(e.tag, e.info) for e in HTML4_ELEMENTS if e.type_ == N],

@@ -9,9 +9,8 @@ from contextlib import contextmanager
 import os
 import pytest
 
+from _test_utils import assert_html_equal
 from yawrap import NavedYawrap
-from yawrap.six import str_types
-import re
 
 
 def flatten(nav_entry):
@@ -141,12 +140,6 @@ NAV_TEST_PARAMS = [(NavedYawrap, plain_info, 'subs_plain'),
                    (StyledNavrap, styled_info, 'subs_StyledNavrap'),
                    (W3StyledNavrap, w3_info, 'subs_W3StyledNavrap')]
 
-MIN_PROG = re.compile("\s*\>\n\s*\<")
-
-
-def minify(html_string):
-    return MIN_PROG.sub("><", html_string)
-
 
 def draw_sample_svg(painter_doc, points="50,150 50,200 200,200 200,100"):
     painter_doc.stag('rect', x="25", y="25", width="200", height="200", klass='the_rect')
@@ -179,14 +172,7 @@ def test_simple_navrap(tmpdir):
 
     home.render_all_files()
 
-    def is_html_equal(html_file, expected_html):
-        with open(html_file, 'rt') as ff:
-            got_html = ff.read()
-        got = BeautifulSoup(minify(got_html), "lxml")
-        exp = BeautifulSoup(minify(expected_html), "lxml")
-        assert got == exp
-
-    is_html_equal(out_file_1, """\
+    assert_html_equal(out_file_1, """\
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -217,7 +203,7 @@ def test_simple_navrap(tmpdir):
       </body>
     </html>\n""")
 
-    is_html_equal(out_file_2, """\
+    assert_html_equal(out_file_2, """\
     <!doctype html>
     <html lang="en-US">
       <head>
@@ -246,7 +232,7 @@ def test_simple_navrap(tmpdir):
           <div>Always do the abouting!</div>
         </main>
       </body>
-    </html>\n""")
+    </html>""")
 
 
 @contextmanager

@@ -55,7 +55,7 @@ def make_place(target_file):
 def assert_keys_not_in(keys, args, kwargs):
     keys = keys if isinstance(keys, (list, tuple)) else [keys]
     for key in keys:
-        defined_keys = list(kwargs.keys()) + list(map(lambda x: x[0], filter(lambda y: isinstance(y, tuple), args)))
+        defined_keys = list(kwargs.keys()) + [x[0] for x in args if isinstance(x, tuple)]
         if key in defined_keys:
             raise ValueError("Duplicated '{}' attribute.".format(key))
 

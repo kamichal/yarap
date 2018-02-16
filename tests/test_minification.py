@@ -90,7 +90,6 @@ def test_minification(min_option, input_html, reference_result):
 
     Yawrap.html_formatter = min_option
     raw_text_result = Yawrap.html_formatter(input_html)
-    print(raw_text_result)
     assert raw_text_result == reference_result
 
 

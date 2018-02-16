@@ -37,18 +37,3 @@ class Ya5(yattag.SimpleDoc):
 
 class Ya4(Ya5):
     version = H4
-
-
-def test_1():
-
-    y = Ya5()
-    with y.html():
-        with y.body():
-            with y.div():
-                with y.p(klass='ok'):
-                    y.text("that's all")
-                    y.br()
-            y.img(href='12')
-
-    render = y.getvalue()
-    assert render == '<html><body><div><p class="ok">that\'s all<br></p></div><img href="12"></body></html>'
