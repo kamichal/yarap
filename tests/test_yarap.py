@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 import os
 
 from yawrap import Yawrap
+from yawrap._formatter import HtmlFormatter
 
 
 def test_linking_a_local_file(out_dir):
@@ -27,7 +28,7 @@ def test_linking_a_local_file(out_dir):
 
 def test_basic(out_dir):
     the_file = os.path.join(out_dir, 'test_basic.html')
-
+    Yawrap.html_formatter = HtmlFormatter.yattag_indent
     jawrap = Yawrap(the_file, 'pleasure')
     with jawrap.tag('div'):
         with jawrap.tag('p'):

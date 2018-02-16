@@ -11,6 +11,7 @@ import pytest
 
 from yawrap import NavedYawrap
 from yawrap.six import str_types
+import re
 
 
 def flatten(nav_entry):
@@ -140,6 +141,12 @@ NAV_TEST_PARAMS = [(NavedYawrap, plain_info, 'subs_plain'),
                    (StyledNavrap, styled_info, 'subs_StyledNavrap'),
                    (W3StyledNavrap, w3_info, 'subs_W3StyledNavrap')]
 
+MIN_PROG = re.compile("\s*\>\n\s*\<")
+
+
+def minify(html_string):
+    return MIN_PROG.sub("><", html_string)
+
 
 def draw_sample_svg(painter_doc, points="50,150 50,200 200,200 200,100"):
     painter_doc.stag('rect', x="25", y="25", width="200", height="200", klass='the_rect')
@@ -148,10 +155,10 @@ def draw_sample_svg(painter_doc, points="50,150 50,200 200,200 200,100"):
     painter_doc.stag('line', x1="50", y1="50", x2="200", y2="200", stroke="blue", stroke_width="4")
 
 
-def test_simple_navrap():
+def test_simple_navrap(tmpdir):
 
-    out_file_1 = "/tmp/nav01a.html"
-    out_file_2 = "/tmp/some/deep/nonexistent/path/nav01b.html"
+    out_file_1 = str(tmpdir.join("nav01a.html"))
+    out_file_2 = str(tmpdir.join("nonexistent/path/nav01b.html"))
 
     class MyPage(NavedYawrap):
         css = """
@@ -173,9 +180,10 @@ def test_simple_navrap():
     home.render_all_files()
 
     def is_html_equal(html_file, expected_html):
-        from bs4 import BeautifulSoup
-        got = BeautifulSoup(open(html_file, 'r').read(), "lxml")
-        exp = BeautifulSoup(expected_html, "lxml")
+        with open(html_file, 'rt') as ff:
+            got_html = ff.read()
+        got = BeautifulSoup(minify(got_html), "lxml")
+        exp = BeautifulSoup(minify(expected_html), "lxml")
         assert got == exp
 
     is_html_equal(out_file_1, """\
@@ -198,7 +206,7 @@ def test_simple_navrap():
             </div>
             <div class="nav_group_div">
               <div class="nav_page">
-                <a href="some/deep/nonexistent/path/nav01b.html" class="nav_page_link">Abouting</a>
+                <a href="nonexistent/path/nav01b.html" class="nav_page_link">Abouting</a>
               </div>
             </div>
           </div>
@@ -207,7 +215,7 @@ def test_simple_navrap():
           <p>I'm home</p>
         </main>
       </body>
-    </html>""")
+    </html>\n""")
 
     is_html_equal(out_file_2, """\
     <!doctype html>
@@ -225,7 +233,7 @@ def test_simple_navrap():
         <nav class="nav_main_panel">
           <div class="nav_group_div">
             <div class="nav_page">
-              <a href="../../../../nav01a.html" class="nav_page_link">Title Force One</a>
+              <a href="../../nav01a.html" class="nav_page_link">Title Force One</a>
             </div>
             <div class="nav_group_div active">
               <div class="nav_page with_bookmarks">
@@ -238,7 +246,7 @@ def test_simple_navrap():
           <div>Always do the abouting!</div>
         </main>
       </body>
-    </html>""")
+    </html>\n""")
 
 
 @contextmanager

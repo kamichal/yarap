@@ -9,8 +9,9 @@ from contextlib import contextmanager
 import os
 import yattag
 
-from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
 from .six import str_types
+from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
+from yawrap._formatter import HtmlFormatter
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
@@ -47,6 +48,7 @@ class Yawrap(yattag.Doc):
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
+    html_formatter = HtmlFormatter.yattag_indent
 
     def __init__(self, target_file, title='', parent=None, defaults=None, errors=None,
                  error_wrapper=('<span class="error">', '</span>'), stag_end='/>'):
@@ -134,12 +136,15 @@ class Yawrap(yattag.Doc):
             with page_doc.tag('body'):
                 yield
 
+    def _get_body_render(self):
+        raw_body_html = self.getvalue()
+        return self.html_formatter(raw_body_html)
+
     def _render_page(self):
         page_doc = yattag.SimpleDoc()
         with self._html_page_structure(page_doc):
             page_doc.asis(self._get_body_render())
-        return yattag.indent(page_doc.getvalue())
 
-    def _get_body_render(self):
-        return yattag.indent(self.getvalue())
+        raw_text = page_doc.getvalue()
+        return self.html_formatter(raw_text)
 
