@@ -4,7 +4,7 @@ long_description = open('README.rst').read()
 
 setup(
     name='yawrap',
-    version='0.2.1',
+    version='0.2.2',
     author='Michal Kaczmarczyk',
     author_email='michal.s.kaczmarczyk@gmail.com',
     maintainer='Michal Kaczmarczyk',
