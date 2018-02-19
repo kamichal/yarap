@@ -6,6 +6,7 @@ include README.rst
 include tox.ini
 exclude bitbucket-pipelines.yml
 exclude docs/Makefile
+exclude distribute_info.txt
 
 exclude tests
 recursive-exclude tests *
