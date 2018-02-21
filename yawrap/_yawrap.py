@@ -12,6 +12,7 @@ import yattag
 from .six import str_types
 from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
 from yawrap._formatter import HtmlFormatter
+from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
@@ -41,6 +42,7 @@ def svg_structure(painter,
 
 
 class Yawrap(yattag.Doc):
+    resources = []
     css = ''
     js = []
     linked_js = []
@@ -99,7 +101,7 @@ class Yawrap(yattag.Doc):
         self.external_csss.add(self._get_rel_path(target_css_file_path))
 
     def link_local_js_file(self, target_js_file_path):
-        self._additional_linked_js.add(self._get_rel_path(target_js_file_path))
+        self._additional_linked_js.append(self._get_rel_path(target_js_file_path))
 
     def link_external_js_file(self, target_js_url):
         self._additional_linked_js.append(target_js_url)
@@ -133,8 +135,17 @@ class Yawrap(yattag.Doc):
                         page_doc.asis(form_css(page_css, indent_level=3))
                 for ext_css in self.external_csss:
                     page_doc.stag("link", rel="stylesheet", type="text/css", href=ext_css)
+
+                for resource in self.resources:
+                    resource.visit(page_doc, self, HEAD)
+
             with page_doc.tag('body'):
+                for resource in self.resources:
+                    resource.visit(page_doc, self, BODY_BEGIN)
+                """ at this moment yawrap will place its html here """
                 yield
+                for resource in self.resources:
+                    resource.visit(page_doc, self, BODY_END)
 
     def _get_body_render(self):
         raw_body_html = self.getvalue()
@@ -147,4 +158,10 @@ class Yawrap(yattag.Doc):
 
         raw_text = page_doc.getvalue()
         return self.html_formatter(raw_text)
+
+    def _get_root(self):
+        return self
+
+    def get_root_dir(self):
+        return self._get_root()._target_dir
 

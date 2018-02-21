@@ -11,6 +11,7 @@ from yattag.simpledoc import ATTR_NO_VALUE
 
 from .six import str_types
 
+
 KNOWN_SUBSTITUTES = {
     'klass': 'class',
     'Class': 'class',
@@ -114,3 +115,24 @@ def form_css(structured_css, indent_level=1):
             yield template.format(ind=indent, selector=selector, definitions=defs)
 
     return ''.join(rules())
+
+
+def error(text):
+    print(text)
+
+
+def warn_(text):
+    print(text)
+
+
+DJANGO_URL_VALIDATION_PROG = re.compile(
+    r'^(?:http|ftp)s?://'  # http:// or https://
+    r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|'  # domain...
+    r'localhost|'  # localhost...
+    r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'  # ...or ip
+    r'(?::\d+)?'  # optional port
+    r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+
+
+def is_url(text):
+    return isinstance(text, str) and DJANGO_URL_VALIDATION_PROG.match(text) is not None
