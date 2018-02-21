@@ -63,7 +63,7 @@ def assert_keys_not_in(keys, args, kwargs):
 
 def dictionize_css(input_css):
     if isinstance(input_css, dict):
-        return input_css
+        return input_css.copy()
     assert isinstance(input_css, str_types)
     input_css = input_css.strip()
     if input_css and any(bracket not in input_css for bracket in ("{", "}")):

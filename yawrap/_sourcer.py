@@ -18,6 +18,7 @@ import posixpath
 
 from .six import urlopen, urlparse, str_types
 from .utils import make_place, is_url, error, warn_
+from yawrap.utils import form_css, dictionize_css
 
 
 HEAD = "head"
@@ -32,13 +33,14 @@ class _Gainer(object):
     __slots__ = ("read", "file_name", "placement")
 
     def __init__(self, read_function_or_str, placement=HEAD, file_name=None):
+        assert placement in PLACEMENT_OPTIONS
         if isinstance(read_function_or_str, str_types):
+            # make string callable
             self.read = lambda: read_function_or_str
         else:
             self.read = read_function_or_str
         self.file_name = file_name
         self._placement = placement
-        assert placement in PLACEMENT_OPTIONS
 
     @classmethod
     def from_url(cls, url, placement=HEAD):
@@ -120,6 +122,7 @@ class _CssResource(_Gainer):
 
     @classmethod
     def embed(cls, doc, content):
+        content = form_css(dictionize_css(content), indent_level=4)
         with doc.tag('style'):
             doc.asis(content)
 

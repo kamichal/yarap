@@ -7,6 +7,7 @@ from _test_utils import assert_html_equal
 from yawrap import Yawrap, NavedYawrap, ExtenalJs, ExtenalCss, EmbedJs, EmbedCss, LinkJs, LinkCss, BODY_BEGIN, \
     BODY_END, _sourcer
 from yawrap._sourcer import os, PLACEMENT_OPTIONS
+import posixpath
 
 
 @pytest.fixture
@@ -17,6 +18,10 @@ def mocked_urlopen(mocker):
             self.url = url
 
         def read(self, *_):
+            basename = posixpath.basename(self.url)
+            
+            if basename.endswith(".css"):
+                return " #%s {color: #BAD;}" % basename
             return "Dummy response to {}".format(self.url)
 
         def close(self, *_):
@@ -28,6 +33,9 @@ def mocked_urlopen(mocker):
 @pytest.fixture
 def mocked_read_file(mocker):
     def read_file_stub(file_path):
+        basename = os.path.basename(file_path)
+        if basename.endswith(".css"):
+            return " #%s {background: #AFE;}" % basename
         return "That's a dummy content of %s file." % file_path
 
     mocker.patch.object(os.path, "isfile", return_value=True)
@@ -87,11 +95,11 @@ def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, t
         <html lang="en-US">
           <head>
             <meta charset="UTF-8" />
-            <style>head { background: #DAD; }</style>
+            <style>head {\n          background: #DAD;\n        }</style>
             <script type="text/javascript">console.log("alles klar in the head")</script>
-            <style>Dummy response to http://www.css.in/da.house.css</style>
+            <style>#da.house.css {\n          color: #BAD;\n        }</style>
             <script type="text/javascript">Dummy response to http://www.js.in/the.head.js</script>
-            <style>That's a dummy content of /path/to/style_to_embed.css file.</style>
+            <style>#style_to_embed.css {\n          background: #AFE;\n        }</style>
             <script type="text/javascript">That's a dummy content of /path/to/script_to_embed.js file.</script>
           </head>
           <body>

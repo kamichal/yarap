@@ -12,7 +12,7 @@ import yattag
 from .six import str_types
 from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
 from yawrap._formatter import HtmlFormatter
-from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END
+from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Gainer
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
@@ -63,6 +63,7 @@ class Yawrap(yattag.Doc):
         self._additional_js = []
         self._additional_linked_js = []
         self._additional_css = {}
+        self._additional_resources = []
         self.external_csss = set()
 
     @contextmanager
@@ -83,6 +84,10 @@ class Yawrap(yattag.Doc):
         svg_tag_attributes.update(self.svg_d)
         with svg_structure(self, svg_tag_attributes, svg_styles_as_str, *args, **svg_tag_attributes):
             yield
+
+    def add(self, js_or_css_resource):
+        assert isinstance(js_or_css_resource, _Gainer), "Bad ussage, expected CSS or JS resource definition."
+        self._additional_resources.append(js_or_css_resource)
 
     def add_css(self, css_rules):
         if not isinstance(css_rules, dict):
@@ -111,7 +116,7 @@ class Yawrap(yattag.Doc):
 
     @contextmanager
     def _html_page_structure(self, page_doc):
-        page_css = dictionize_css(self.css).copy()
+        page_css = dictionize_css(self.css)
         page_css.update(self._additional_css)
         page_js = self._additional_js + self.js
         linked_js = self._additional_linked_js + self.linked_js
@@ -136,15 +141,15 @@ class Yawrap(yattag.Doc):
                 for ext_css in self.external_csss:
                     page_doc.stag("link", rel="stylesheet", type="text/css", href=ext_css)
 
-                for resource in self.resources:
+                for resource in self.resources + self._additional_resources:
                     resource.visit(page_doc, self, HEAD)
 
             with page_doc.tag('body'):
-                for resource in self.resources:
+                for resource in self.resources + self._additional_resources:
                     resource.visit(page_doc, self, BODY_BEGIN)
                 """ at this moment yawrap will place its html here """
                 yield
-                for resource in self.resources:
+                for resource in self.resources + self._additional_resources:
                     resource.visit(page_doc, self, BODY_END)
 
     def _get_body_render(self):
