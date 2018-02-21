@@ -1,19 +1,17 @@
+exclude bitbucket-pipelines.yml
+exclude distribute_info.txt
+exclude docs/Makefile
+exclude docs/_config.yml
+exclude tests
+
 include *.py
 include .coveragerc
-
 include LICENSE
 include README.rst
 include tox.ini
-exclude bitbucket-pipelines.yml
-exclude docs/Makefile
-exclude distribute_info.txt
 
-exclude tests
 recursive-exclude tests *
-
+recursive-exclude yawrap/tests/out *
 recursive-include docs *.py
 recursive-include docs *.rst
-
 recursive-include yawrap *.py
-
-recursive-exclude yawrap/tests/out *
