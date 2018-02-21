@@ -1,11 +1,12 @@
 
+from itertools import product
 import pytest
 
-from yawrap import Yawrap, ExtenalJs, ExtenalCss, EmbedCss, LinkJs, BODY_BEGIN, BODY_END
-from yawrap import _sourcer
-from yawrap._sourcer import EmbedJs, os, LinkCss, PLACEMENT_OPTIONS, _Gainer
 from _test_utils import assert_html_equal
-from itertools import product
+from yawrap import Yawrap, NavedYawrap, ExtenalJs, ExtenalCss, EmbedJs, EmbedCss, LinkJs, LinkCss, BODY_BEGIN, \
+    BODY_END, _sourcer
+from yawrap._sourcer import os, PLACEMENT_OPTIONS
+from bs4 import BeautifulSoup
 
 
 @pytest.fixture
@@ -99,6 +100,34 @@ def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, t
         </html>""")
 
 
+def test_embedding_in_body(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
+
+    class MyRap(Yawrap):
+        resources = [
+            EmbedJs.from_str('console.log("alles klar in the body")', placement=BODY_BEGIN),
+            EmbedJs.from_url('http://www.js.in/the.body.js', placement=BODY_BEGIN),
+            EmbedJs.from_file("/path/to/script_to_embed.js", placement=BODY_END),
+        ]
+
+    doc = MyRap(str(tmpdir.join("that_file.html")))
+    with doc.tag("p"):
+        doc.text("The body content")
+
+    result = doc._render_page()
+    assert_html_equal(result, """<!doctype html>
+        <html lang="en-US">
+          <head>
+            <meta charset="UTF-8" />
+          </head>
+          <body>
+            <script type="text/javascript">console.log("alles klar in the body")</script>
+            <script type="text/javascript">Dummy response to http://www.js.in/the.body.js</script>
+            <p>The body content</p>
+            <script type="text/javascript">That's a dummy content of /path/to/script_to_embed.js file.</script>
+          </body>
+        </html>""")
+
+
 def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
 
     class MyRap(Yawrap):
@@ -135,10 +164,18 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
         </html>""")
 
 
-def test_linking_local_files_in_head_custom_loc(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
-
+@pytest.fixture
+def custom_link_dir():
+    previous_value = LinkCss.resource_subdir
     LinkCss.resource_subdir = "custom/css/dir"
     LinkJs.resource_subdir = "custom/js/dir"
+    yield
+    LinkCss.resource_subdir = previous_value
+    LinkJs.resource_subdir = previous_value
+
+
+def test_linking_local_files_in_head_custom_loc(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir,
+                                                custom_link_dir):
 
     class MyRap(Yawrap):
 
@@ -226,37 +263,36 @@ def test_silly_definitions_2(Operation):
     assert "Cannot reference remote/external file by local file content." in str(e.value)
 
 
-def test_sourcing_to_body_begin(mocked_urlopen, tmpdir):
-
-    class MyRap(Yawrap):
-        resources = [
-            ExtenalCss("https://www.css.com/w3.css"),
-            ExtenalJs("https://jquery.com/jquery.head.min.js"),
-
-            EmbedCss.from_str("head { background: #DAD; }"),
-            EmbedJs.from_str('console.log("alles klar in the head")'),
-            EmbedJs.from_str('console.log("alles klar the body")', BODY_BEGIN),
-            EmbedJs.from_str('console.log("body ends clearly as well")', BODY_END),
-
-            EmbedCss.from_url("http://www.css.in/da.house.css"),
-            EmbedJs.from_url('http://www.js.in/the.head.js'),
-            EmbedJs.from_url('http://body.pl/starts.js', BODY_BEGIN),
-            EmbedJs.from_url('https://www.see.you/body.js', BODY_END),
-
-            LinkJs.from_url("https://invalid.address.com/want/to/have/it/in/head.js"),
-            LinkJs.from_url("https://invalid.address.com/want/to/have/it/at_body_beggining.js", BODY_BEGIN),
-            LinkJs.from_url("https://invalid.address.com/want/to/have/it/at_body_end.js", BODY_END),
-        ]
-
-    doc = MyRap(str(tmpdir.join("that_file.html")))
-    with doc.tag("p"):
-        doc.text("The body content")
-
-    print(doc._render_page())
-
-
 def test_read_file(tmpdir):
     the_file = tmpdir.join("that.file")
     the_file.write("sentinel\n")
-    result = _Gainer._read_file(str(the_file))
+    result = _sourcer._Gainer._read_file(str(the_file))
     assert result == "sentinel\n"
+
+
+def test_inheriting_local_files_linkage(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
+
+    class Root(NavedYawrap):
+        resources = [
+            LinkCss.from_str("body { background: #DAD; }", file_name="common_style.css"),
+            LinkJs.from_str('console.log("all right!");', file_name="common_script.js"),
+        ]
+
+    root_file = tmpdir.join("that_file.html")
+    sub_file = tmpdir.join("somewhere", "else", "page.html")
+
+    root_doc = Root(str(root_file))
+
+    with root_doc.tag("p"):
+        root_doc.text("The root body content")
+
+    sub_doc = root_doc.sub(str(sub_file), "sub_name")
+
+    root_soup = BeautifulSoup(root_doc._render_page(), "lxml")
+
+    assert root_soup.html.head.script['src'] == "resources/common_script.js"
+    assert root_soup.html.head.link['href'] == "resources/common_style.css"
+
+    sub_soup = BeautifulSoup(sub_doc._render_page(), "lxml")
+    assert sub_soup.html.head.script['src'] == "../../resources/common_script.js"
+    assert sub_soup.html.head.link['href'] == "../../resources/common_style.css"

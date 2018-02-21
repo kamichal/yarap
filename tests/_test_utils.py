@@ -11,6 +11,8 @@ def minify(html_string):
 
 
 def html_from_file_or_string(file_or_string):
+    if not file_or_string:
+        return file_or_string
     if ">" not in file_or_string:
         assert os.path.isfile(file_or_string)
         with open(file_or_string, "rt") as ff:
