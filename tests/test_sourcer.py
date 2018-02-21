@@ -1,4 +1,5 @@
 
+from bs4 import BeautifulSoup
 from itertools import product
 import pytest
 
@@ -6,7 +7,6 @@ from _test_utils import assert_html_equal
 from yawrap import Yawrap, NavedYawrap, ExtenalJs, ExtenalCss, EmbedJs, EmbedCss, LinkJs, LinkCss, BODY_BEGIN, \
     BODY_END, _sourcer
 from yawrap._sourcer import os, PLACEMENT_OPTIONS
-from bs4 import BeautifulSoup
 
 
 @pytest.fixture
@@ -69,8 +69,8 @@ def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, t
 
     class MyRap(Yawrap):
         resources = [
-            EmbedCss.from_str("head { background: #DAD; }"),
-            EmbedJs.from_str('console.log("alles klar in the head")'),
+            EmbedCss("head { background: #DAD; }"),
+            EmbedJs('console.log("alles klar in the head")'),
 
             EmbedCss.from_url("http://www.css.in/da.house.css"),
             EmbedJs.from_url('http://www.js.in/the.head.js'),
@@ -104,7 +104,7 @@ def test_embedding_in_body(mocked_urlopen, mocked_read_file, mocked_save_file, t
 
     class MyRap(Yawrap):
         resources = [
-            EmbedJs.from_str('console.log("alles klar in the body")', placement=BODY_BEGIN),
+            EmbedJs('console.log("alles klar in the body")', placement=BODY_BEGIN),
             EmbedJs.from_url('http://www.js.in/the.body.js', placement=BODY_BEGIN),
             EmbedJs.from_file("/path/to/script_to_embed.js", placement=BODY_END),
         ]
@@ -132,8 +132,8 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
 
     class MyRap(Yawrap):
         resources = [
-            LinkCss.from_str("Store that style to the file.css", file_name="that_new_style.css"),
-            LinkJs.from_str("Store that script to the file.js", file_name="that_new_script.js"),
+            LinkCss("Store that style to the file.css", file_name="that_new_style.css"),
+            LinkJs("Store that script to the file.js", file_name="that_new_script.js", placement=BODY_END),
 
             LinkCss.from_url("https://want.to/have/it/in/my/head.css"),
             LinkJs.from_url("https://want.to/have/it/in/my/head.js"),
@@ -152,7 +152,6 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
           <head>
             <meta charset="UTF-8" />
             <link href="resources/that_new_style.css" type="text/css" rel="stylesheet" />
-            <script src="resources/that_new_script.js"></script>
             <link href="resources/head.css" type="text/css" rel="stylesheet" />
             <script src="resources/head.js"></script>
             <link href="resources/local_style.css" type="text/css" rel="stylesheet" />
@@ -160,6 +159,7 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
           </head>
           <body>
             <p>The body content</p>
+          <script src="resources/that_new_script.js"></script>
           </body>
         </html>""")
 
@@ -180,11 +180,11 @@ def test_linking_local_files_in_head_custom_loc(mocked_urlopen, mocked_read_file
     class MyRap(Yawrap):
 
         resources = [
-            LinkCss.from_str("Store that style to the file.css", file_name="that_new_style.css"),
+            LinkCss("Store that style to the file.css", file_name="that_new_style.css"),
             LinkCss.from_url("https://want.to/have/it/from_web.css"),
             LinkCss.from_file("/link/to/local_style.css"),
 
-            LinkJs.from_str("Store that script to the file.js", file_name="that_new_script.js"),
+            LinkJs("Store that script to the file.js", file_name="that_new_script.js"),
             LinkJs.from_url("https://want.to/have/it/from_web.js"),
             LinkJs.from_file("link/to/local_script.js"),
         ]
@@ -217,7 +217,7 @@ def test_cannot_put_css_in_body(Operation, placement):
     with pytest.raises(TypeError) as e:
         class MyRap(Yawrap):
             resources = [
-                Operation.from_str("head { background: #DAD; }", placement=placement, file_name="some.css"),
+                Operation("head { background: #DAD; }", placement=placement, file_name="some.css"),
             ]
     assert ('Cannot place CSS out of head section (%s)' % placement) in str(e.value)
 
@@ -244,16 +244,9 @@ def test_cannot_link_css_in_body2(placement):
 def test_have_to_provide_file_name(placement):
     with pytest.raises(ValueError) as e:
         class MyRap(Yawrap):
-            resources = [LinkJs.from_str("script content", placement=placement)]
+            resources = [LinkJs("script content", placement=placement)]
         MyRap("file.html")._render_page()
     assert "You need to provide filename in order to store the content for LinkJs operation." in str(e.value)
-
-
-@pytest.mark.parametrize("Operation", [ExtenalCss, ExtenalJs])
-def test_silly_definitions(Operation):
-    with pytest.raises(TypeError) as e:
-        Operation.from_str("anything")
-    assert "Cannot reference remote/external file by string content." in str(e.value)
 
 
 @pytest.mark.parametrize("Operation", [ExtenalCss, ExtenalJs])
@@ -274,8 +267,8 @@ def test_inheriting_local_files_linkage(mocked_urlopen, mocked_read_file, mocked
 
     class Root(NavedYawrap):
         resources = [
-            LinkCss.from_str("body { background: #DAD; }", file_name="common_style.css"),
-            LinkJs.from_str('console.log("all right!");', file_name="common_script.js"),
+            LinkCss("body { background: #DAD; }", file_name="common_style.css"),
+            LinkJs('console.log("all right!");', file_name="common_script.js"),
         ]
 
     root_file = tmpdir.join("that_file.html")

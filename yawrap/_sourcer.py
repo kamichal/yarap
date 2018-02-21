@@ -16,7 +16,7 @@ from contextlib import closing
 import os
 import posixpath
 
-from .six import urlopen, urlparse
+from .six import urlopen, urlparse, str_types
 from .utils import make_place, is_url, error, warn_
 
 
@@ -31,9 +31,11 @@ class _Gainer(object):
         It creates an object that exposes "read()" function and file_name, that can be also useful. """
     __slots__ = ("read", "file_name", "placement")
 
-    def __init__(self, read_function, file_name, placement):
-        """ Don't use the constructor directly, use one of from_* classmethods. """
-        self.read = read_function
+    def __init__(self, read_function_or_str, placement=HEAD, file_name=None):
+        if isinstance(read_function_or_str, str_types):
+            self.read = lambda: read_function_or_str
+        else:
+            self.read = read_function_or_str
         self.file_name = file_name
         self._placement = placement
         assert placement in PLACEMENT_OPTIONS
@@ -47,7 +49,7 @@ class _Gainer(object):
 
         def read():
             return cls._download(url)
-        return cls(read, file_name, placement)
+        return cls(read, placement, file_name)
 
     @classmethod
     def from_file(cls, file_path, placement=HEAD):
@@ -58,14 +60,7 @@ class _Gainer(object):
 
         def read():
             return cls._read_file(file_path)
-        return cls(read, file_name, placement)
-
-    @classmethod
-    def from_str(cls, str_content, placement=HEAD, file_name=None):
-        """ file_name is needed if you want to store the file locally
-            If you want to embed the str_content, then it can be skipped.
-        """
-        return cls(lambda: str_content, file_name, placement)
+        return cls(read, placement, file_name)
 
     @staticmethod
     def _download(url):
@@ -114,10 +109,10 @@ class _CssResource(_Gainer):
     rel = "stylesheet"
     type_ = "text/css"
 
-    def __init__(self, read_function, file_name, placement):
+    def __init__(self, read_function, placement=HEAD, file_name=None):
         if placement != HEAD:
             raise TypeError("Cannot place CSS out of head section (%s)" % placement)
-        super(_CssResource, self).__init__(read_function, file_name, placement)
+        super(_CssResource, self).__init__(read_function, placement, file_name)
 
     @classmethod
     def link(cls, doc, href):
@@ -161,14 +156,6 @@ class _LinkLocal(_Gainer):
             raise ValueError("You need to provide filename in order to store "
                              "the content for %s operation." % cls.__name__)
 
-    @classmethod
-    def from_str(cls, str_content, placement=HEAD, file_name=None):
-        """ file_name is needed if you want to store the file locally
-            If you want to embed the str_content, then it can be skipped.
-        """
-        cls._check_file_name_provided(file_name)
-        return cls(lambda: str_content, file_name, placement)
-
 
 class _LinkExternal(_Gainer):
     __slots__ = ("url", "placement")
@@ -189,10 +176,6 @@ class _LinkExternal(_Gainer):
     @classmethod
     def from_file(cls, *_):
         raise TypeError("Cannot reference remote/external file by local file content.")
-
-    @classmethod
-    def from_str(cls, *_):
-        raise TypeError("Cannot reference remote/external file by string content.")
 
 
 class EmbedCss(_Embed, _CssResource):
