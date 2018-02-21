@@ -111,10 +111,18 @@ class _CssResource(_Gainer):
     rel = "stylesheet"
     type_ = "text/css"
 
-    def __init__(self, read_function, placement=HEAD, file_name=None):
+    def __init__(self, read_function_or_str_or_dict, placement=HEAD, file_name=None):
         if placement != HEAD:
             raise TypeError("Cannot place CSS out of head section (%s)" % placement)
-        super(_CssResource, self).__init__(read_function, placement, file_name)
+        if isinstance(read_function_or_str_or_dict, str_types):
+            def read():
+                return form_css(dictionize_css(read_function_or_str_or_dict), indent_level=0)
+        elif isinstance(read_function_or_str_or_dict, dict):
+            def read():
+                return form_css(read_function_or_str_or_dict, indent_level=0)
+        else:
+            read = read_function_or_str_or_dict
+        super(_CssResource, self).__init__(read, placement, file_name)
 
     @classmethod
     def link(cls, doc, href):
@@ -122,7 +130,7 @@ class _CssResource(_Gainer):
 
     @classmethod
     def embed(cls, doc, content):
-        content = form_css(dictionize_css(content), indent_level=4)
+        content = form_css(dictionize_css(content), indent_level=0)
         with doc.tag('style'):
             doc.asis(content)
 

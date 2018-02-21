@@ -19,7 +19,7 @@ def mocked_urlopen(mocker):
 
         def read(self, *_):
             basename = posixpath.basename(self.url)
-            
+
             if basename.endswith(".css"):
                 return " #%s {color: #BAD;}" % basename
             return "Dummy response to {}".format(self.url)
@@ -95,11 +95,11 @@ def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, t
         <html lang="en-US">
           <head>
             <meta charset="UTF-8" />
-            <style>head {\n          background: #DAD;\n        }</style>
+            <style>head {\n  background: #DAD;\n}</style>
             <script type="text/javascript">console.log("alles klar in the head")</script>
-            <style>#da.house.css {\n          color: #BAD;\n        }</style>
+            <style>#da.house.css {\n  color: #BAD;\n}</style>
             <script type="text/javascript">Dummy response to http://www.js.in/the.head.js</script>
-            <style>#style_to_embed.css {\n          background: #AFE;\n        }</style>
+            <style>#style_to_embed.css {\n  background: #AFE;\n}</style>
             <script type="text/javascript">That's a dummy content of /path/to/script_to_embed.js file.</script>
           </head>
           <body>
@@ -140,7 +140,7 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
 
     class MyRap(Yawrap):
         resources = [
-            LinkCss("Store that style to the file.css", file_name="that_new_style.css"),
+            LinkCss("#nothing {}", file_name="that_new_style.css"),
             LinkJs("Store that script to the file.js", file_name="that_new_script.js", placement=BODY_END),
 
             LinkCss.from_url("https://want.to/have/it/in/my/head.css"),
@@ -172,6 +172,30 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
         </html>""")
 
 
+@pytest.mark.parametrize("css_definition", [
+    "#selector { color: #BAC; margin: 0;}",
+    {"#selector": {"color": "#BAC", "margin": 0}},
+])
+def test_saving_files(tmpdir, css_definition):
+    css_file_name = "that_new_style.css"
+    css_rel_path = posixpath.join(LinkCss.resource_subdir, css_file_name)
+    out_file = tmpdir.join("test_saving_files.html")
+    css_file = tmpdir.join(LinkCss.resource_subdir, css_file_name)
+
+    class MyRap(Yawrap):
+        resources = [
+            LinkCss(css_definition, file_name=css_file_name),
+        ]
+
+    doc = MyRap(str(out_file))
+    assert BeautifulSoup(doc._render_page(), "lxml").html.head.link['href'] == css_rel_path
+    assert css_file.read() == """
+#selector {
+  color: #BAC;
+  margin: 0;
+}"""
+
+
 @pytest.fixture
 def custom_link_dir():
     previous_value = LinkCss.resource_subdir
@@ -188,7 +212,7 @@ def test_linking_local_files_in_head_custom_loc(mocked_urlopen, mocked_read_file
     class MyRap(Yawrap):
 
         resources = [
-            LinkCss("Store that style to the file.css", file_name="that_new_style.css"),
+            LinkCss("#nothing {}", file_name="that_new_style.css"),
             LinkCss.from_url("https://want.to/have/it/from_web.css"),
             LinkCss.from_file("/link/to/local_style.css"),
 
@@ -221,7 +245,7 @@ def test_linking_local_files_in_head_custom_loc(mocked_urlopen, mocked_read_file
 
 
 @pytest.mark.parametrize("Operation, placement", product([EmbedCss, LinkCss], [BODY_BEGIN, BODY_END]))
-def test_cannot_put_css_in_body(Operation, placement):
+def test_cannot_put_css_in_body(Operation, placement, mocked_save_file):
     with pytest.raises(TypeError) as e:
         class MyRap(Yawrap):
             resources = [
@@ -249,7 +273,7 @@ def test_cannot_link_css_in_body2(placement):
 
 
 @pytest.mark.parametrize("placement", PLACEMENT_OPTIONS)
-def test_have_to_provide_file_name(placement):
+def test_have_to_provide_file_name(placement, mocked_save_file):
     with pytest.raises(ValueError) as e:
         class MyRap(Yawrap):
             resources = [LinkJs("script content", placement=placement)]
@@ -297,3 +321,41 @@ def test_inheriting_local_files_linkage(mocked_urlopen, mocked_read_file, mocked
     sub_soup = BeautifulSoup(sub_doc._render_page(), "lxml")
     assert sub_soup.html.head.script['src'] == "../../resources/common_script.js"
     assert sub_soup.html.head.link['href'] == "../../resources/common_style.css"
+
+
+def test_defining_css_as_a_dict(mocked_save_file):
+    class Root(NavedYawrap):
+        resources = [
+            EmbedCss({"body": {"background": "#DAD"}}),
+            LinkCss({"#that": {"color": "#DAD"}}, file_name="common_style.css"),
+        ]
+    root_doc = Root("one.html")
+    root_doc.add(EmbedCss({"div": {"padding": "0px"}}))
+
+    sub_doc = root_doc.sub("two.html")
+    sub_doc.add(EmbedCss({"#id": {"margin": "10px 12px"}}))
+    sub_doc.add(LinkCss({"a": {"width": "90%"}}, file_name="sub.css"))
+
+    root_soup = BeautifulSoup(root_doc._render_page(), "lxml")
+    sub_soup = BeautifulSoup(sub_doc._render_page(), "lxml")
+
+    expected_root_styles = [
+        "body { background: #DAD; }".split(),
+        "div { padding: 0px; }".split()
+    ]
+    expected_sub_styles = [
+        "body { background: #DAD; }".split(),
+        "#id { margin: 10px 12px; }".split()
+    ]
+
+    root_styles = [style.text.split() for style in root_soup.html.head.find_all("style")]
+    assert all([style in root_styles for style in expected_root_styles])
+
+    sub_styles = [style.text.split() for style in sub_soup.html.head.find_all("style")]
+    assert all([style in sub_styles for style in expected_sub_styles])
+
+    root_links = [link["href"] for link in root_soup.html.head.find_all("link")]
+    assert root_links == ['resources/common_style.css']
+
+    sub_links = [link["href"] for link in sub_soup.html.head.find_all("link")]
+    assert sub_links == ['resources/common_style.css', 'resources/sub.css']
