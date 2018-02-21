@@ -164,4 +164,3 @@ class Yawrap(yattag.Doc):
 
     def get_root_dir(self):
         return self._get_root()._target_dir
-

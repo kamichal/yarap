@@ -22,4 +22,4 @@ def test_one():
     with doc.tag("p"):
         doc.text("The body content")
 
-    print doc._render_page()
+    print(doc._render_page())

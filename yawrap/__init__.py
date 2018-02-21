@@ -1,5 +1,6 @@
+# flake8: noqa
 import yattag
-
+ 
 from ._formatter import HtmlFormatter
 from ._navrap import NavedYawrap
 from ._yawrap import Yawrap

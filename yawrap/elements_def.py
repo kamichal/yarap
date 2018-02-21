@@ -28,7 +28,7 @@ HTML_ELEMENTS = [
     ES("abbr", HB, N, "Defines an abbreviation or an acronym"),
     ES("address", HB, N, "Defines contact information for the author/owner of a document/article"),
     ES("b", HB, N, "Defines bold text"),
-    ES("bdi", H5, N, "Isolates a part of text that might be formatted in a different direction from other text outside it"),
+    ES("bdi", H5, N, "Isolates a part of text that might be formatted in a different direction from other text outside it"),  # noqa: E501
     ES("bdo", HB, N, "Overrides the current text direction"),
     ES("big", H4, N, "Not supported in HTML5. Use CSS instead. Defines big text"),
     ES("blockquote", HB, N, "Defines a section that is quoted from another source"),
@@ -79,7 +79,7 @@ HTML_ELEMENTS = [
     # Frames
     ES("frame", H4, N, "Not supported in HTML5. Defines a window (a frame) in a frameset"),
     ES("frameset", H4, N, "Not supported in HTML5. Defines a set of frames"),
-    ES("noframes", H4, N, "Not supported in HTML5. Defines an alternate content for users that do not support frames"),
+    ES("noframes", H4, N, "Not supported in HTML5. Defines an alternate content for users that do not support frames"),  # noqa: E501
     ES("iframe", HB, N, "Defines an inline frame"),
     # Images
     ES("img", HB, E, "Defines an image"),
@@ -96,7 +96,7 @@ HTML_ELEMENTS = [
     ES("video", H5, N, "Defines a video or movie"),
     # Links
     ES("a", HB, N, "Defines a hyperlink"),
-    ES("link", HB, E, "Defines the relationship between a document and an external resource (most used to link to style sheets)"),
+    ES("link", HB, E, "Defines the relationship between a document and an external resource (most used to link to style sheets)"),  # noqa: E501
     ES("nav", H5, N, "Defines navigation links"),
     # Lists
     ES("ul", HB, N, "Defines an unordered list"),
@@ -137,7 +137,7 @@ HTML_ELEMENTS = [
     ES("head", HB, N, "Defines information about the document"),
     ES("meta", HB, E, "Defines metadata about an HTML document"),
     ES("base", HB, E, "Specifies the base URL/target for all relative URLs in a document"),
-    ES("basefont", H4, N, "Not supported in HTML5. Use CSS instead. Specifies a default color, size, and font for all text in a document"),
+    ES("basefont", H4, N, "Not supported in HTML5. Use CSS instead. Specifies a default color, size, and font for all text in a document"),  # noqa: E501
     # Programming
     ES("script", HB, N, "Defines a client-side script"),
     ES("noscript", HB, N, "Defines an alternate content for users that do not support client-side scripts"),

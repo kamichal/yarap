@@ -438,7 +438,7 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums)
         child3.text('contents of chapter %s' % bix)
 
     parent.render_all_files()
-    assert all([os.path.isfile(f) for f in files])
+    assert all([os.path.isfile(file_) for file_ in files])
 
     assert child3._get_root() == parent
 

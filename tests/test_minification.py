@@ -48,7 +48,7 @@ SAMPLE_1_LIMITTED_W = """\
         color: #b0baba;
     }</style></head><body><div class="thing"><div id="00">that 00</div><div id="01">that 01</div><div id="02">that 02</div>
 <div id="03">that 03</div></div><div class="thing"><div id="10">that 10</div><div id="11">that 11</div><div id="12">that 12</div><div id="13">that 13</div></div><div class="thing"><div id="20">that 20</div><div id="21">that 21</div><div id="22">
-that 22</div><div id="23">that 23</div></div></body></html>"""
+that 22</div><div id="23">that 23</div></div></body></html>"""  # noqa: E501
 
 SAMPLE_1_NEWLINES = """\
 <!doctype html><html lang="en-US"><head><meta charset="UTF-8" /><title>title</title>

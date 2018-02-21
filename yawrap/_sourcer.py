@@ -15,10 +15,9 @@
 from contextlib import closing
 import os
 import posixpath
-import urllib2
-from urlparse import urlparse
 
-from yawrap.utils import make_place, is_url, error, warn_
+from .six import urlopen, urlparse
+from .utils import make_place, is_url, error, warn_
 
 
 HEAD = "head"
@@ -72,7 +71,7 @@ class _Gainer(object):
     def _download(url):
         assert is_url(url), "That doesn't seem to be a valid url: %s" % url
         try:
-            with closing(urllib2.urlopen(url)) as response:
+            with closing(urlopen(url)) as response:
                 return response.read()
         except Exception as e:
             error("unable to download: %s\n%s" % (url, e))
