@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup, element
+import difflib
 import os
+from pprint import pformat
 import re
 
 
@@ -29,8 +31,13 @@ def assert_html_equal(result_html_string, reference_html_string):
 
     result = walk_html(get_soup(result_html_string))
     reference = walk_html(get_soup(reference_html_string))
-    assert result == reference
+    assert result == reference, compare_walk_result(result, reference)
     return True
+
+
+def compare_walk_result(result, reference):
+    d = difflib.Differ()
+    return "\n".join(d.compare(pformat(result).split("\n"), pformat(reference).split("\n")))
 
 
 def walk_html(html_soup):
