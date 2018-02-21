@@ -61,7 +61,7 @@ class _Gainer(object):
         return cls(read, file_name, placement)
 
     @classmethod
-    def from_str(cls, str_content, file_name=None, placement=HEAD):
+    def from_str(cls, str_content, placement=HEAD, file_name=None):
         """ file_name is needed if you want to store the file locally
             If you want to embed the str_content, then it can be skipped.
         """
@@ -89,7 +89,7 @@ class _Gainer(object):
         return self._placement == placement
 
     @staticmethod
-    def _store_as_local_file(str_content, target_file_path):
+    def _save_as_file(str_content, target_file_path):
         if os.path.exists(target_file_path):
             warn_("File: %s already exists, overwritting." % target_file_path)
         with open(make_place(target_file_path), "wt") as ff:
@@ -146,12 +146,28 @@ class _LinkLocal(_Gainer):
 
     def visit(self, doc, yawrap_doc, placement):
         if self._placement_match(placement):
+            self._check_file_name_provided(self.file_name)
+
             root_dir = yawrap_doc.get_root_dir()
             target_file = os.path.join(root_dir, self.resource_subdir, self.file_name)
             content = self.read()
-            self._store_as_local_file(content, target_file)
+            self._save_as_file(content, target_file)
             href = posixpath.relpath(target_file, yawrap_doc._target_dir)
             self.link(doc, href)
+
+    @classmethod
+    def _check_file_name_provided(cls, file_name):
+        if not file_name:
+            raise ValueError("You need to provide filename in order to store "
+                             "the content for %s operation." % cls.__name__)
+
+    @classmethod
+    def from_str(cls, str_content, placement=HEAD, file_name=None):
+        """ file_name is needed if you want to store the file locally
+            If you want to embed the str_content, then it can be skipped.
+        """
+        cls._check_file_name_provided(file_name)
+        return cls(lambda: str_content, file_name, placement)
 
 
 class _LinkExternal(_Gainer):
@@ -165,6 +181,10 @@ class _LinkExternal(_Gainer):
     def visit(self, doc, _, placement):
         if self._placement_match(placement):
             self.link(doc, self.url)
+
+    @classmethod
+    def from_url(cls, url, placement=HEAD):
+        return cls(url, placement)
 
     @classmethod
     def from_file(cls, *_):
