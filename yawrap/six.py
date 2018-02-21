@@ -12,4 +12,3 @@ else:
     str_types = str
     from urllib.request import urlopen
     from urllib.parse import urlparse
-
