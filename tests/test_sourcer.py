@@ -1,13 +1,13 @@
 
 from bs4 import BeautifulSoup
 from itertools import product
+import posixpath
 import pytest
 
 from _test_utils import assert_html_equal
 from yawrap import Yawrap, NavedYawrap, ExtenalJs, ExtenalCss, EmbedJs, EmbedCss, LinkJs, LinkCss, BODY_BEGIN, \
     BODY_END, _sourcer
 from yawrap._sourcer import os, PLACEMENT_OPTIONS
-import posixpath
 
 
 @pytest.fixture
@@ -40,12 +40,12 @@ def mocked_read_file(mocker):
 
     mocker.patch.object(os.path, "isfile", return_value=True)
     mocker.patch.object(os.path, "isdir", return_value=True)
-    mocker.patch.object(_sourcer._Gainer, "_read_file", side_effect=read_file_stub)
+    mocker.patch.object(_sourcer._Resource, "_read_file", side_effect=read_file_stub)
 
 
 @pytest.fixture
 def mocked_save_file(mocker):
-    m = mocker.patch.object(_sourcer._Gainer, "_save_as_file")
+    m = mocker.patch.object(_sourcer._ExportToTargetFs, "_save_as_file")
     return m
 
 
@@ -291,7 +291,7 @@ def test_silly_definitions_2(Operation):
 def test_read_file(tmpdir):
     the_file = tmpdir.join("that.file")
     the_file.write("sentinel\n")
-    result = _sourcer._Gainer._read_file(str(the_file))
+    result = _sourcer._Resource._read_file(str(the_file))
     assert result == "sentinel\n"
 
 

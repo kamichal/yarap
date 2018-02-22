@@ -1,15 +1,19 @@
 """
     There are some possibilities when you want to use CSS or JS scripts in a html page.
 
-    A. When the content is on web, specified by an url - you may want to:
-        1. save it and reference from a directory close to target page or 2. embed in the target page
-        or 3. just reference it by the url
+    A. When the content is on the web, specified by an url - you may want to:
+        1. download it (while the page is being built), save it and reference it from a directory
+        relative to target page (several pages may wont like to share the file)
+        2. embed it in the target page (it's better for a single-file document type)
+        3. just reference it by the url (will require web access for each view)
 
-    B. When the content is in local file - you mpage ay want to:
-        1. save it in target directory or 2. embed in the page
+    B. When the content is in a local file - you may want to:
+        1. export it to directory relative to a target document or
+        2. embed it in the document (CSS in head, JS anywhere)
 
-    C. When content is in loacal string variable - you may want to:
-        1. save it in target directory or 2. embed in the page
+    B'. When the content is in loacal python string - you may want to:
+        1. export it to directory relative to a target document or
+        2. embed it in the document (CSS in head, JS anywhere)
 """
 
 from contextlib import closing
@@ -27,31 +31,28 @@ BODY_BEGIN = "body_begin"
 PLACEMENT_OPTIONS = [HEAD, BODY_BEGIN, BODY_END]
 
 
-class _Gainer(object):
-    """ Class that handles acquisition of the resource content.
-        It creates an object that exposes "read()" function and file_name, that can be also useful. """
-    __slots__ = ("read", "file_name", "placement")
+class _Resource(object):
+    """
+        Class that provides methods of resource content's acquisition.
+        The from_url and from_file classmethods are supposed to serve alternative contructors.
+    """
 
-    def __init__(self, read_function_or_str, placement=HEAD, file_name=None):
-        assert placement in PLACEMENT_OPTIONS
-        if isinstance(read_function_or_str, str_types):
-            # make string callable
-            self.read = lambda: read_function_or_str
-        else:
-            self.read = read_function_or_str
+    def __init__(self, read_method, file_name):
+        self.read_method = read_method
         self.file_name = file_name
-        self._placement = placement
 
     @classmethod
     def from_url(cls, url, placement=HEAD):
         """ Provide content of the resource from the web. """
         assert url, "Bad argument: %s" % url
         assert is_url(url), "That doesn't seem to be a valid url: %s" % url
-        file_name = posixpath.basename(urlparse(url).path)
+        assert issubclass(cls, _DocumentVisitor), "You messed up."
 
-        def read():
+        def read_method():
             return cls._download(url)
-        return cls(read, placement, file_name)
+
+        file_name = posixpath.basename(urlparse(url).path)
+        return cls(read_method, placement, file_name)
 
     @classmethod
     def from_file(cls, file_path, placement=HEAD):
@@ -60,9 +61,10 @@ class _Gainer(object):
         assert os.path.isfile(file_path), "That file doesn't exist: %s" % file_path
         file_name = os.path.basename(file_path)
 
-        def read():
+        def read_method():
             return cls._read_file(file_path)
-        return cls(read, placement, file_name)
+        assert issubclass(cls, _DocumentVisitor), "You messed up."
+        return cls(read_method, placement, file_name)
 
     @staticmethod
     def _download(url):
@@ -80,10 +82,102 @@ class _Gainer(object):
         with open(file_path, "rt") as ff:
             return ff.read()
 
+
+class _DocumentVisitor(object):
+
+    def __init__(self, placement_target):
+        assert placement_target in PLACEMENT_OPTIONS, "Invalid placement type."
+        self._placement = placement_target
+
     def _placement_match(self, placement):
-        assert placement in PLACEMENT_OPTIONS, "Invalid placement type."
-        assert self._placement in PLACEMENT_OPTIONS, "Invalid placement type."
         return self._placement == placement
+
+
+class _JsResource(_Resource, _DocumentVisitor):
+    type_ = "text/javascript"
+
+    def __init__(self, read_function_or_str, placement=HEAD, file_name=None):
+        if isinstance(read_function_or_str, str_types):
+            def read_method():
+                return read_function_or_str
+        else:
+            read_method = read_function_or_str
+
+        _Resource.__init__(self, read_method, file_name)
+        _DocumentVisitor.__init__(self, placement)
+
+    @classmethod
+    def link(cls, page_doc, href):
+        with page_doc.tag('script', src=href):
+            pass
+
+    @classmethod
+    def embed(cls, page_doc, content):
+        with page_doc.tag('script', type=cls.type_):
+            page_doc.asis(content)
+
+
+class _CssResource(_Resource, _DocumentVisitor):
+    rel = "stylesheet"
+    type_ = "text/css"
+
+    def __init__(self, read_function_or_str_or_dict, placement=HEAD, file_name=None):
+        if placement != HEAD:
+            raise TypeError("Cannot place CSS out of head section (%s)" % placement)
+
+        if isinstance(read_function_or_str_or_dict, str_types):
+            def read_method():
+                return form_css(dictionize_css(read_function_or_str_or_dict), indent_level=0)
+        elif isinstance(read_function_or_str_or_dict, dict):
+            def read_method():
+                return form_css(read_function_or_str_or_dict, indent_level=0)
+        else:
+            read_method = read_function_or_str_or_dict
+
+        _Resource.__init__(self, read_method, file_name)
+        _DocumentVisitor.__init__(self, placement)
+
+    @classmethod
+    def link(cls, page_doc, href):
+        page_doc.stag('link', rel=cls.rel, type=cls.type_, href=href)
+
+    @classmethod
+    def embed(cls, page_doc, content):
+        content = form_css(dictionize_css(content), indent_level=0)
+        with page_doc.tag('style'):
+            page_doc.asis(content)
+
+    def _placement_match(self, placement):
+        assert self._placement == HEAD, "CSS can be placed only in head section."
+        return self._placement == placement
+
+
+class _Embed(_DocumentVisitor):
+
+    def visit(self, page_doc, _, placement):
+        if self._placement_match(placement):
+            content = self.read_method()
+            self.embed(page_doc, content)
+
+
+class _ExportToTargetFs(_Resource, _DocumentVisitor):
+    resource_subdir = "resources"
+
+    def visit(self, page_doc, yawrap_instance, placement):
+        if self._placement_match(placement):
+            self._check_file_name_provided()
+
+            root_dir = yawrap_instance.get_root_dir()
+            target_file = os.path.join(root_dir, self.resource_subdir, self.file_name)
+            content = self.read_method()
+            self._save_as_file(content, target_file)
+            href = posixpath.relpath(target_file, yawrap_instance._target_dir)
+            self.link(page_doc, href)
+
+    def _check_file_name_provided(self):
+        if not self.file_name:
+            raise ValueError("You need to provide filename in order to store "
+                             "the content for %s operation." % self.__class__.__name__)
 
     @staticmethod
     def _save_as_file(str_content, target_file_path):
@@ -93,82 +187,7 @@ class _Gainer(object):
             ff.write(str_content)
 
 
-class _JsResource(_Gainer):
-    type_ = "text/javascript"
-
-    @classmethod
-    def link(cls, doc, href):
-        with doc.tag('script', src=href):
-            pass
-
-    @classmethod
-    def embed(cls, doc, content):
-        with doc.tag('script', type=cls.type_):
-            doc.asis(content)
-
-
-class _CssResource(_Gainer):
-    rel = "stylesheet"
-    type_ = "text/css"
-
-    def __init__(self, read_function_or_str_or_dict, placement=HEAD, file_name=None):
-        if placement != HEAD:
-            raise TypeError("Cannot place CSS out of head section (%s)" % placement)
-        if isinstance(read_function_or_str_or_dict, str_types):
-            def read():
-                return form_css(dictionize_css(read_function_or_str_or_dict), indent_level=0)
-        elif isinstance(read_function_or_str_or_dict, dict):
-            def read():
-                return form_css(read_function_or_str_or_dict, indent_level=0)
-        else:
-            read = read_function_or_str_or_dict
-        super(_CssResource, self).__init__(read, placement, file_name)
-
-    @classmethod
-    def link(cls, doc, href):
-        doc.stag('link', rel=cls.rel, type=cls.type_, href=href)
-
-    @classmethod
-    def embed(cls, doc, content):
-        content = form_css(dictionize_css(content), indent_level=0)
-        with doc.tag('style'):
-            doc.asis(content)
-
-    def _placement_match(self, placement):
-        assert self._placement == HEAD, "CSS can be placed only in head section."
-        return self._placement == placement
-
-
-class _Embed(_Gainer):
-
-    def visit(self, doc, _, placement):
-        if self._placement_match(placement):
-            content = self.read()
-            self.embed(doc, content)
-
-
-class _LinkLocal(_Gainer):
-    resource_subdir = "resources"
-
-    def visit(self, doc, yawrap_doc, placement):
-        if self._placement_match(placement):
-            self._check_file_name_provided(self.file_name)
-
-            root_dir = yawrap_doc.get_root_dir()
-            target_file = os.path.join(root_dir, self.resource_subdir, self.file_name)
-            content = self.read()
-            self._save_as_file(content, target_file)
-            href = posixpath.relpath(target_file, yawrap_doc._target_dir)
-            self.link(doc, href)
-
-    @classmethod
-    def _check_file_name_provided(cls, file_name):
-        if not file_name:
-            raise ValueError("You need to provide filename in order to store "
-                             "the content for %s operation." % cls.__name__)
-
-
-class _LinkExternal(_Gainer):
+class _LinkExternal(_Resource, _DocumentVisitor):
     __slots__ = ("url", "placement")
 
     def __init__(self, url, placement=HEAD):
@@ -176,9 +195,9 @@ class _LinkExternal(_Gainer):
         self.url = url
         self._placement = placement
 
-    def visit(self, doc, _, placement):
+    def visit(self, page_doc, _, placement):
         if self._placement_match(placement):
-            self.link(doc, self.url)
+            self.link(page_doc, self.url)
 
     @classmethod
     def from_url(cls, url, placement=HEAD):
@@ -197,11 +216,11 @@ class EmbedJs(_Embed, _JsResource):
     pass
 
 
-class LinkCss(_LinkLocal, _CssResource):
+class LinkCss(_ExportToTargetFs, _CssResource):
     pass
 
 
-class LinkJs(_LinkLocal, _JsResource):
+class LinkJs(_ExportToTargetFs, _JsResource):
     pass
 
 

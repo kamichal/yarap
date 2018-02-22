@@ -12,7 +12,7 @@ import yattag
 from .six import str_types
 from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
 from yawrap._formatter import HtmlFormatter
-from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Gainer
+from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Resource
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
@@ -86,7 +86,7 @@ class Yawrap(yattag.Doc):
             yield
 
     def add(self, js_or_css_resource):
-        assert isinstance(js_or_css_resource, _Gainer), "Bad ussage, expected CSS or JS resource definition."
+        assert isinstance(js_or_css_resource, _Resource), "Bad ussage, expected CSS or JS resource definition."
         self._additional_resources.append(js_or_css_resource)
 
     def add_css(self, css_rules):
