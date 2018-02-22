@@ -92,6 +92,14 @@ class _DocumentVisitor(object):
     def _placement_match(self, placement):
         return self._placement == placement
 
+    def visit(self, page_doc, yawrap_instance, placement):
+        if self._placement_match(placement):
+            self.act(page_doc, yawrap_instance)
+
+    @classmethod
+    def act(self):
+        raise ValueError("You messed up.")
+
 
 class _JsResource(_Resource, _DocumentVisitor):
     type_ = "text/javascript"
@@ -154,30 +162,31 @@ class _CssResource(_Resource, _DocumentVisitor):
 
 class _Embed(_DocumentVisitor):
 
-    def visit(self, page_doc, _, placement):
-        if self._placement_match(placement):
-            content = self.read_method()
-            self.embed(page_doc, content)
+    def act(self, page_doc, _):
+        content = self.read_method()
+        self.embed(page_doc, content)
 
 
-class _ExportToTargetFs(_Resource, _DocumentVisitor):
+class _ExportToTargetFs(_DocumentVisitor):
     resource_subdir = "resources"
 
-    def visit(self, page_doc, yawrap_instance, placement):
-        if self._placement_match(placement):
-            self._check_file_name_provided()
-
-            root_dir = yawrap_instance.get_root_dir()
-            target_file = os.path.join(root_dir, self.resource_subdir, self.file_name)
-            content = self.read_method()
-            self._save_as_file(content, target_file)
-            href = posixpath.relpath(target_file, yawrap_instance._target_dir)
-            self.link(page_doc, href)
+    def act(self, page_doc, yawrap_instance):
+        self._check_file_name_provided()
+        href = self._create_local_file(yawrap_instance)
+        self.link(page_doc, href)
 
     def _check_file_name_provided(self):
         if not self.file_name:
             raise ValueError("You need to provide filename in order to store "
                              "the content for %s operation." % self.__class__.__name__)
+
+    def _create_local_file(self, yawrap_instance):
+        root_dir = yawrap_instance.get_root_dir()
+        target_file = os.path.join(root_dir, self.resource_subdir, self.file_name)
+        content = self.read_method()
+        self._save_as_file(content, target_file)
+        href = posixpath.relpath(target_file, yawrap_instance._target_dir)
+        return href
 
     @staticmethod
     def _save_as_file(str_content, target_file_path):
@@ -187,24 +196,22 @@ class _ExportToTargetFs(_Resource, _DocumentVisitor):
             ff.write(str_content)
 
 
-class _LinkExternal(_Resource, _DocumentVisitor):
-    __slots__ = ("url", "placement")
+class _LinkExternalURL(_DocumentVisitor):
 
     def __init__(self, url, placement=HEAD):
         assert is_url(url), "That doesn't seem to be a valid url: %s" % url
         self.url = url
-        self._placement = placement
+        _DocumentVisitor.__init__(self, placement)
 
-    def visit(self, page_doc, _, placement):
-        if self._placement_match(placement):
-            self.link(page_doc, self.url)
+    def act(self, page_doc, _):
+        self.link(page_doc, self.url)
 
     @classmethod
     def from_url(cls, url, placement=HEAD):
-        return cls(url, placement)
+        return cls(url, placement)  # constructor bypass
 
     @classmethod
-    def from_file(cls, *_):
+    def from_file(cls, *_, **__):
         raise TypeError("Cannot reference remote/external file by local file content.")
 
 
@@ -224,9 +231,9 @@ class LinkJs(_ExportToTargetFs, _JsResource):
     pass
 
 
-class ExtenalCss(_LinkExternal, _CssResource):
+class ExtenalCss(_LinkExternalURL, _CssResource):
     pass
 
 
-class ExtenalJs(_LinkExternal, _JsResource):
+class ExtenalJs(_LinkExternalURL, _JsResource):
     pass
