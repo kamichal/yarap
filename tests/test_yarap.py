@@ -7,8 +7,7 @@ Created on 24 Sep 2017
 from bs4 import BeautifulSoup
 import os
 
-from yawrap import Yawrap, ExternalJs
-from yawrap._formatter import HtmlFormatter
+from yawrap import Yawrap, ExternalJs, HtmlFormatter, EmbedCss, EmbedJs
 
 from ._test_utils import assert_html_equal
 
@@ -55,7 +54,7 @@ def test_basic(out_dir):
 def test_overloading(tmpdir):
 
     class MyRap(Yawrap):
-        css = {'.content': {'color': '#daf'}}
+        resources = [EmbedCss({'.content': {'color': '#daf'}})]
 
         def __init__(self, target_file):
             title = 'MyWrap'
@@ -78,8 +77,8 @@ def test_overloading(tmpdir):
     <title>MyWrap</title>
     <style>
       .content {
-        color: #daf;
-      }</style>
+    color: #daf;
+  }</style>
   </head>
   <body>
     <p>that's my wrap</p>
@@ -91,14 +90,13 @@ def test_overloading_2(tmpdir):
 
     class MyJsPage(Yawrap):
         resources = [
-            ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
-        ]
-        css = """
+            ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"),
+            EmbedCss("""
           .box {
             width:80px;
             height: 80px;
-          }"""
-        js = ["""
+          }"""),
+            EmbedJs("""
           $(document).ready(function(){
               $("button").click(function(){
                   $("#div1").fadeToggle();
@@ -106,7 +104,7 @@ def test_overloading_2(tmpdir):
                   $("#div3").fadeToggle(3000);
               });
           });
-        """]
+        """)]
 
         def __init__(self, out_file):
             title = 'jQuery W3 example, js defined as class attribute.'
@@ -130,13 +128,18 @@ def test_overloading_2(tmpdir):
 
     MyJsPage(str(out_file)).render()
 
-    expected_page = """\
-    <!doctype html>
+    expected_page = """<!doctype html>
     <html lang="en-US">
       <head>
-    <meta charset="UTF-8" />
-    <title>jQuery W3 example, js defined as class attribute.</title>
-    <script>
+        <meta charset="UTF-8" />
+        <title>jQuery W3 example, js defined as class attribute.</title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <style>
+          .box {
+            width:80px;
+            height: 80px;
+          }</style>
+        <script type="text/javascript">
           $(document).ready(function(){
               $("button").click(function(){
                   $("#div1").fadeToggle();
@@ -144,24 +147,19 @@ def test_overloading_2(tmpdir):
                   $("#div3").fadeToggle(3000);
               });
           });
-    </script>
-    <style>
-      .box {
-        height: 80px;
-        width: 80px;
-      }</style>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    </head>
-    <body>
-    <p>Demonstrate fadeToggle() with different speed parameters.</p>
-    <button>Click to fade in/out boxes</button>
-    <div style="background-color:red;" class="box" id="div1"></div>
-    <br />
-    <div style="background-color:green;" class="box" id="div2"></div>
-    <br />
-    <div style="background-color:blue;" class="box" id="div3"></div>
-    <br />
+          </script>
+      </head>
+      <body>
+        <p>Demonstrate fadeToggle() with different speed parameters.</p>
+        <button>Click to fade in/out boxes</button>
+        <div style="background-color:red;" id="div1" class="box"></div>
+        <br/>
+        <div style="background-color:green;" id="div2" class="box"></div>
+        <br/>
+        <div style="background-color:blue;" id="div3" class="box"></div>
+        <br/>
       </body>
-    </html>"""
+    </html>
+    """
 
     assert_html_equal(out_file.read(), expected_page)

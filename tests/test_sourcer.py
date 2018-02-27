@@ -96,11 +96,11 @@ def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, t
         <html lang="en-US">
           <head>
             <meta charset="UTF-8" />
-            <style>head {\n  background: #DAD;\n}</style>
+            <style>head { background: #DAD; }</style>
             <script type="text/javascript">console.log("alles klar in the head")</script>
-            <style>#da.house.css {\n  color: #BAD;\n}</style>
+            <style>#da.house.css {color: #BAD;}</style>
             <script type="text/javascript">Dummy response to http://www.js.in/the.head.js</script>
-            <style>#style_to_embed.css {\n  background: #AFE;\n}</style>
+            <style>#style_to_embed.css {background: #AFE;}</style>
             <script type="text/javascript">That's a dummy content of /path/to/script_to_embed.js file.</script>
           </head>
           <body>
@@ -320,8 +320,8 @@ def test_inheriting_local_files_linkage(mocked_urlopen, mocked_read_file, mocked
 def test_defining_css_as_a_dict(mocked_save_file):
     class Root(NavedYawrap):
         resources = [
-            EmbedCss(" body { background: #DAD;}"),
-            LinkCss(" #that {color: #DAD;}", file_name="common_style.css"),
+            EmbedCss({"body": {"background": "#DAD"}}),
+            LinkCss({"#that": {"color": "#DAD"}}, file_name="common_style.css"),
         ]
     root_doc = Root("one.html")
     root_doc.add(EmbedCss("div {padding: 0px;}"))
@@ -335,11 +335,11 @@ def test_defining_css_as_a_dict(mocked_save_file):
 
     expected_root_styles = [
         "body { background: #DAD; }".split(),
-        "div { padding: 0px; }".split()
+        "div {padding: 0px;}".split()
     ]
     expected_sub_styles = [
         "body { background: #DAD; }".split(),
-        "#id { margin: 10px 12px; }".split()
+        "#id {margin: 10px 12px;}".split()
     ]
 
     root_styles = [style.text.split() for style in root_soup.html.head.find_all("style")]

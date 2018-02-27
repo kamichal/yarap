@@ -71,19 +71,18 @@ def test_that():
     <meta charset="UTF-8" />
     <title>Name of the page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <style>
-.box {
-  display: inline-block;
-  height: 80px;
-  margin: 8px;
-  padding: 8px;
-  width: 80px;
-}
-body {
-  font-family: helvetica, sans-serif;
-  font-size: 14px;
-  padding: 12px;
-}</style>
+    <style>body {
+            padding: 12px;
+            font-family: helvetica, sans-serif;
+            font-size: 14px;
+        }
+        .box {
+            display: inline-block;
+            height: 80px;
+            margin: 8px;
+            padding: 8px;
+            width: 80px;
+        }</style>
   </head>
   <body>
     <h2>Demonstrate a simple JavaScript.</h2>

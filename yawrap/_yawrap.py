@@ -9,10 +9,9 @@ from contextlib import contextmanager
 import os
 import yattag
 
-from .six import str_types
-from .utils import fix_yattag, dictionize_css, form_css, assert_keys_not_in, make_place
 from yawrap._formatter import HtmlFormatter
 from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Resource
+from yawrap.utils import fix_yattag, assert_keys_not_in, make_place
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
@@ -44,7 +43,6 @@ def svg_structure(painter,
 class Yawrap(yattag.Doc):
     resources = []
     css = ''
-    js = []
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
@@ -58,7 +56,6 @@ class Yawrap(yattag.Doc):
         self.title = title
         self._parent = parent
         self._target_dir = os.path.dirname(target_file)
-        self._additional_linked_js = []
         self._additional_css = {}
         self._additional_resources = []
         self.external_csss = set()
@@ -83,14 +80,9 @@ class Yawrap(yattag.Doc):
             yield
 
     def add(self, js_or_css_resource):
-        assert isinstance(js_or_css_resource, _Resource), "Bad ussage, expected CSS or JS resource definition."
+        assert isinstance(js_or_css_resource, _Resource), "Bad ussage, expected CSS or JS"\
+            " resource definition, got %s." % type(js_or_css_resource).__name__
         self._additional_resources.append(js_or_css_resource)
-
-    def add_css(self, css_rules):
-        if not isinstance(css_rules, dict):
-            assert isinstance(css_rules, str_types)
-            css_rules = dictionize_css(css_rules)
-        self._additional_css.update(css_rules)
 
     def _get_rel_path(self, target_local_file):
         return os.path.relpath(os.path.abspath(target_local_file), self._target_dir)
@@ -98,19 +90,11 @@ class Yawrap(yattag.Doc):
     def link_local_css_file(self, target_css_file_path):
         self.external_csss.add(self._get_rel_path(target_css_file_path))
 
-    def link_local_js_file(self, target_js_file_path):
-        self._additional_linked_js.append(self._get_rel_path(target_js_file_path))
-
-    def link_external_js_file(self, target_js_url):
-        self._additional_linked_js.append(target_js_url)
-
     def link_external_css_file(self, target_css_url):
         self.external_csss.add(target_css_url)
 
     @contextmanager
     def _html_page_structure(self, page_doc):
-        page_css = dictionize_css(self.css)
-        page_css.update(self._additional_css)
 
         page_doc.asis('<!doctype html>')
         with page_doc.tag('html', **self.html_d):
@@ -120,15 +104,6 @@ class Yawrap(yattag.Doc):
                 if self.title:
                     with page_doc.tag('title'):
                         page_doc.text(self.title)
-                for js_link in self._additional_linked_js:
-                    with page_doc.tag("script", src=js_link):
-                        pass
-                for js in self.js:
-                    with page_doc.tag('script'):
-                        page_doc.asis(js)
-                if page_css:
-                    with page_doc.tag('style'):
-                        page_doc.asis(form_css(page_css, indent_level=3))
                 for ext_css in self.external_csss:
                     page_doc.stag("link", rel="stylesheet", type="text/css", href=ext_css)
 

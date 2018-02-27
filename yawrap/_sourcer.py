@@ -22,7 +22,7 @@ import posixpath
 
 from .six import urlopen, urlparse, str_types
 from .utils import make_place, is_url, error, warn_
-from yawrap.utils import form_css, dictionize_css
+from yawrap.utils import form_css
 
 HEAD = "head"
 BODY_END = "body_end"
@@ -90,13 +90,17 @@ class _DocumentVisitor(_Resource):
     def __init__(self, read_function_or_str, placement=HEAD, file_name=None):
         self._check_placement(placement)
         self._placement = placement
+        read_method = self._form_read_method(read_function_or_str)
+        _Resource.__init__(self, read_method, file_name)
 
+    @classmethod
+    def _form_read_method(cls, read_function_or_str):
         if isinstance(read_function_or_str, str_types):
             def read_method():
                 return read_function_or_str
+            return read_method
         else:
-            read_method = read_function_or_str
-        _Resource.__init__(self, read_method, file_name)
+            return read_function_or_str
 
     def _check_placement(self, placement):
         assert (placement in PLACEMENT_OPTIONS), "Wrong placement value: %s" % placement
@@ -137,9 +141,21 @@ class _CssResource(_DocumentVisitor):
 
     @classmethod
     def embed(cls, page_doc, content):
-        content = form_css(dictionize_css(content), indent_level=0)
         with page_doc.tag('style'):
             page_doc.asis(content)
+
+    @classmethod
+    def _form_read_method(cls, function_or_str_or_dict):
+        if isinstance(function_or_str_or_dict, str_types):
+            def read_method():
+                return function_or_str_or_dict
+            return read_method
+        elif isinstance(function_or_str_or_dict, dict):
+            def read_method():
+                return form_css(function_or_str_or_dict)
+            return read_method
+        else:
+            return function_or_str_or_dict
 
     def _check_placement(self, placement):
         _DocumentVisitor._check_placement(self, placement)

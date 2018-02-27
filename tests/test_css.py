@@ -2,18 +2,11 @@ from bs4 import BeautifulSoup
 import os
 import pytest
 
-from yawrap import Yawrap, NavedYawrap
+from yawrap import Yawrap, NavedYawrap, EmbedCss
 
 
 CssStyle1 = '.some {margin: 2px;}'
-CssStyle2 = '\n\n\n.other {\n padding: 0;\n}\n'
-CssStyleExpected = """
-      .other {
-        padding: 0;
-      }
-      .some {
-        margin: 2px;
-      }"""
+CssStyle2 = '.other {\n padding: 0;\n}'
 
 
 class DerivedFromYawrap(Yawrap):
@@ -73,33 +66,19 @@ def test_empty_doc(yawrap_class_with_naved):
 </html>"""
 
 
-def test_adding_css_multiple_times(yawrap_class):
-    #  just for asserting that multiple style addition does not cause style duplication
-    jarap = yawrap_class('')
-    jarap.add_css(CssStyle1)
-    jarap.add_css(CssStyle1)
-    jarap.add_css(CssStyle1)
-    jarap.add_css(CssStyle2)
-    jarap.add_css(CssStyle2)
-    soup = BeautifulSoup(jarap._render_page(), "lxml")
-    style = soup.html.head.style
-    assert len(style) == 1
-    assert style.text == CssStyleExpected
-
-
 def test_class_defined_css(yawrap_class_with_naved):
 
     class JarapWCss(yawrap_class_with_naved):
-        css = CssStyle1
+        resources = [
+            EmbedCss(CssStyle1)
+        ]
 
     jarap = JarapWCss('')
-    jarap.add_css(CssStyle2)
+    jarap.add(EmbedCss(CssStyle2))
     assert jarap._get_body_render() == ''
     render = jarap._render_page()
     soup = BeautifulSoup(render, "lxml")
-    style = soup.html.head.style
-    assert len(style) == 1
-    assert style.text == CssStyleExpected
+    assert [c.text for c in soup.html.head.children if c.name == "style"] == [CssStyle1, CssStyle2]
 
 
 def test_link_local_style(out_dir, yawrap_class_with_naved):

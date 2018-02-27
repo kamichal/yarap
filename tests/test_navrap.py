@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import os
 import pytest
 
-from yawrap import NavedYawrap
+from yawrap import NavedYawrap, EmbedCss
 
 from ._test_utils import assert_html_equal
 
@@ -155,11 +155,12 @@ def test_simple_navrap(tmpdir):
     out_file_2 = str(tmpdir.join("nonexistent/path/nav01b.html"))
 
     class MyPage(NavedYawrap):
-        css = """
-            body {
-                margin: 16;
-                font-family: Verdana, sans-serif;
-            }"""
+        resources = [EmbedCss("""
+        body {
+            margin: 16;
+            font-family: Verdana, sans-serif;
+        }""")
+                     ]
 
     home = MyPage(out_file_1, title="Title Force One")
 
@@ -180,10 +181,10 @@ def test_simple_navrap(tmpdir):
         <meta charset="UTF-8" />
         <title>Title Force One</title>
         <style>
-      body {
-        font-family: Verdana, sans-serif;
-        margin: 16;
-      }</style>
+          body {
+            margin: 16;
+            font-family: Verdana, sans-serif;
+        }</style>
       </head>
       <body>
         <nav class="nav_main_panel">
@@ -211,10 +212,10 @@ def test_simple_navrap(tmpdir):
         <meta charset="UTF-8" />
         <title>Abouting</title>
         <style>
-      body {
-        font-family: Verdana, sans-serif;
-        margin: 16;
-      }</style>
+          body {
+            margin: 16;
+            font-family: Verdana, sans-serif;
+        }</style>
       </head>
       <body>
         <nav class="nav_main_panel">
@@ -240,7 +241,7 @@ def test_simple_navrap(tmpdir):
 def add_tooltip(target_doc, popup_width=280, type_='span', *args, **kwargs):
     import yattag
 
-    target_doc.add_css({
+    target_doc.add(EmbedCss({
         ".tooltip": {
             "position": "relative",
             "display": "inline-block",
@@ -271,7 +272,7 @@ def add_tooltip(target_doc, popup_width=280, type_='span', *args, **kwargs):
             "border-style": "solid",
             "border-color": "transparent transparent black transparent"
         }
-    })
+    }))
 
     popup_doc = yattag.SimpleDoc()
 
@@ -331,7 +332,7 @@ Advantage of using such stuff is ability to joining CSS and HTML of a plugin in 
 It's easy to maintain. It's reusable by separation from page class definition. It can be used totally dynamic.
 """
 
-    host_doc.add_css(style)
+    host_doc.add(EmbedCss(style))
     with host_doc.tag('div', klass='main_container'):
         with host_doc.tag('div', klass='container blue'):
             with host_doc.tag('h4'):

@@ -5,9 +5,8 @@ Created on 30 wrz 2017
 
 @author: kamichal
 '''
-import pytest
 
-from yawrap.utils import dictionize_css, form_css
+from yawrap.utils import form_css
 
 
 RAW_CSSs = """
@@ -36,13 +35,7 @@ RAW_CSSs = """
         height: 1000px;
         margin-left: 25%;
         padding: 1px 16px;
-      }""", """\
-.a_div a /* !@# comment */{  display:  block; color: #000; padding: 8px 16px;text-decoration: none;}
-.a_div a.active {background-color: #4CAF50;color:white;}
-.a_div.active{background-color: #fdf8fa;/* !@# comment */color: white;}.a_div_b.with_bookmarks{background: #DDD;}
-.a_div a:hover:not(.active){background-color:#555;color: white;}
-.main_content_body{margin-left:25%;padding:1px 16px;height:1000px;}
-"""
+      }"""
 
 STRUCTURIZED_CSS = {
     '.main_content_body': {
@@ -74,28 +67,19 @@ STRUCTURIZED_CSS = {
 }
 
 
-def test_analyzing_empty_css():
-    assert {} == dictionize_css('')
-
-
-def test_forming_empty_css():
+def test_forming_empty_css_from_empty_dict():
     assert '' == form_css({})
 
 
+def test_forming_empty_css2_from_empty_str():
+    assert '' == form_css("")
+
+
 def test_forming_css_with_empty_rule():
-    assert '\n  selector {}' == form_css({'selector': {}})
+    assert form_css({'selector': {}}) == '\n  selector {}'
 
 
-@pytest.mark.parametrize('input_css', RAW_CSSs, ids=list(map(str, range(len(RAW_CSSs)))))
-def test_analyzing_css(input_css):
-    assert STRUCTURIZED_CSS == dictionize_css(input_css)
+def test_forming_css():
 
-
-@pytest.mark.parametrize('input_css', RAW_CSSs, ids=list(map(str, range(len(RAW_CSSs)))))
-def test_forming_css(input_css):
-    structured_css = dictionize_css(input_css)
-
-    result = form_css(structured_css, indent_level=3)
-    assert result == RAW_CSSs[0]
-    restructured_css = dictionize_css(result)
-    assert restructured_css == structured_css
+    result = form_css(STRUCTURIZED_CSS, indent_level=3)
+    assert result == RAW_CSSs
