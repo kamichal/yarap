@@ -173,11 +173,8 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
         </html>""")
 
 
-@pytest.mark.parametrize("css_definition", [
-    "#selector { color: #BAC; margin: 0;}",
-    {"#selector": {"color": "#BAC", "margin": 0}},
-])
-def test_saving_files(tmpdir, css_definition):
+def test_saving_files(tmpdir):
+    css_definition = "#selector { color: #BAC; margin: 0;}"
     css_file_name = "that_new_style.css"
     css_rel_path = posixpath.join(LinkCss.resource_subdir, css_file_name)
     out_file = tmpdir.join("test_saving_files.html")
@@ -190,11 +187,7 @@ def test_saving_files(tmpdir, css_definition):
 
     doc = MyRap(str(out_file))
     assert BeautifulSoup(doc._render_page(), "lxml").html.head.link['href'] == css_rel_path
-    assert css_file.read() == """
-#selector {
-  color: #BAC;
-  margin: 0;
-}"""
+    assert css_file.read() == css_definition
 
 
 @pytest.fixture
@@ -257,20 +250,20 @@ def test_cannot_put_css_in_body(Operation, placement, mocked_save_file):
 
 @pytest.mark.parametrize("placement", [BODY_BEGIN, BODY_END])
 def test_cannot_link_css_in_body(placement):
-    with pytest.raises(AssertionError) as e:
+    with pytest.raises(TypeError) as e:
         class MyRap(Yawrap):
             resources = [ExternalCss("http://the.org/file.css", placement=placement)]
         MyRap("that_file.html")._render_page()
-    assert "CSS can be placed only in head section" in str(e.value)
+    assert "Cannot place CSS out of head section" in str(e.value)
 
 
 @pytest.mark.parametrize("placement", [BODY_BEGIN, BODY_END])
 def test_cannot_link_css_in_body2(placement):
-    with pytest.raises(AssertionError) as e:
+    with pytest.raises(TypeError) as e:
         class MyRap(Yawrap):
             resources = [ExternalCss.from_url("http://the.org/file.css", placement=placement)]
         MyRap("that_file.html")._render_page()
-    assert "CSS can be placed only in head section" in str(e.value)
+    assert "Cannot place CSS out of head section" in str(e.value)
 
 
 @pytest.mark.parametrize("placement", PLACEMENT_OPTIONS)
@@ -327,15 +320,15 @@ def test_inheriting_local_files_linkage(mocked_urlopen, mocked_read_file, mocked
 def test_defining_css_as_a_dict(mocked_save_file):
     class Root(NavedYawrap):
         resources = [
-            EmbedCss({"body": {"background": "#DAD"}}),
-            LinkCss({"#that": {"color": "#DAD"}}, file_name="common_style.css"),
+            EmbedCss(" body { background: #DAD;}"),
+            LinkCss(" #that {color: #DAD;}", file_name="common_style.css"),
         ]
     root_doc = Root("one.html")
-    root_doc.add(EmbedCss({"div": {"padding": "0px"}}))
+    root_doc.add(EmbedCss("div {padding: 0px;}"))
 
     sub_doc = root_doc.sub("two.html")
-    sub_doc.add(EmbedCss({"#id": {"margin": "10px 12px"}}))
-    sub_doc.add(LinkCss({"a": {"width": "90%"}}, file_name="sub.css"))
+    sub_doc.add(EmbedCss("#id {margin: 10px 12px;}"))
+    sub_doc.add(LinkCss("a {width: 90%;}", file_name="sub.css"))
 
     root_soup = BeautifulSoup(root_doc._render_page(), "lxml")
     sub_soup = BeautifulSoup(sub_doc._render_page(), "lxml")

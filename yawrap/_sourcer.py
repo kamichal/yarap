@@ -85,11 +85,21 @@ class _Resource(object):
             return ff.read()
 
 
-class _DocumentVisitor(object):
+class _DocumentVisitor(_Resource):
 
-    def __init__(self, placement_target):
-        assert placement_target in PLACEMENT_OPTIONS, "Invalid placement type."
-        self._placement = placement_target
+    def __init__(self, read_function_or_str, placement=HEAD, file_name=None):
+        self._check_placement(placement)
+        self._placement = placement
+
+        if isinstance(read_function_or_str, str_types):
+            def read_method():
+                return read_function_or_str
+        else:
+            read_method = read_function_or_str
+        _Resource.__init__(self, read_method, file_name)
+
+    def _check_placement(self, placement):
+        assert (placement in PLACEMENT_OPTIONS), "Wrong placement value: %s" % placement
 
     def _placement_match(self, placement):
         return self._placement == placement
@@ -100,21 +110,11 @@ class _DocumentVisitor(object):
 
     @classmethod
     def act(self):
-        raise ValueError("You messed up.")
+        raise ValueError("You messed up. That shouldn't happen.")
 
 
-class _JsResource(_Resource, _DocumentVisitor):
+class _JsResource(_DocumentVisitor):
     type_ = "text/javascript"
-
-    def __init__(self, read_function_or_str, placement=HEAD, file_name=None):
-        if isinstance(read_function_or_str, str_types):
-            def read_method():
-                return read_function_or_str
-        else:
-            read_method = read_function_or_str
-
-        _Resource.__init__(self, read_method, file_name)
-        _DocumentVisitor.__init__(self, placement)
 
     @classmethod
     def link(cls, page_doc, href):
@@ -127,25 +127,9 @@ class _JsResource(_Resource, _DocumentVisitor):
             page_doc.asis(content)
 
 
-class _CssResource(_Resource, _DocumentVisitor):
+class _CssResource(_DocumentVisitor):
     rel = "stylesheet"
     type_ = "text/css"
-
-    def __init__(self, read_function_or_str_or_dict, placement=HEAD, file_name=None):
-        if placement != HEAD:
-            raise TypeError("Cannot place CSS out of head section (%s)" % placement)
-
-        if isinstance(read_function_or_str_or_dict, str_types):
-            def read_method():
-                return form_css(dictionize_css(read_function_or_str_or_dict), indent_level=0)
-        elif isinstance(read_function_or_str_or_dict, dict):
-            def read_method():
-                return form_css(read_function_or_str_or_dict, indent_level=0)
-        else:
-            read_method = read_function_or_str_or_dict
-
-        _Resource.__init__(self, read_method, file_name)
-        _DocumentVisitor.__init__(self, placement)
 
     @classmethod
     def link(cls, page_doc, href):
@@ -157,9 +141,10 @@ class _CssResource(_Resource, _DocumentVisitor):
         with page_doc.tag('style'):
             page_doc.asis(content)
 
-    def _placement_match(self, placement):
-        assert self._placement == HEAD, "CSS can be placed only in head section."
-        return self._placement == placement
+    def _check_placement(self, placement):
+        _DocumentVisitor._check_placement(self, placement)
+        if placement != HEAD:
+            raise TypeError("Cannot place CSS out of head section (%s)" % placement)
 
 
 class _Embed(_DocumentVisitor):
@@ -203,7 +188,7 @@ class _LinkExternalURL(_DocumentVisitor):
     def __init__(self, url, placement=HEAD):
         assert is_url(url), "That doesn't seem to be a valid url: %s" % url
         self.url = url
-        _DocumentVisitor.__init__(self, placement)
+        super(_LinkExternalURL, self).__init__(lambda: self.url, placement=placement)
 
     def act(self, page_doc, _):
         self.link(page_doc, self.url)
