@@ -9,8 +9,9 @@ from contextlib import contextmanager
 import os
 import pytest
 
-from _test_utils import assert_html_equal
 from yawrap import NavedYawrap
+
+from ._test_utils import assert_html_equal
 
 
 def flatten(nav_entry):

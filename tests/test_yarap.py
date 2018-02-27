@@ -7,9 +7,10 @@ Created on 24 Sep 2017
 from bs4 import BeautifulSoup
 import os
 
-from _test_utils import assert_html_equal
-from yawrap import Yawrap
+from yawrap import Yawrap, ExternalJs
 from yawrap._formatter import HtmlFormatter
+
+from ._test_utils import assert_html_equal
 
 
 def test_linking_a_local_file(out_dir):
@@ -89,7 +90,9 @@ def test_overloading(tmpdir):
 def test_overloading_2(tmpdir):
 
     class MyJsPage(Yawrap):
-        linked_js = ["https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"]
+        resources = [
+            ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+        ]
         css = """
           .box {
             width:80px;
@@ -133,7 +136,6 @@ def test_overloading_2(tmpdir):
       <head>
     <meta charset="UTF-8" />
     <title>jQuery W3 example, js defined as class attribute.</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script>
           $(document).ready(function(){
               $("button").click(function(){
@@ -142,14 +144,15 @@ def test_overloading_2(tmpdir):
                   $("#div3").fadeToggle(3000);
               });
           });
-        </script>
+    </script>
     <style>
       .box {
         height: 80px;
         width: 80px;
       }</style>
-      </head>
-      <body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    </head>
+    <body>
     <p>Demonstrate fadeToggle() with different speed parameters.</p>
     <button>Click to fade in/out boxes</button>
     <div style="background-color:red;" class="box" id="div1"></div>

@@ -45,8 +45,6 @@ class Yawrap(yattag.Doc):
     resources = []
     css = ''
     js = []
-    linked_js = []
-    linked_css = []
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
@@ -60,7 +58,6 @@ class Yawrap(yattag.Doc):
         self.title = title
         self._parent = parent
         self._target_dir = os.path.dirname(target_file)
-        self._additional_js = []
         self._additional_linked_js = []
         self._additional_css = {}
         self._additional_resources = []
@@ -95,10 +92,6 @@ class Yawrap(yattag.Doc):
             css_rules = dictionize_css(css_rules)
         self._additional_css.update(css_rules)
 
-    def add_js(self, js_script):
-        assert isinstance(js_script, str_types)
-        self._additional_js.append(js_script)
-
     def _get_rel_path(self, target_local_file):
         return os.path.relpath(os.path.abspath(target_local_file), self._target_dir)
 
@@ -118,8 +111,6 @@ class Yawrap(yattag.Doc):
     def _html_page_structure(self, page_doc):
         page_css = dictionize_css(self.css)
         page_css.update(self._additional_css)
-        page_js = self._additional_js + self.js
-        linked_js = self._additional_linked_js + self.linked_js
 
         page_doc.asis('<!doctype html>')
         with page_doc.tag('html', **self.html_d):
@@ -129,10 +120,10 @@ class Yawrap(yattag.Doc):
                 if self.title:
                     with page_doc.tag('title'):
                         page_doc.text(self.title)
-                for js_link in linked_js:
+                for js_link in self._additional_linked_js:
                     with page_doc.tag("script", src=js_link):
                         pass
-                for js in page_js:
+                for js in self.js:
                     with page_doc.tag('script'):
                         page_doc.asis(js)
                 if page_css:

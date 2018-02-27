@@ -1,6 +1,6 @@
 import pytest
 
-from _test_utils import walk_html, get_soup, assert_html_equal, minify
+from ._test_utils import walk_html, get_soup, assert_html_equal, minify
 
 
 SAMPLE_HTML_PRETTY = """\

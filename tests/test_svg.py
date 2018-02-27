@@ -1,7 +1,8 @@
 import os
 
 from yawrap import Yawrap
-from _test_utils import assert_html_equal
+
+from ._test_utils import assert_html_equal
 
 
 def draw_sample_svg(painter_doc, points="50,150 50,200 200,200 200,100"):

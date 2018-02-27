@@ -4,10 +4,11 @@ from itertools import product
 import posixpath
 import pytest
 
-from _test_utils import assert_html_equal
-from yawrap import Yawrap, NavedYawrap, ExtenalJs, ExtenalCss, EmbedJs, EmbedCss, LinkJs, LinkCss, BODY_BEGIN, \
+from yawrap import Yawrap, NavedYawrap, ExternalJs, ExternalCss, EmbedJs, EmbedCss, LinkJs, LinkCss, BODY_BEGIN, \
     BODY_END, _sourcer
 from yawrap._sourcer import os, PLACEMENT_OPTIONS
+
+from ._test_utils import assert_html_equal
 
 
 @pytest.fixture
@@ -27,7 +28,7 @@ def mocked_urlopen(mocker):
         def close(self, *_):
             pass
 
-    mocker.patch.object(_sourcer, "urlopen", side_effect=lambda *p: MockedUrlopen(*p))
+    mocker.patch.object(_sourcer, "urlopen", side_effect=lambda *p, **k: MockedUrlopen(*p, **k))
 
 
 @pytest.fixture
@@ -53,8 +54,8 @@ def test_linking_external_resources_in_head():
 
     class MyRap(Yawrap):
         resources = [
-            ExtenalCss("https://www.css.com/css.css"),
-            ExtenalJs("https://www.js.com/js.js"),
+            ExternalCss("https://www.css.com/css.css"),
+            ExternalJs("https://www.js.com/js.js"),
         ]
 
     doc = MyRap("that_file.html")
@@ -258,7 +259,7 @@ def test_cannot_put_css_in_body(Operation, placement, mocked_save_file):
 def test_cannot_link_css_in_body(placement):
     with pytest.raises(AssertionError) as e:
         class MyRap(Yawrap):
-            resources = [ExtenalCss("http://the.org/file.css", placement=placement)]
+            resources = [ExternalCss("http://the.org/file.css", placement=placement)]
         MyRap("that_file.html")._render_page()
     assert "CSS can be placed only in head section" in str(e.value)
 
@@ -267,7 +268,7 @@ def test_cannot_link_css_in_body(placement):
 def test_cannot_link_css_in_body2(placement):
     with pytest.raises(AssertionError) as e:
         class MyRap(Yawrap):
-            resources = [ExtenalCss.from_url("http://the.org/file.css", placement=placement)]
+            resources = [ExternalCss.from_url("http://the.org/file.css", placement=placement)]
         MyRap("that_file.html")._render_page()
     assert "CSS can be placed only in head section" in str(e.value)
 
@@ -281,7 +282,7 @@ def test_have_to_provide_file_name(placement, mocked_save_file):
     assert "You need to provide filename in order to store the content for LinkJs operation." in str(e.value)
 
 
-@pytest.mark.parametrize("Operation", [ExtenalCss, ExtenalJs])
+@pytest.mark.parametrize("Operation", [ExternalCss, ExternalJs])
 def test_silly_definitions_2(Operation):
     with pytest.raises(TypeError) as e:
         Operation.from_file("anything")

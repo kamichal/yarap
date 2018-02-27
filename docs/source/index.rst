@@ -87,42 +87,26 @@ Here is a list of things that ``yawrap`` offers:
    in correct subsection of the page navigation.
 
 
-Basic Usage
------------
+Usage Examples
+==============
 
-This is a tiny example. Such a code is sufficient to generate an HTML page:
+Because a good example is worth more than thousand words.
 
-.. doctest::
+.. toctree::
+   :maxdepth: 1
 
-    >>> from yawrap import Yawrap
-    >>> out_file = '/tmp/example_0.html'
-
-    >>> jawrap = Yawrap(out_file)             # passing target file location is mandatory
-
-    >>> with jawrap.tag('p'):                 # add a paragraph
-    ...     jawrap.text('Hello yawrap!')      # and its content
-
-    >>> jawrap.render()                       # creates the /tmp/example_0.html file
-
-    >>> print(open(out_file, 'rt').read())    # view the created file
-    <!doctype html>
-    <html lang="en-US">
-      <head>
-        <meta charset="UTF-8" />
-      </head>
-      <body>
-        <p>Hello yawrap!</p>
-      </body>
-    </html>
+   usage_00
+   usage_01
+   usage_02
+   usage_03
 
 
-
-Contents:
+Contents
+========
 
 .. toctree::
    :maxdepth: 2
-   
-   usage
+
    css_support
    js_support
    navrap

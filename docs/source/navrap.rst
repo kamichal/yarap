@@ -7,7 +7,7 @@ It's easy to navigate between several files in different paths, using ``sub()`` 
 Each call of ``sub()`` returns instance of given NavedYawrap class, with same styles and scripts as the parent one.
 Each page will be rendered with navigation section, with relative paths. See the hrefs in the example below.
 
-The first document (``home`` in this example) will be the the `root` of the document structure. 
+The first document (``home`` in this example) will be the `root` of the document structure. 
 
 .. testcode::
 

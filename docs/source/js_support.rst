@@ -32,80 +32,8 @@ Appending js to ``Yawrap`` or ``Navrap`` instances can be done appending string-
 Using jQuery
 -------------
 
-Simple example detailing how to create simple W3-jQuery example from 
-https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
+Please reffer to :ref:`FadeExample <js_fade>`. It shows jQuerry usage.
 
-.. testcode::
-
-    from bs4 import BeautifulSoup
-   
-    def soup(html_page):   # helper function for later assertions
-        return BeautifulSoup(html_page, "lxml")
-
-    from yawrap import Yawrap
-    out_file = '/tmp/js_1.html'
-
-    jw = Yawrap(out_file, 'jQuery W3 example.')
-    jw.link_external_js_file("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")  # source jQuery
-    jw.add_js("""
-        $(document).ready(function(){
-            $("button").click(function(){
-                $("#div1").fadeToggle();
-                $("#div2").fadeToggle("slow");
-                $("#div3").fadeToggle(3000);
-            });
-        });
-    """)
-
-    with jw.tag('p'):
-        jw.text("Demonstrate fadeToggle() with different speed parameters.")
-
-    with jw.tag('button'):
-        jw.text("Click to fade in/out boxes")
-
-    # helper function
-    def create_box(name, add_style):
-        with jw.tag('div', id=name, style="width:80px; height: 80px; " + add_style):
-            pass
-        jw.stag('br')
-
-    create_box('div1', "background-color:red;")
-    create_box('div2', "background-color:green;")
-    create_box('div3', "background-color:blue;")
-
-    jw.render()
-    expected = """\
-    <!doctype html>
-    <html lang="en-US">
-      <head>
-        <meta charset="UTF-8" />
-        <title>jQuery W3 example.</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script>
-        $(document).ready(function(){
-            $("button").click(function(){
-                $("#div1").fadeToggle();
-                $("#div2").fadeToggle("slow");
-                $("#div3").fadeToggle(3000);
-            });
-        });
-    </script>
-      </head>
-      <body>
-        <p>Demonstrate fadeToggle() with different speed parameters.</p>
-        <button>Click to fade in/out boxes</button>
-        <div id="div1" style="width:80px; height: 80px; background-color:red;"></div>
-        <br />
-        <div id="div2" style="width:80px; height: 80px; background-color:green;"></div>
-        <br />
-        <div id="div3" style="width:80px; height: 80px; background-color:blue;"></div>
-        <br />
-      </body>
-    </html>"""
-
-    assert soup(open(out_file, 'rt').read()) == soup(expected)
-
-The last assertion returns:
 
 .. _css-class-level:
 
@@ -118,13 +46,15 @@ as class level attributes like this:
 .. testcode::
 
     from bs4 import BeautifulSoup
-    from yawrap import Yawrap
+    from yawrap import Yawrap, ExternalJs
  
     out_file1 = '/tmp/js_2a.html'
     out_file2 = '/tmp/js_2b.html'
 
     class MyJsPage(Yawrap):
-        linked_js = ["https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"]
+        Resources = [
+            ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
+        ]
         css = """
           .box { 
             width:80px;
@@ -173,7 +103,6 @@ as class level attributes like this:
       <head>
         <meta charset="UTF-8" />
         <title>jQuery W3 example, js defined as class attribute.</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script>
           $(document).ready(function(){
               $("button").click(function(){
@@ -188,6 +117,7 @@ as class level attributes like this:
             height: 80px;
             width: 80px;
           }</style>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
       </head>
       <body>
         <p>Demonstrate fadeToggle() with different speed parameters.</p>
