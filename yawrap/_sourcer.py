@@ -80,7 +80,7 @@ class _Resource(object):
 
     @staticmethod
     def _read_file(file_path):
-        assert os.path.exists(file_path), "File doesn't exist: %s" % file_path
+        assert os.path.isfile(file_path), "File doesn't exist: %s" % file_path
         with open(file_path, "rt") as ff:
             return ff.read()
 

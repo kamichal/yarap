@@ -10,7 +10,7 @@ https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
 
 .. literalinclude:: ../examples/test_usage_01.py
     :language: python
-    :end-before: def test_that
+    :end-before: end section A
 
 Will create a page as below. Note that the ``placement=BODY_END`` in ``EmbedJs`` call caused the script to 
 be placed at the end. Withouth that argument it would get into ``head`` section. 

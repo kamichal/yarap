@@ -456,8 +456,8 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums)
         assert soup.html
         assert soup.html.head
         assert soup.html.body
-        if parent.css:
-            assert len(soup.html.head.style) == 1
+
+        assert len(soup.html.head.style) == 1
 
         nav_def = soup.html.body.find_all('nav', class_="nav_main_panel")
         assert len(nav_def) == 1

@@ -42,7 +42,6 @@ def svg_structure(painter,
 
 class Yawrap(yattag.Doc):
     resources = []
-    css = ''
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
@@ -56,9 +55,7 @@ class Yawrap(yattag.Doc):
         self.title = title
         self._parent = parent
         self._target_dir = os.path.dirname(target_file)
-        self._additional_css = {}
         self._additional_resources = []
-        self.external_csss = set()
 
     @contextmanager
     def local_link(self, target, *args, **kwargs):
@@ -87,12 +84,6 @@ class Yawrap(yattag.Doc):
     def _get_rel_path(self, target_local_file):
         return os.path.relpath(os.path.abspath(target_local_file), self._target_dir)
 
-    def link_local_css_file(self, target_css_file_path):
-        self.external_csss.add(self._get_rel_path(target_css_file_path))
-
-    def link_external_css_file(self, target_css_url):
-        self.external_csss.add(target_css_url)
-
     @contextmanager
     def _html_page_structure(self, page_doc):
 
@@ -104,8 +95,6 @@ class Yawrap(yattag.Doc):
                 if self.title:
                     with page_doc.tag('title'):
                         page_doc.text(self.title)
-                for ext_css in self.external_csss:
-                    page_doc.stag("link", rel="stylesheet", type="text/css", href=ext_css)
 
                 for resource in self.resources + self._additional_resources:
                     resource.visit(page_doc, self, HEAD)

@@ -32,10 +32,25 @@ Appending js to ``Yawrap`` or ``Navrap`` instances can be done appending string-
 Using jQuery
 -------------
 
-Please reffer to :ref:`FadeExample <js_fade>`. It shows jQuerry usage.
+It's an adaptation of following example: 
+https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
 
+.. literalinclude:: ../examples/test_usage_01.py
+    :language: python
+    :end-before: end section A
 
-.. _css-class-level:
+Will create a page as below. Note that the ``placement=BODY_END`` in ``EmbedJs`` call caused the script to 
+be placed at the end. Withouth that argument it would get into ``head`` section. 
+
+.. literalinclude:: _static/test_usage_01.html
+    :language: html
+
+That looks like this:
+
+.. raw:: html
+
+    <iframe src="_static/test_usage_01.html" height="285px" width="45%"></iframe>
+
 
 Sharing scripts and styles across multiple pages
 ------------------------------------------------
@@ -43,101 +58,22 @@ Sharing scripts and styles across multiple pages
 Similar effect as above but with reusable java scripts and CSS can be obtained by defining them 
 as class level attributes like this:
 
-.. testcode::
+.. literalinclude:: ../examples/test_usage_01.py
+    :language: python
+    :start-after: end section A
+    :end-before: end section B
 
-    from bs4 import BeautifulSoup
-    from yawrap import Yawrap, ExternalJs
- 
-    out_file1 = '/tmp/js_2a.html'
-    out_file2 = '/tmp/js_2b.html'
+Which produces the page:
 
-    class MyJsPage(Yawrap):
-        Resources = [
-            ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js")
-        ]
-        css = """
-          .box { 
-            width:80px;
-            height: 80px;
-          }"""
-        js = ["""
-          $(document).ready(function(){
-              $("button").click(function(){
-                  $("#div1").fadeToggle();
-                  $("#div2").fadeToggle("slow");
-                  $("#div3").fadeToggle(3000);
-              });
-          });
-        """]
+.. literalinclude:: _static/test_usage_01_linked.html
+    :language: html
 
-        def __init__(self, out_file):
-            title = 'jQuery W3 example, js defined as class attribute.'
-            Yawrap.__init__(self, out_file, title)
+..and the script ``resources/common_linked.js``:
 
-            with self.tag('p'):
-                self.text("Demonstrate fadeToggle() with different speed parameters.")
+.. literalinclude:: _static/resources/common_linked.js
+    :language: js
 
-            with self.tag('button'):
-                self.text("Click to fade in/out boxes")
+..and the style ``resources/common_linked.css``:
 
-            self.create_box2('div1', "background-color:red;")
-            self.create_box2('div2', "background-color:green;")
-            self.create_box2('div3', "background-color:blue;")
-
-        def create_box2(self, name, add_style):
-            with self.tag('div', id=name, klass="box", style=add_style):
-                pass
-            self.stag('br')
-       
-
-    MyJsPage(out_file1).render()
-    MyJsPage(out_file2).render()
-   
-    # helper function for assertions
-    def soup(html_page):
-        return BeautifulSoup(html_page, "lxml")
-
-    expected = soup("""\
-    <!doctype html>
-    <html lang="en-US">
-      <head>
-        <meta charset="UTF-8" />
-        <title>jQuery W3 example, js defined as class attribute.</title>
-        <script>
-          $(document).ready(function(){
-              $("button").click(function(){
-                  $("#div1").fadeToggle();
-                  $("#div2").fadeToggle("slow");
-                  $("#div3").fadeToggle(3000);
-              });
-          });
-        </script>
-        <style>
-          .box {
-            height: 80px;
-            width: 80px;
-          }</style>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-      </head>
-      <body>
-        <p>Demonstrate fadeToggle() with different speed parameters.</p>
-        <button>Click to fade in/out boxes</button>
-        <div style="background-color:red;" id="div1" class="box"></div>
-        <br />
-        <div style="background-color:green;" id="div2" class="box"></div>
-        <br />
-        <div style="background-color:blue;" id="div3" class="box"></div>
-        <br />
-      </body>
-    </html>""")
-    
-    
-    print(soup(open(out_file1, 'rt').read()) == expected, 
-          soup(open(out_file2, 'rt').read()) == expected)
-
-.. testoutput::
-
-   (True, True)
-
-Such a overloading of class attributes is useful using ``Navrap`` class. Some of its methods creates sub-pages 
-being an instances of parent class, giving them the same JS and CSS.
+.. literalinclude:: _static/resources/common_linked.css
+    :language: css

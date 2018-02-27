@@ -56,9 +56,52 @@ def create_page(output_file_path):
 
 # that's it
 
+# end section A
+
+
+from yawrap import LinkCss, LinkJs
+
+
+class MyPage(MyPageTemplate):
+    resources = [
+        ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"),
+        LinkCss("""
+        body {
+            padding: 12px;
+            font-family: helvetica, sans-serif;
+            font-size: 14px;
+        }
+        .box {
+            display: inline-block;
+            height: 80px;
+            margin: 8px;
+            padding: 8px;
+            width: 80px;
+        }""", file_name="common_linked.css"),
+        LinkJs("""
+        $("button").click(function(){
+            $("#red-box").fadeToggle();
+            $("#green-box").fadeToggle("slow");
+            $("#blue-box").fadeToggle(3000);
+        });
+        """, placement=BODY_END, file_name="common_linked.js"),
+    ]
+
+    # uses methods inherited from MyPageTemplate defined above
+
+
+def create_page_with_linked_resources(output_file_path):
+    doc = MyPage(output_file_path)
+    doc.fill_with_content()
+    doc.render()
+
+
+# end section B
+
+from exampling_tools import get_output_file_path
+
 
 def test_that():
-    from exampling_tools import get_output_file_path
     from tests._test_utils import assert_html_equal
 
     output_file_path = get_output_file_path("test_usage_01.html")
@@ -103,3 +146,8 @@ def test_that():
   </body>
 </html>
     """)
+
+
+def test_linked_resources():
+    output_file_path = get_output_file_path("test_usage_01_linked.html")
+    create_page_with_linked_resources(output_file_path)
