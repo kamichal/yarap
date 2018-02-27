@@ -24,11 +24,11 @@ from .six import urlopen, urlparse, str_types
 from .utils import make_place, is_url, error, warn_
 from yawrap.utils import form_css, dictionize_css
 
-
 HEAD = "head"
 BODY_END = "body_end"
 BODY_BEGIN = "body_begin"
 PLACEMENT_OPTIONS = [HEAD, BODY_BEGIN, BODY_END]
+RAISE_ON_DOWNLOAD_FAIL = True
 
 
 class _Resource(object):
@@ -58,7 +58,6 @@ class _Resource(object):
     def from_file(cls, file_path, placement=HEAD):
         """ Provide content of the resource from a local file. """
         assert file_path, "Bad argument: %s" % file_path
-        assert os.path.isfile(file_path), "That file doesn't exist: %s" % file_path
         file_name = os.path.basename(file_path)
 
         def read_method():
@@ -70,11 +69,14 @@ class _Resource(object):
     def _download(url):
         assert is_url(url), "That doesn't seem to be a valid url: %s" % url
         try:
-            with closing(urlopen(url)) as response:
+            with closing(urlopen(url, timeout=3)) as response:
                 return response.read()
         except Exception as e:
-            error("unable to download: %s\n%s" % (url, e))
-            return "// Failed to download %s" % url
+            if RAISE_ON_DOWNLOAD_FAIL:
+                raise
+            else:
+                error("unable to download: %s\n%s" % (url, e))
+                return ""
 
     @staticmethod
     def _read_file(file_path):
@@ -231,9 +233,9 @@ class LinkJs(_ExportToTargetFs, _JsResource):
     pass
 
 
-class ExtenalCss(_LinkExternalURL, _CssResource):
+class ExternalCss(_LinkExternalURL, _CssResource):
     pass
 
 
-class ExtenalJs(_LinkExternalURL, _JsResource):
+class ExternalJs(_LinkExternalURL, _JsResource):
     pass
