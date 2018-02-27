@@ -1,9 +1,11 @@
+import os
 
 from tests._test_utils import assert_html_equal
 
 
+# doc_start_here
 def test_naved_yawrap():
-    import os
+
     from exampling_tools import get_output_file_path
     from yawrap import NavedYawrap, EmbedCss
 

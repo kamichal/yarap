@@ -1,3 +1,5 @@
+.. _css-class-level:
+
 Ways to feed it with CSS / JS resources
 ---------------------------------------
 

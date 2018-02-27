@@ -9,8 +9,9 @@ Each page will be rendered with navigation section, with relative paths. See the
 
 The first document (``home`` in this example) will be the `root` of the document structure. 
 
-.. literalinclude:: ../examples/test_navrap.py
+.. literalinclude:: ../examples/test_doc_navrap.py
     :language: python
+    :start-after: doc_start_here
     :end-before: doc end_here
 
 Generates two html pages:
