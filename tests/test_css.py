@@ -47,14 +47,9 @@ def test_empty_doc(yawrap_class_with_naved):
 
     if yawrap_class_with_naved == DerivedFromNavedYawrap:
         assert render == """\
-<!doctype html>
-<html lang='en-US'>
-  <head>
-    <meta charset='UTF-8' />
-  </head>
-  <body>
-    <main class='main_content_body'></main>
-  </body>
+<!doctype html><html lang='en-US'>
+  <head><meta charset='UTF-8' /></head>
+  <body><main class='main_content_body'></main></body>
 </html>"""
     else:
         assert render == """\

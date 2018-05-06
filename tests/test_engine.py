@@ -1,20 +1,31 @@
-from yawrap._engine import Tag, Doc
 import pytest
 
+from yawrap._engine import Tag, Doc
 
-def test_sorting_attributes():
-    attrs = {
-        "class": 1,
-        "id": 2,
-        "name": 3,
-        "src": 4,
-        "href": 5,
-        "alt": 6,
-        "style": 7,
-        "something": None,
-    }
-    expected_result = " class=1 id=2 name=3 src=4 href=5 something alt=6 style=7"
-    assert Tag._form_attributes(attrs) == expected_result
+
+class TestTag:
+
+    def test_sorting_attributes(self):
+        attrs = {
+            "class": 1,
+            "id": 2,
+            "name": 3,
+            "src": 4,
+            "href": 5,
+            "alt": 6,
+            "style": 7,
+            "something": None,
+        }
+        expected_result = " class=1 id=2 name=3 src=4 href=5 something alt=6 style=7"
+        assert Tag._form_attributes(attrs) == expected_result
+
+    def test_badly_typed(self):
+        with pytest.raises(ValueError, match="Attribute argument must be tuple of 2 elements \(name, value\)."):
+            Tag("name", ("bad", "number", "of elements"))
+
+    def test_bad_types(self):
+        with pytest.raises(ValueError, match="Couldn't make an attribute & value pair out of <object object"):
+            Tag("name", object())
 
 
 def test_empty_doc():
@@ -145,4 +156,3 @@ class TestClassesHandling():
         with doc.tag("one", klass="B  A C"):
             doc.discard_class("B N D")
         assert str(doc) == "<one class='A C'></one>"
-

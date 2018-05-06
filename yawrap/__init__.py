@@ -1,7 +1,6 @@
 # flake8: noqa
 
 from ._engine import Doc
-from ._formatter import HtmlFormatter
 from ._navrap import NavedYawrap
 from ._sourcer import HEAD, BODY_BEGIN, BODY_END, EmbedCss, EmbedJs, LinkCss, LinkJs, ExternalCss, ExternalJs
 from ._yawrap import Yawrap

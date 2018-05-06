@@ -9,7 +9,6 @@ from contextlib import contextmanager
 import os
 
 from yawrap._engine import Doc
-from yawrap._formatter import HtmlFormatter
 from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Resource
 from yawrap.utils import assert_keys_not_in, make_place
 
@@ -43,7 +42,6 @@ class Yawrap(Doc):
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
-    html_formatter = HtmlFormatter.yattag_indent
 
     def __init__(self, target_file, title='', parent=None, defaults=None, errors=None,
                  error_wrapper=('<span class="error">', '</span>'), stag_end='/>'):

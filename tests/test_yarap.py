@@ -7,7 +7,7 @@ Created on 24 Sep 2017
 from bs4 import BeautifulSoup
 import os
 
-from yawrap import Yawrap, ExternalJs, HtmlFormatter, EmbedCss, EmbedJs
+from yawrap import Yawrap, ExternalJs, EmbedCss, EmbedJs
 
 from ._test_utils import assert_html_equal
 
@@ -30,7 +30,6 @@ def test_linking_a_local_file(out_dir):
 
 def test_basic(out_dir):
     the_file = os.path.join(out_dir, 'test_basic.html')
-    Yawrap.html_formatter = HtmlFormatter.yattag_indent
     jawrap = Yawrap(the_file, 'pleasure')
     with jawrap.tag('div'):
         with jawrap.tag('p'):

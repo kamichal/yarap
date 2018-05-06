@@ -65,7 +65,7 @@ class NavedYawrap(Yawrap):
                 self._insert_nav(page_doc)
             with page_doc.tag('main', klass='main_content_body'):
                 page_doc.asis(self.getvalue())
-        return self.html_formatter(page_doc.getvalue())
+        return page_doc.getvalue()
 
     def _get_root(self):
         if self._parent:

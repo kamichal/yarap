@@ -208,10 +208,10 @@ class Doc(object):
         tag = SingleTag(tag_name, *args, **kwargs)
         self._children.append(tag)
 
-    def tagtext(self):
+    def tagtext(self):  # pragma: no cover
         return self, self.tag, self.text
 
-    def ttl(self):
+    def ttl(self):  # pragma: no cover
         return self, self.tag, self.text, self.line
 
     def getvalue(self):
