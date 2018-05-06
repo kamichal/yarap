@@ -2,14 +2,12 @@ from collections import namedtuple
 from contextlib import contextmanager
 import os
 import weakref
-import yattag
 
+from ._engine import Doc
 from ._yawrap import Yawrap
-from .utils import assert_keys_not_in, fix_yattag
 from .six import str_types
+from .utils import assert_keys_not_in
 
-
-fix_yattag(yattag)
 
 NavEntry = namedtuple('NavEntry', 'element, bookmarks, children')
 
@@ -61,12 +59,12 @@ class NavedYawrap(Yawrap):
             sub.render_all_files()
 
     def _render_page(self):
-        page_doc = yattag.SimpleDoc()
+        page_doc = Doc()
         with self._html_page_structure(page_doc):
             if self._subs or self._parent:
                 self._insert_nav(page_doc)
             with page_doc.tag('main', klass='main_content_body'):
-                page_doc.asis(self._get_body_render())
+                page_doc.asis(self.getvalue())
         return self.html_formatter(page_doc.getvalue())
 
     def _get_root(self):

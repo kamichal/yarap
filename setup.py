@@ -12,11 +12,11 @@ setup(
     license='MIT license',
     url='https://bitbucket.org/gandowin/yarap/',
     description='yawrap: simple generator of complex '
-        'html reports, yattag extension',
+        'html reports, api compatible with yattag',
     long_description=long_description,
     packages=find_packages(),
-    requires=['yattag'],
-    install_requires=['yattag'],
+    requires=[],
+    install_requires=[],
     keywords='static html generator',
     classifiers=[
         'Development Status :: 4 - Beta',

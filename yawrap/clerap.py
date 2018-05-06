@@ -1,16 +1,12 @@
-import yattag
-
-from .utils import fix_yattag
+from ._engine import Doc
 from .elements_def import H4, H5, CONTEXT_ELEMENTS, EMPTY_ELEMENTS
 
-fix_yattag(yattag)
 
-
-class Ya5(yattag.SimpleDoc):
+class Ya5(Doc):
     version = H5
 
-    def __init__(self, stag_end=">"):
-        super(Ya5, self).__init__(stag_end)
+    def __init__(self):
+        super(Ya5, self).__init__()
 
         def create_contextual(elm):
             def _tag(*args, **kwargs):

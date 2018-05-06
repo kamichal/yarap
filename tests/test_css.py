@@ -37,31 +37,29 @@ def yawrap_class_with_naved(request):
 
 def test_empty_body(yawrap_class):
     jarap = yawrap_class('')
-    assert jarap._get_body_render() == ''
+    assert jarap.getvalue() == ''
 
 
 def test_empty_doc(yawrap_class_with_naved):
     jarap = yawrap_class_with_naved('')
-    assert jarap._get_body_render() == ''
+    assert jarap.getvalue() == ''
     render = jarap._render_page()
+    print render
     if yawrap_class_with_naved == DerivedFromNavedYawrap:
         assert render == """\
 <!doctype html>
-<html lang="en-US">
+<html lang='en-US'>
   <head>
-    <meta charset="UTF-8" />
+    <meta charset='UTF-8' />
   </head>
   <body>
-    <main class="main_content_body"></main>
+    <main class='main_content_body'></main>
   </body>
 </html>"""
     else:
         assert render == """\
-<!doctype html>
-<html lang="en-US">
-  <head>
-    <meta charset="UTF-8" />
-  </head>
+<!doctype html><html lang='en-US'>
+  <head><meta charset='UTF-8' /></head>
   <body></body>
 </html>"""
 
@@ -75,7 +73,7 @@ def test_class_defined_css(yawrap_class_with_naved):
 
     jarap = JarapWCss('')
     jarap.add(EmbedCss(CssStyle2))
-    assert jarap._get_body_render() == ''
+    assert jarap.getvalue() == ''
     render = jarap._render_page()
     soup = BeautifulSoup(render, "lxml")
     assert [c.text for c in soup.html.head.children if c.name == "style"] == [CssStyle1, CssStyle2]

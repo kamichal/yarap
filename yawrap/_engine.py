@@ -18,9 +18,6 @@ class IndentableLine(object):
         indent = self.indenter * self.indent_level
         return "%s%s" % (indent, self.text)
 
-    def __len__(self):
-        return len(str(self))
-
 
 class NonindentableLine(IndentableLine):
     indenter = ""
@@ -79,6 +76,7 @@ class Tag(object):
                 yield (arg, None)
             else:
                 raise ValueError("Couldn't make an attribute & value pair out of %r." % arg)
+
         for key, value in kwargs.items():
             unslugged_key = ATTRIBUTE_SUBSTITUTES.get(key, key)
             yield unslugged_key, value
@@ -101,6 +99,10 @@ class Tag(object):
                     yield " %s=%r" % (key, value)
 
         return ''.join(list(collect_attributes()))
+
+    def _update_attributes(self, *args, **kwargs):
+        new_attrs = dict(self._process_attributes(args, kwargs))
+        self.attributes.update(new_attrs)
 
     def _build_lines(self):
         begin_tag = "<%s%s>" % (self.tag_name, self._form_attributes(self.attributes))
@@ -173,9 +175,16 @@ class Doc(object):
         return "".join(str(c) for c in self._root_tag.children)
 
     @property
+    def _top_element(self):
+        return self.__tag_stack[-1]
+
+    @property
+    def _attributes(self):
+        return self._top_element.attributes
+
+    @property
     def _children(self):
-        top_most_element = self.__tag_stack[-1]
-        return top_most_element.children
+        return self._top_element.children
 
     @contextmanager
     def tag(self, tag_name, *args, **kwargs):
@@ -215,4 +224,52 @@ class Doc(object):
         self._children.append(CdataTag(raw_text))
 
     def asis(self, raw_text):
+        """ add the text, whatever is there """
         self._children.append(PlainText(raw_text))
+
+    def nl(self):
+        """ adds blank line to resulting html document """
+        self.asis("")
+
+    def attr(self, *args, **kwargs):
+        """ update attribures of current element """
+        self._top_element._update_attributes(*args, **kwargs)
+
+    def classes(self):
+        top_element = self._top_element
+        assert not isinstance(top_element, self.DocumentRootTag), "Root element has no classes."
+        return top_element.attributes.get("class", "").split()
+
+    def add_class(self, names):
+        """ adds class names (space-separated words) to current element """
+        assert isinstance(names, str_types)
+        classes = self.classes()
+
+        for name in names.split():
+            if name not in classes:
+                classes.append(name)
+
+        self._attributes.update({"class": " ".join(classes)})
+
+    def discard_class(self, names):
+        """ removes class names (space-separated words) to current element """
+        assert isinstance(names, str_types)
+        classes = self.classes()
+        for name in names.split():
+            if name in classes:
+                classes.pop(classes.index(name))
+        if classes:
+            self._attributes.update({"class": " ".join(classes)})
+        else:
+            self._attributes.pop("class", None)
+
+    def toggle_class(self, names):
+        """ toggles class names (space-separated words) to current element """
+        already_processed = []
+        for name in names.split():
+            if name not in already_processed:
+                if name in self.classes():
+                    self.discard_class(name)
+                else:
+                    self.add_class(name)
+                already_processed.append(name)

@@ -7,17 +7,14 @@ Created on 23 Sep 2017
 
 from contextlib import contextmanager
 import os
-import yattag
 
 from yawrap._engine import Doc
 from yawrap._formatter import HtmlFormatter
 from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Resource
-from yawrap.utils import fix_yattag, assert_keys_not_in, make_place
+from yawrap.utils import assert_keys_not_in, make_place
 
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
-
-fix_yattag(yattag)
 
 
 @contextmanager
@@ -108,17 +105,12 @@ class Yawrap(Doc):
                 for resource in self.resources + self._additional_resources:
                     resource.visit(page_doc, self, BODY_END)
 
-    def _get_body_render(self):
-        raw_body_html = self.getvalue()
-        return self.html_formatter(raw_body_html)
-
     def _render_page(self):
-        page_doc = yattag.SimpleDoc()
+        page_doc = Doc()
         with self._html_page_structure(page_doc):
-            page_doc.asis(self._get_body_render())
+            page_doc.asis(self.getvalue())
 
-        raw_text = page_doc.getvalue()
-        return self.html_formatter(raw_text)
+        return page_doc.getvalue()
 
     def _get_root(self):
         return self

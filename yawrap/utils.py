@@ -7,42 +7,8 @@ Created on 30 wrz 2017
 '''
 import os
 import re
-from yattag.simpledoc import ATTR_NO_VALUE
 
 from .six import str_types
-
-
-KNOWN_SUBSTITUTES = {
-    'klass': 'class',
-    'Class': 'class',
-    'class_': 'class',
-    'fill_opacity': 'fill-opacity',
-    'stroke_width': 'stroke-width',
-    'stroke_dasharray': ' stroke-dasharray',
-    "stroke_opacity": "stroke-opacity",
-    "stroke_dashoffset": "stroke-dashoffset",
-    "stroke_linejoin": "stroke-linejoin",
-    "stroke_miterlimit": "stroke-miterlimit",
-}
-
-
-def _attributes2(args, kwargs):
-
-    def tr(arg):
-        if isinstance(arg, tuple):
-            return arg
-        elif isinstance(arg, str_types):
-            return (arg, ATTR_NO_VALUE)
-        else:
-            raise ValueError("Couldn't make a XML or HTML attribute/value pair out of %s." % repr(arg))
-
-    result = dict(map(tr, args))
-    result.update({KNOWN_SUBSTITUTES.get(k, k): v for k, v in kwargs.items()})
-    return result
-
-
-def fix_yattag(yattag_module):
-    yattag_module.simpledoc._attributes = _attributes2
 
 
 def make_place(target_file):

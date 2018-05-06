@@ -9,8 +9,7 @@ from contextlib import contextmanager
 import os
 import pytest
 
-from yawrap import NavedYawrap, EmbedCss
-
+from yawrap import NavedYawrap, EmbedCss, Doc
 from ._test_utils import assert_html_equal
 
 
@@ -239,7 +238,6 @@ def test_simple_navrap(tmpdir):
 
 @contextmanager
 def add_tooltip(target_doc, popup_width=280, type_='span', *args, **kwargs):
-    import yattag
 
     target_doc.add(EmbedCss({
         ".tooltip": {
@@ -274,7 +272,7 @@ def add_tooltip(target_doc, popup_width=280, type_='span', *args, **kwargs):
         }
     }))
 
-    popup_doc = yattag.SimpleDoc()
+    popup_doc = Doc()
 
     with target_doc.tag(type_, klass="tooltip", *args, **kwargs):
         yield popup_doc
