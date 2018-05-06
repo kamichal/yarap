@@ -19,12 +19,13 @@ def test_linking_a_local_file(out_dir):
     jarap = Yawrap(dummy_target)
     with jarap.local_link(dummy_file):
         jarap.text('the target')
+
     render = jarap._render_page()
     soup = BeautifulSoup(render, "lxml")
     link = soup.html.body.a
     assert link
     assert link['href'] == '../some.html'
-    assert link.text == 'the target'
+    assert link.text.strip() == 'the target'
 
 
 def test_basic(out_dir):

@@ -9,6 +9,7 @@ from contextlib import contextmanager
 import os
 import yattag
 
+from yawrap._engine import Doc
 from yawrap._formatter import HtmlFormatter
 from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Resource
 from yawrap.utils import fix_yattag, assert_keys_not_in, make_place
@@ -40,7 +41,7 @@ def svg_structure(painter,
         yield
 
 
-class Yawrap(yattag.Doc):
+class Yawrap(Doc):
     resources = []
     html_d = dict(lang="en-US")
     meta_d = [dict(charset="UTF-8")]
@@ -50,7 +51,7 @@ class Yawrap(yattag.Doc):
     def __init__(self, target_file, title='', parent=None, defaults=None, errors=None,
                  error_wrapper=('<span class="error">', '</span>'), stag_end='/>'):
 
-        super(Yawrap, self).__init__(defaults, errors, error_wrapper, stag_end)
+        super(Yawrap, self).__init__()
         self._target_file = target_file
         self.title = title
         self._parent = parent

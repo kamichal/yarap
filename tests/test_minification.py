@@ -100,8 +100,9 @@ def a_huge_page():
             for _ in range(30):
                 with self.tag("div", klass="quite_long_class_name"):
                     for __ in range(30):
-                        for ___ in range(30):
-                            self.text("That is a frequently occurring text.")
+                        with self.tag("div"):
+                            for ___ in range(30):
+                                self.text("That is a frequently occurring text.")
 
     rap = MyRap("", "")
     rap.make_huge_page()

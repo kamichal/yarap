@@ -6,6 +6,11 @@ _END_TAG_PROG = re.compile("(\</\s*\w+\s*\>)")
 
 
 @staticmethod
+def _as_is(raw_html_string):
+    return raw_html_string
+
+
+@staticmethod
 def _no_indent(raw_html_string):
     """ no indentation,
         the fastest store (no html postprocessing),
@@ -59,6 +64,7 @@ def _yattag_indent(raw_html_string):
 
 # It's assumed they are sorted in order of performance
 _HtmlFormatterOption = namedtuple("_HtmlFormatterOption", [
+    "as_is",
     "no_indent",
     "limited_line_width",
     "new_line_each_end",
@@ -66,6 +72,7 @@ _HtmlFormatterOption = namedtuple("_HtmlFormatterOption", [
 ])
 
 HtmlFormatter = _HtmlFormatterOption(
+    as_is=_as_is,
     no_indent=_no_indent,
     limited_line_width=_limited_line_width,
     new_line_each_end=_new_line_each_end,
