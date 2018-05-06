@@ -109,7 +109,7 @@ def a_huge_page():
     return rap
 
 
-def test_check_timings(a_huge_page):
+def ntest_check_timings(a_huge_page):
 
     def measure_exec_time(current_formatter):
         a_huge_page.__class__.html_formatter = current_formatter

@@ -3,6 +3,29 @@ from contextlib import contextmanager
 from yawrap.six import str_types
 
 
+class IndentableLine(object):
+    __slots__ = ("text", "indent_level")
+    indenter = "  "
+
+    def __init__(self, text):
+        self.text = text
+        self.indent_level = 0
+
+    def increase_indent(self):
+        self.indent_level += 1
+
+    def __str__(self):
+        indent = self.indenter * self.indent_level
+        return "%s%s" % (indent, self.text)
+
+    def __len__(self):
+        return len(str(self))
+
+
+class NonindentableLine(IndentableLine):
+    indenter = ""
+
+
 ATTRIBUTE_SUBSTITUTES = {
     'klass': 'class',
     'Class': 'class',
@@ -16,50 +39,30 @@ ATTRIBUTE_SUBSTITUTES = {
     "stroke_miterlimit": "stroke-miterlimit",
 }
 
-
-class IndentableLine(object):
-    __slots__ = ("text", "indent_level")
-    single_indent = "  "
-
-    def __init__(self, text):
-        self.text = text
-        self.indent_level = 0
-
-    def increase_indent(self):
-        self.indent_level += 1
-
-    def __str__(self):
-        return self.single_indent * self.indent_level + self.text
-
-    def __len__(self):
-        return len(str(self))
-
-
-class NonindentableLine(IndentableLine):
-    single_indent = ""
+DEFAULT_ATTRIBUTE_ORDER = {
+    "class": 0,
+    "id": 1,
+    "name": 2,
+    "src": 3,
+    "for": 4,
+    "type": 5,
+    "href": 6,
+    "value": 7,
+    "default rank for other attributes": 10,
+    "title": 101,
+    "alt": 102,
+    "style": 103,
+}
 
 
 class Tag(object):
     __slots__ = ("tag_name", "attributes", "children")
-    max_line_width = 20
-    attribute_precedence_rank = {
-        "class": 0,
-        "id": 1,
-        "name": 2,
-        "src": 3,
-        "for": 4,
-        "type": 5,
-        "href": 6,
-        "value": 7,
-        "default rank for other attributes": 10,
-        "title": 101,
-        "alt": 102,
-        "style": 103,
-    }
+    attribute_precedence_rank = DEFAULT_ATTRIBUTE_ORDER
+    max_line_width = 100
 
     def __init__(self, tag_name, *args, **kwargs):
         self.tag_name = tag_name
-        self.attributes = self._process_attributes(args, kwargs)
+        self.attributes = dict(self._process_attributes(args, kwargs))
         self.children = []
 
     def __str__(self):
@@ -67,19 +70,18 @@ class Tag(object):
 
     @classmethod
     def _process_attributes(cls, args, kwargs):
-        def pair(arg):
+        for arg in args:
             if isinstance(arg, tuple):
                 if len(arg) != 2:
                     raise ValueError("Attribute argument must be tuple of 2 elements (name, value).")
-                return arg
+                yield arg
             elif isinstance(arg, str_types):
-                return (arg, None)
+                yield (arg, None)
             else:
-                raise ValueError("Couldn't make an attribute/value pair out of %r." % arg)
-
-        result = dict(pair(a) for a in args)
-        result.update({ATTRIBUTE_SUBSTITUTES.get(k, k): v for k, v in kwargs.items()})
-        return result
+                raise ValueError("Couldn't make an attribute & value pair out of %r." % arg)
+        for key, value in kwargs.items():
+            unslugged_key = ATTRIBUTE_SUBSTITUTES.get(key, key)
+            yield unslugged_key, value
 
     @classmethod
     def _form_attributes(cls, attributes_dict):
@@ -103,18 +105,18 @@ class Tag(object):
     def _build_lines(self):
         begin_tag = "<%s%s>" % (self.tag_name, self._form_attributes(self.attributes))
         end_tag = "</%s>" % self.tag_name
-        inner_lines = [line for child in self.children for line in child._build_lines()]
+        children_lines = [line for child in self.children for line in child._build_lines()]
 
-        if len(inner_lines) <= 1:
+        if len(children_lines) <= 1:
             # try to fit it in single line
-            parts = [begin_tag] + [str(l) for l in inner_lines] + [end_tag]
+            parts = [begin_tag] + [str(l) for l in children_lines] + [end_tag]
             total_length = sum(map(len, parts))
             if total_length <= self.max_line_width:
                 return [IndentableLine("".join(parts))]
 
-        for c in inner_lines:
-            c.increase_indent()
-        return [IndentableLine(begin_tag)] + inner_lines + [IndentableLine(end_tag)]
+        for child_line in children_lines:
+            child_line.increase_indent()
+        return [IndentableLine(begin_tag)] + children_lines + [IndentableLine(end_tag)]
 
 
 class SingleTag(Tag):
@@ -132,19 +134,24 @@ class Text(object):
         self._text = text
 
     def _build_lines(self):
-        return [IndentableLine(l) for l in self._text.split("\n")]
+        return [IndentableLine(l) for l in str(self).split("\n")]
 
     def __str__(self):
         return self._text
 
 
-class Asis(Text):
+class PlainText(Text):
 
     def _build_lines(self):
         return [NonindentableLine(str(self))]
 
 
-class CdataTag(Asis):
+class Comment(Text):
+    def __str__(self):
+        return "<!-- %s -->" % self._text
+
+
+class CdataTag(PlainText):
 
     def __str__(self):
         return "<![CDATA[%s]]>" % self._text
@@ -180,8 +187,8 @@ class Doc(object):
         finally:
             self.__tag_stack.pop()
 
-    def text(self, *text_):
-        self._children.extend([Text(t) for t in text_])
+    def text(self, *text):
+        self._children.extend([Text(t) for t in text])
 
     def line(self, tag_name, content="", *args, **kwargs):
         tag = Tag(tag_name, *args, **kwargs)
@@ -201,8 +208,11 @@ class Doc(object):
     def getvalue(self):
         return str(self)
 
+    def comment(self, text):
+        self._children.append(Comment(text))
+
     def cdata(self, raw_text):
         self._children.append(CdataTag(raw_text))
 
     def asis(self, raw_text):
-        self._children.append(Asis(raw_text))
+        self._children.append(PlainText(raw_text))
