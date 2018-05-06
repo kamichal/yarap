@@ -44,7 +44,7 @@ def test_empty_doc(yawrap_class_with_naved):
     jarap = yawrap_class_with_naved('')
     assert jarap.getvalue() == ''
     render = jarap._render_page()
-    print render
+
     if yawrap_class_with_naved == DerivedFromNavedYawrap:
         assert render == """\
 <!doctype html>
