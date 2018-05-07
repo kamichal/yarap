@@ -442,7 +442,7 @@ def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums)
         with open(file_, 'rt') as ff:
             content = ff.read()
 
-        soup = BeautifulSoup(content, "lxml")
+        soup = BeautifulSoup(content, "html.parser")
         assert soup.html
         assert soup.html.head
         assert soup.html.body

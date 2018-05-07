@@ -19,7 +19,7 @@ def test_linking_a_local_file(out_dir):
         jarap.text('the target')
 
     render = jarap._render_page()
-    soup = BeautifulSoup(render, "lxml")
+    soup = BeautifulSoup(render, "html.parser")
     link = soup.html.body.a
     assert link
     assert link['href'] == '../some.html'

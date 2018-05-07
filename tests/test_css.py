@@ -72,7 +72,7 @@ def test_class_defined_css(yawrap_class_with_naved):
     jarap = JarapWCss('')
     jarap.add(EmbedCss(CssStyle2))
     render = jarap._render_page()
-    soup = BeautifulSoup(render, "lxml")
+    soup = BeautifulSoup(render, "html.parser")
     assert [c.text for c in soup.html.head.children if c.name == "style"] == [CssStyle1, CssStyle2]
 
 
@@ -88,7 +88,7 @@ def test_link_local_style(out_dir, yawrap_class_with_naved, mocker):
     jarap = yawrap_class_with_naved(dummy_target)
     jarap.add(LinkCss.from_file(dummy_css))
     render = jarap._render_page()
-    soup = BeautifulSoup(render, "lxml")
+    soup = BeautifulSoup(render, "html.parser")
     link = soup.html.head.link
     assert link
     assert link['href'] == 'resources/some.css'
@@ -100,7 +100,7 @@ def test_link_ext_style(yawrap_class_with_naved):
     jarap = yawrap_class_with_naved('')
     jarap.add(ExternalCss('http://css.org/great.css'))
     render = jarap._render_page()
-    soup = BeautifulSoup(render, "lxml")
+    soup = BeautifulSoup(render, "html.parser")
     link = soup.html.head.link
     assert link
     assert link['href'] == 'http://css.org/great.css'

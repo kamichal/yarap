@@ -177,7 +177,7 @@ def test_saving_files(tmpdir):
         ]
 
     doc = MyRap(str(out_file))
-    assert BeautifulSoup(doc._render_page(), "lxml").html.head.link['href'] == css_rel_path
+    assert BeautifulSoup(doc._render_page(), "html.parser").html.head.link['href'] == css_rel_path
     assert css_file.read() == css_definition
 
 
@@ -295,12 +295,12 @@ def test_inheriting_local_files_linkage(mocked_urlopen, mocked_read_file, mocked
 
     sub_doc = root_doc.sub(str(sub_file), "sub_name")
 
-    root_soup = BeautifulSoup(root_doc._render_page(), "lxml")
+    root_soup = BeautifulSoup(root_doc._render_page(), "html.parser")
 
     assert root_soup.html.head.script['src'] == "resources/common_script.js"
     assert root_soup.html.head.link['href'] == "resources/common_style.css"
 
-    sub_soup = BeautifulSoup(sub_doc._render_page(), "lxml")
+    sub_soup = BeautifulSoup(sub_doc._render_page(), "html.parser")
     assert sub_soup.html.head.script['src'] == "../../resources/common_script.js"
     assert sub_soup.html.head.link['href'] == "../../resources/common_style.css"
 
@@ -318,8 +318,8 @@ def test_defining_css_as_a_dict(mocked_save_file):
     sub_doc.add(EmbedCss("#id {margin: 10px 12px;}"))
     sub_doc.add(LinkCss("a {width: 90%;}", file_name="sub.css"))
 
-    root_soup = BeautifulSoup(root_doc._render_page(), "lxml")
-    sub_soup = BeautifulSoup(sub_doc._render_page(), "lxml")
+    root_soup = BeautifulSoup(root_doc._render_page(), "html.parser")
+    sub_soup = BeautifulSoup(sub_doc._render_page(), "html.parser")
 
     expected_root_styles = [
         "body { background: #DAD; }".split(),

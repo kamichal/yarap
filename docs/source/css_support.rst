@@ -166,7 +166,7 @@ Using global CSS from some resources can be obtained by calling :func:`add` with
     </html>"""
 
     from bs4 import BeautifulSoup
-    print(BeautifulSoup(file_content, "lxml") == BeautifulSoup(expected_result, "lxml"))
+    print(BeautifulSoup(file_content, "html.parser") == BeautifulSoup(expected_result, "html.parser"))
 
 .. testoutput::
 
