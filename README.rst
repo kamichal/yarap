@@ -1,6 +1,38 @@
 Yawrap
 ======
 
+.. image:: https://travis-ci.org/kamichal/yarap.svg?branch=master
+    :target: https://travis-ci.org/kamichal/yarap
+    :alt: Build Status
+
+.. image:: https://readthedocs.org/projects/yawrap/badge/?version=latest
+    :target: http://yawrap.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
+
+.. image:: https://img.shields.io/github/issues/kamichal/yarap.svg
+    :target: https://github.com/kamichal/yarap/issues
+    :alt: GitHub issues
+
+.. image:: https://img.shields.io/pypi/pyversions/yawrap.svg
+    :target: https://pypi.org/project/yawrap
+    :alt: PyPI - Python Version
+
+.. image:: https://img.shields.io/pypi/status/yawrap.svg
+    :target: https://pypi.org/project/yawrap
+    :alt: PyPI - Development Status
+
+.. image:: https://img.shields.io/pypi/format/yawrap.svg
+    :target: https://pypi.org/project/yawrap
+    :alt: PyPI - Package Format
+
+.. image:: https://img.shields.io/pypi/v/yawrap.svg
+    :target: https://pypi.org/project/yawrap
+    :alt: PyPI
+
+.. image:: https://img.shields.io/github/license/kamichal/yarap.svg
+    :target: https://github.com/kamichal/yarap/blob/master/LICENSE
+    :alt: GitHub license
+
 Yawrap is a powerful, lightweight, pythonic `pseudo-static HTML` builder that works with:
 
     - ``python2.7``,
@@ -21,14 +53,6 @@ Author:  Michał Kaczmarczyk from Poland
 Email:   `michal.skaczmarczy.k at gmail.com`
 ======== ======================================================
 
-
-.. image:: https://travis-ci.org/kamichal/yarap.svg?branch=master
-    :target: https://travis-ci.org/kamichal/yarap
-    :alt: Build Status
-
-.. image:: https://readthedocs.org/projects/yawrap/badge/?version=latest
-    :target: http://yawrap.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
 
 Yawrap features
 ---------------
