@@ -19,9 +19,9 @@ def make_place(target_file):
     return target_file
 
 
-def assert_keys_not_in(keys, args, kwargs):
-    keys = keys if isinstance(keys, (list, tuple)) else [keys]
-    for key in keys:
+def assert_keys_not_in(restricted_keys, args, kwargs):
+    restricted_keys = restricted_keys if isinstance(restricted_keys, (list, tuple)) else [restricted_keys]
+    for key in restricted_keys:
         defined_keys = list(kwargs.keys()) + [x[0] for x in args if isinstance(x, tuple)]
         if key in defined_keys:
             raise ValueError("Duplicated '{}' attribute.".format(key))
@@ -48,14 +48,6 @@ def form_css(structured_css, indent_level=1):
             yield template.format(ind=indent, selector=selector, definitions=defs)
 
     return ''.join(rules())
-
-
-def error(text):
-    print(text)
-
-
-def warn_(text):
-    print(text)
 
 
 DJANGO_URL_VALIDATION_PROG = re.compile(

@@ -8,8 +8,6 @@ from yawrap import Yawrap, NavedYawrap, ExternalJs, ExternalCss, EmbedJs, EmbedC
     BODY_END, _sourcer
 from yawrap._sourcer import os, PLACEMENT_OPTIONS
 
-from ._test_utils import assert_html_equal
-
 
 @pytest.fixture
 def mocked_urlopen(mocker):
@@ -61,17 +59,15 @@ def test_linking_external_resources_in_head():
     doc = MyRap("that_file.html")
     with doc.tag("p"):
         doc.text("The body content")
-    assert_html_equal(doc._render_page(), """<!doctype html>
-        <html lang="en-US">
-          <head>
-            <meta charset="UTF-8" />
-            <link href="https://www.css.com/css.css" type="text/css" rel="stylesheet" />
-            <script src="https://www.js.com/js.js"></script>
-          </head>
-          <body>
-            <p>The body content</p>
-          </body>
-        </html>""")
+    assert doc.getvalue() == """\
+<!doctype html><html lang='en-US'>
+  <head>
+    <meta charset='UTF-8' />
+    <link type='text/css' href='https://www.css.com/css.css' rel='stylesheet' />
+    <script src='https://www.js.com/js.js'></script>
+  </head>
+  <body><p>The body content</p></body>
+</html>"""
 
 
 def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
@@ -92,21 +88,19 @@ def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, t
     with doc.tag("p"):
         doc.text("The body content")
 
-    assert_html_equal(doc._render_page(), """<!doctype html>
-        <html lang="en-US">
-          <head>
-            <meta charset="UTF-8" />
-            <style>head { background: #DAD; }</style>
-            <script type="text/javascript">console.log("alles klar in the head")</script>
-            <style>#da.house.css {color: #BAD;}</style>
-            <script type="text/javascript">Dummy response to http://www.js.in/the.head.js</script>
-            <style>#style_to_embed.css {background: #AFE;}</style>
-            <script type="text/javascript">That's a dummy content of /path/to/script_to_embed.js file.</script>
-          </head>
-          <body>
-            <p>The body content</p>
-          </body>
-        </html>""")
+    assert doc.getvalue() == """\
+<!doctype html><html lang='en-US'>
+  <head>
+    <meta charset='UTF-8' />
+    <style>head { background: #DAD; }</style>
+    <script type='text/javascript'>console.log("alles klar in the head")</script>
+    <style> #da.house.css {color: #BAD;}</style>
+    <script type='text/javascript'>Dummy response to http://www.js.in/the.head.js</script>
+    <style> #style_to_embed.css {background: #AFE;}</style>
+    <script type='text/javascript'>That's a dummy content of /path/to/script_to_embed.js file.</script>
+  </head>
+  <body><p>The body content</p></body>
+</html>"""
 
 
 def test_embedding_in_body(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
@@ -122,19 +116,16 @@ def test_embedding_in_body(mocked_urlopen, mocked_read_file, mocked_save_file, t
     with doc.tag("p"):
         doc.text("The body content")
 
-    result = doc._render_page()
-    assert_html_equal(result, """<!doctype html>
-        <html lang="en-US">
-          <head>
-            <meta charset="UTF-8" />
-          </head>
-          <body>
-            <script type="text/javascript">console.log("alles klar in the body")</script>
-            <script type="text/javascript">Dummy response to http://www.js.in/the.body.js</script>
-            <p>The body content</p>
-            <script type="text/javascript">That's a dummy content of /path/to/script_to_embed.js file.</script>
-          </body>
-        </html>""")
+    assert doc.getvalue() == """\
+<!doctype html><html lang='en-US'>
+  <head><meta charset='UTF-8' /></head>
+  <body>
+    <script type='text/javascript'>console.log("alles klar in the body")</script>
+    <script type='text/javascript'>Dummy response to http://www.js.in/the.body.js</script>
+    <p>The body content</p>
+    <script type='text/javascript'>That's a dummy content of /path/to/script_to_embed.js file.</script>
+  </body>
+</html>"""
 
 
 def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
@@ -156,21 +147,21 @@ def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_sa
     with doc.tag("p"):
         doc.text("The body content")
 
-    assert_html_equal(doc._render_page(), """<!doctype html>
-        <html lang="en-US">
-          <head>
-            <meta charset="UTF-8" />
-            <link href="resources/that_new_style.css" type="text/css" rel="stylesheet" />
-            <link href="resources/head.css" type="text/css" rel="stylesheet" />
-            <script src="resources/head.js"></script>
-            <link href="resources/local_style.css" type="text/css" rel="stylesheet" />
-            <script src="resources/local_script.js"></script>
-          </head>
-          <body>
-            <p>The body content</p>
-          <script src="resources/that_new_script.js"></script>
-          </body>
-        </html>""")
+    assert doc.getvalue() == """\
+<!doctype html><html lang='en-US'>
+  <head>
+    <meta charset='UTF-8' />
+    <link type='text/css' href='resources/that_new_style.css' rel='stylesheet' />
+    <link type='text/css' href='resources/head.css' rel='stylesheet' />
+    <script src='resources/head.js'></script>
+    <link type='text/css' href='resources/local_style.css' rel='stylesheet' />
+    <script src='resources/local_script.js'></script>
+  </head>
+  <body>
+    <p>The body content</p>
+    <script src='resources/that_new_script.js'></script>
+  </body>
+</html>"""
 
 
 def test_saving_files(tmpdir):
@@ -220,22 +211,19 @@ def test_linking_local_files_in_head_custom_loc(mocked_urlopen, mocked_read_file
     with doc.tag("p"):
         doc.text("The body content")
 
-    assert_html_equal(doc._render_page(), """<!doctype html>
-        <html lang="en-US">
-          <head>
-            <meta charset="UTF-8" />
-            <link href="custom/css/dir/that_new_style.css" type="text/css" rel="stylesheet" />
-            <link href="custom/css/dir/from_web.css" type="text/css" rel="stylesheet" />
-            <link href="custom/css/dir/local_style.css" type="text/css" rel="stylesheet" />
-
-            <script src="custom/js/dir/that_new_script.js"></script>
-            <script src="custom/js/dir/from_web.js"></script>
-            <script src="custom/js/dir/local_script.js"></script>
-          </head>
-          <body>
-            <p>The body content</p>
-          </body>
-        </html>""")
+    assert doc.getvalue() == """\
+<!doctype html><html lang='en-US'>
+  <head>
+    <meta charset='UTF-8' />
+    <link type='text/css' href='custom/css/dir/that_new_style.css' rel='stylesheet' />
+    <link type='text/css' href='custom/css/dir/from_web.css' rel='stylesheet' />
+    <link type='text/css' href='custom/css/dir/local_style.css' rel='stylesheet' />
+    <script src='custom/js/dir/that_new_script.js'></script>
+    <script src='custom/js/dir/from_web.js'></script>
+    <script src='custom/js/dir/local_script.js'></script>
+  </head>
+  <body><p>The body content</p></body>
+</html>"""
 
 
 @pytest.mark.parametrize("Operation, placement", product([EmbedCss, LinkCss], [BODY_BEGIN, BODY_END]))

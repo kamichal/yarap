@@ -65,7 +65,7 @@ from yawrap import LinkCss, LinkJs
 class MyPage(MyPageTemplate):
     resources = [
         ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"),
-        LinkCss("""
+        LinkCss("""\
         body {
             padding: 12px;
             font-family: helvetica, sans-serif;
@@ -78,7 +78,7 @@ class MyPage(MyPageTemplate):
             padding: 8px;
             width: 80px;
         }""", file_name="common_linked.css"),
-        LinkJs("""
+        LinkJs("""\
         $("button").click(function(){
             $("#red-box").fadeToggle();
             $("#green-box").fadeToggle("slow");
@@ -102,19 +102,19 @@ from exampling_tools import get_output_file_path
 
 
 def test_that():
-    from tests._test_utils import assert_html_equal
-
     output_file_path = get_output_file_path("test_usage_01.html")
     create_page(output_file_path)
 
-    assert_html_equal(output_file_path, """
-<!doctype html>
-<html lang="en-US">
+    with open(output_file_path, "rt") as f:
+        assert f.read() == """\
+<!doctype html><html lang='en-US'>
   <head>
-    <meta charset="UTF-8" />
+    <meta charset='UTF-8' />
     <title>Name of the page</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <style>body {
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <style>
+
+        body {
             padding: 12px;
             font-family: helvetica, sans-serif;
             font-size: 14px;
@@ -125,27 +125,30 @@ def test_that():
             margin: 8px;
             padding: 8px;
             width: 80px;
-        }</style>
+        }
+        
+    </style>
   </head>
   <body>
     <h2>Demonstrate a simple JavaScript.</h2>
     <p>fadeToggle() operating with different speed parameters.</p>
     <button>Click to fade in/out boxes</button>
     <div>
-      <div style="background-color:red;" id="red-box" class="box">red-box</div>
-      <div style="background-color:#0f0;" id="green-box" class="box">green-box</div>
-      <div style="background-color:#0a1cf0;" id="blue-box" class="box">blue-box</div>
+      <div class='box' id='red-box' style='background-color:red;'>red-box</div>
+      <div class='box' id='green-box' style='background-color:#0f0;'>green-box</div>
+      <div class='box' id='blue-box' style='background-color:#0a1cf0;'>blue-box</div>
     </div>
-    <script type="text/javascript">
+    <script type='text/javascript'>
+
         $("button").click(function(){
             $("#red-box").fadeToggle();
             $("#green-box").fadeToggle("slow");
             $("#blue-box").fadeToggle(3000);
         });
-        </script>
+        
+    </script>
   </body>
-</html>
-    """)
+</html>"""
 
 
 def test_linked_resources():

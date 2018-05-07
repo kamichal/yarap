@@ -2,8 +2,6 @@ import os
 
 from yawrap import Yawrap
 
-from ._test_utils import assert_html_equal
-
 
 def draw_sample_svg(painter_doc, points="50,150 50,200 200,200 200,100"):
     painter_doc.stag('rect', x="25", y="25", width="200", height="200", klass='the_rect')
@@ -18,20 +16,16 @@ def test_basic_svg(out_dir):
     with jarap.svg(width=260, height=260, svg_styles_as_str=".the_rect {fill: lime; stroke-width: 4; stroke: pink;}"):
         draw_sample_svg(jarap)
 
-    html = jarap._render_page()
-
-    assert_html_equal(html, """\
-        <!doctype html>
-        <html lang="en-US"><head><meta charset="UTF-8" /></head>
-        <body>
-            <svg width="260" xmlns="http://www.w3.org/2000/svg" version="1.1" height="260">
-                <style type="text/css">
-                    <![CDATA[.the_rect {fill: lime; stroke-width: 4; stroke: pink;}]]>
-                </style>
-                <rect y="25" x="25" height="200" class="the_rect" width="200"/>
-                <circle cy="125" cx="125" r="75" fill="orange"/>
-                <polyline stroke="red" stroke-width="4" fill="none" points="50,150 50,200 200,200 200,100"/>
-                <line stroke-width="4" x2="200" stroke="blue" x1="50" y1="50" y2="200"/>
-            </svg>
-        </body>
-        </html>""")
+    assert jarap._render_page() == """\
+<!doctype html><html lang='en-US'>
+  <head><meta charset='UTF-8' /></head>
+  <body>
+    <svg height=260 version='1.1' width=260 xmlns='http://www.w3.org/2000/svg'>
+      <style type='text/css'><![CDATA[.the_rect {fill: lime; stroke-width: 4; stroke: pink;}]]></style>
+      <rect class='the_rect' height='200' width='200' x='25' y='25' />
+      <circle cx='125' cy='125' fill='orange' r='75' />
+      <polyline fill='none' points='50,150 50,200 200,200 200,100' stroke='red' stroke-width=4 />
+      <line stroke='blue' stroke-width='4' x1='50' x2='200' y1='50' y2='200' />
+    </svg>
+  </body>
+</html>"""

@@ -29,9 +29,8 @@ BASIC_NAV_CSS = """\
 class NavedYawrap(Yawrap):
     css = BASIC_NAV_CSS
 
-    def __init__(self, target_file, title='', parent=None, nav_title='', defaults=None, errors=None,
-                 error_wrapper=('<span class="error">', '</span>'), stag_end=' />'):
-        super(NavedYawrap, self).__init__(target_file, title, parent, defaults, errors, error_wrapper, stag_end)
+    def __init__(self, target_file, title='', parent=None, nav_title=''):
+        super(NavedYawrap, self).__init__(target_file, title, parent)
         self.nav_title = nav_title or title
         self._subs = []
         self._bookmarks = []
@@ -64,7 +63,7 @@ class NavedYawrap(Yawrap):
             if self._subs or self._parent:
                 self._insert_nav(page_doc)
             with page_doc.tag('main', klass='main_content_body'):
-                page_doc.asis(self.getvalue())
+                page_doc._clone_children(self)
         return page_doc.getvalue()
 
     def _get_root(self):

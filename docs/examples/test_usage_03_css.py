@@ -1,8 +1,10 @@
 
 from yawrap import Yawrap
 
+
 class PlainPage(Yawrap):
     resources = []
+
 
 doc = PlainPage("/tmp/test.html")
 doc.render()
@@ -11,6 +13,7 @@ doc.render()
 
 
 from yawrap import ExternalCss, ExternalJs
+
 
 class PageWithExternalCss(Yawrap):
     resources = [
@@ -32,6 +35,7 @@ class LinkedCssPage(Yawrap):
 
 # end of section C
 
+
 class LocalSources(Yawrap):
     resources = [
         LinkCss.from_file("path/to/source_of/w3.css"),
@@ -39,6 +43,7 @@ class LocalSources(Yawrap):
     ]
 
 # end of section D
+
 
 class LinkCssInMyStyle(LinkCss):
     resource_subdir = "the_super_directory"
@@ -63,12 +68,18 @@ class MyStyleOfLinking(Yawrap):
 def test_that(mocker):
     from yawrap import _sourcer
     from exampling_tools import get_output_file_path  # need it to make this docs building
-    from tests._test_utils import assert_html_equal
+
     _sourcer.RAISE_ON_DOWNLOAD_FAIL = False
     mocker.patch.object(_sourcer._Resource, "_download", return_value="")
 
-    PlainPage(get_output_file_path("test_usage_03a.html")).render()
+    plain_file_path = get_output_file_path("test_usage_03a.html")
+    PlainPage(plain_file_path).render()
     PageWithExternalCss(get_output_file_path("test_usage_03b.html")).render()
     LinkedCssPage(get_output_file_path("test_usage_03c.html")).render()
     MyStyleOfLinking(get_output_file_path("test_usage_03e.html")).render()
-#     assert_html_equal(plain_file_path, """ """)
+    with open(plain_file_path, "rt") as f:
+        assert f.read() == """\
+<!doctype html><html lang='en-US'>
+  <head><meta charset='UTF-8' /></head>
+  <body></body>
+</html>"""

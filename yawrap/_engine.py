@@ -2,6 +2,17 @@ from contextlib import contextmanager
 
 from yawrap.six import str_types
 
+"""
+    The purpose of this module is to replace dependency to yattag with own machinery.
+    The Doc class shares same interface with yattag. Cannot guarantee that, but in vast most
+    of cases this module's code fully substitutes yattag.SimpleDoc class.
+
+    The main reason - to make own code that supplements well known package is that:
+    - the well known package doesn't create indentation on the fly.
+    - the well known package doesn't like to change. New features are not welcome.
+    - because no dependency and pure pythonic code are nice
+"""
+
 
 class IndentableLine(object):
     __slots__ = ("text", "indent_level")
@@ -179,12 +190,20 @@ class Doc(object):
         return self.__tag_stack[-1]
 
     @property
+    def __root_element(self):
+        return self.__tag_stack[0]
+
+    @property
     def _attributes(self):
         return self._top_element.attributes
 
     @property
     def _children(self):
         return self._top_element.children
+
+    def _clone_children(self, other_doc):
+        assert isinstance(other_doc, Doc)
+        self._children.extend(other_doc.__root_element.children)
 
     @contextmanager
     def tag(self, tag_name, *args, **kwargs):

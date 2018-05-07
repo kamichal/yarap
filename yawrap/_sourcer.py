@@ -21,7 +21,7 @@ import os
 import posixpath
 
 from .six import urlopen, urlparse, str_types
-from .utils import make_place, is_url, error, warn_
+from .utils import make_place, is_url
 from yawrap.utils import form_css
 
 HEAD = "head"
@@ -29,6 +29,10 @@ BODY_END = "body_end"
 BODY_BEGIN = "body_begin"
 PLACEMENT_OPTIONS = [HEAD, BODY_BEGIN, BODY_END]
 RAISE_ON_DOWNLOAD_FAIL = True
+
+
+def warn_(text):
+    print(text)
 
 
 class _Resource(object):
@@ -71,11 +75,11 @@ class _Resource(object):
         try:
             with closing(urlopen(url, timeout=3)) as response:
                 return response.read()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             if RAISE_ON_DOWNLOAD_FAIL:
                 raise
             else:
-                error("unable to download: %s\n%s" % (url, e))
+                print("unable to download: %s\n%s" % (url, e))
                 return ""
 
     @staticmethod

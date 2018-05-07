@@ -24,16 +24,10 @@ def svg_structure(painter,
                   **kwargs):
 
     kwargs.update(svg_tag_attributes)
-    svg_defs = None
     with painter.tag('svg', *args, **kwargs):
         if svg_styles_as_str:
             with painter.tag('style', type="text/css"):
                 painter.cdata(svg_styles_as_str)
-        if svg_defs:
-            with painter.tag('defs', type="text/css"):
-                for id_, svg_def in svg_defs.items():
-                    with painter.tag('g', id=id_):
-                        painter.asis(svg_def)
         yield
 
 
@@ -43,8 +37,7 @@ class Yawrap(Doc):
     meta_d = [dict(charset="UTF-8")]
     svg_d = DEFAULT_SVG_TAG_ATTRIBUTES
 
-    def __init__(self, target_file, title='', parent=None, defaults=None, errors=None,
-                 error_wrapper=('<span class="error">', '</span>'), stag_end='/>'):
+    def __init__(self, target_file, title='', parent=None):
 
         super(Yawrap, self).__init__()
         self._target_file = target_file
@@ -65,6 +58,9 @@ class Yawrap(Doc):
         raw_html = self._render_page()
         with open(make_place(self._target_file), 'wt') as ff:
             ff.write(raw_html)
+
+    def getvalue(self):
+        return self._render_page()
 
     @contextmanager
     def svg(self, svg_styles_as_str='', *args, **svg_tag_attributes):
@@ -106,8 +102,7 @@ class Yawrap(Doc):
     def _render_page(self):
         page_doc = Doc()
         with self._html_page_structure(page_doc):
-            page_doc.asis(self.getvalue())
-
+            page_doc._clone_children(self)
         return page_doc.getvalue()
 
     def _get_root(self):

@@ -1,7 +1,5 @@
 from yawrap import Ya4, Ya5
 
-from ._test_utils import assert_html_equal
-
 
 def test_clearap_v5():
     y = Ya5()
@@ -13,17 +11,18 @@ def test_clearap_v5():
                     y.br()
             y.img(href='12')
 
-    assert_html_equal(y.getvalue(), """\
-        <html>
-        <body style="color: #5f5;">
-          <div>
-            <p class="ok">
-              that\'s all<br>
-            </p>
-          </div>
-          <img href="12">
-        </body>
-        </html>""")
+    assert y.getvalue() == """\
+<html>
+  <body style='color: #5f5;'>
+    <div>
+      <p class='ok'>
+        that's all
+        <br />
+      </p>
+    </div>
+    <img href='12' />
+  </body>
+</html>"""
 
 
 def test_clearap_v4():
@@ -36,14 +35,15 @@ def test_clearap_v4():
                     y.br()
             y.img(href='12')
 
-    assert_html_equal(y.getvalue(), """\
-        <html>
-        <body style="color: #5f5;">
-          <div>
-            <p class="ok">
-              that\'s all<br>
-            </p>
-          </div>
-          <img href="12">
-        </body>
-        </html>""")
+    assert y.getvalue() == """\
+<html>
+  <body style='color: #5f5;'>
+    <div>
+      <p class='ok'>
+        that's all
+        <br />
+      </p>
+    </div>
+    <img href='12' />
+  </body>
+</html>"""

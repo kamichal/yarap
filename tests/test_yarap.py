@@ -9,8 +9,6 @@ import os
 
 from yawrap import Yawrap, ExternalJs, EmbedCss, EmbedJs
 
-from ._test_utils import assert_html_equal
-
 
 def test_linking_a_local_file(out_dir):
     dummy_file = os.path.join(out_dir, 'some.html')
@@ -35,20 +33,14 @@ def test_basic(out_dir):
         with jawrap.tag('p'):
             jawrap.text('Nothing much here.')
 
-    render = jawrap._render_page()
-    assert_html_equal(render, """\
-<!doctype html>
-<html lang="en-US">
+    assert jawrap._render_page() == """\
+<!doctype html><html lang='en-US'>
   <head>
-    <meta charset="UTF-8" />
+    <meta charset='UTF-8' />
     <title>pleasure</title>
   </head>
-  <body>
-    <div>
-      <p>Nothing much here.</p>
-    </div>
-  </body>
-</html>""")
+  <body><div><p>Nothing much here.</p></div></body>
+</html>"""
 
 
 def test_overloading(tmpdir):
@@ -66,24 +58,20 @@ def test_overloading(tmpdir):
     out_file = tmpdir.join('myRap.html')
 
     a = MyRap(str(out_file))
-
     a.render()
 
-    assert_html_equal(out_file.read(), """\
-<!doctype html>
-<html lang="en-US">
+    assert out_file.read() == """\
+<!doctype html><html lang='en-US'>
   <head>
-    <meta charset="UTF-8" />
+    <meta charset='UTF-8' />
     <title>MyWrap</title>
     <style>
-      .content {
+  .content {
     color: #daf;
   }</style>
   </head>
-  <body>
-    <p>that's my wrap</p>
-  </body>
-</html>""")
+  <body><p>that's my wrap</p></body>
+</html>"""
 
 
 def test_overloading_2(tmpdir):
@@ -96,15 +84,14 @@ def test_overloading_2(tmpdir):
             width:80px;
             height: 80px;
           }"""),
-            EmbedJs("""
+            EmbedJs("""\
           $(document).ready(function(){
               $("button").click(function(){
                   $("#div1").fadeToggle();
                   $("#div2").fadeToggle("slow");
                   $("#div3").fadeToggle(3000);
               });
-          });
-        """)]
+          });""")]
 
         def __init__(self, out_file):
             title = 'jQuery W3 example, js defined as class attribute.'
@@ -128,18 +115,18 @@ def test_overloading_2(tmpdir):
 
     MyJsPage(str(out_file)).render()
 
-    expected_page = """<!doctype html>
-    <html lang="en-US">
-      <head>
-        <meta charset="UTF-8" />
-        <title>jQuery W3 example, js defined as class attribute.</title>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <style>
+    expected_page = """\
+<!doctype html><html lang='en-US'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>jQuery W3 example, js defined as class attribute.</title>
+    <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+    <style>
           .box {
             width:80px;
             height: 80px;
           }</style>
-        <script type="text/javascript">
+    <script type='text/javascript'>
           $(document).ready(function(){
               $("button").click(function(){
                   $("#div1").fadeToggle();
@@ -147,19 +134,18 @@ def test_overloading_2(tmpdir):
                   $("#div3").fadeToggle(3000);
               });
           });
-          </script>
-      </head>
-      <body>
-        <p>Demonstrate fadeToggle() with different speed parameters.</p>
-        <button>Click to fade in/out boxes</button>
-        <div style="background-color:red;" id="div1" class="box"></div>
-        <br/>
-        <div style="background-color:green;" id="div2" class="box"></div>
-        <br/>
-        <div style="background-color:blue;" id="div3" class="box"></div>
-        <br/>
-      </body>
-    </html>
-    """
+    </script>
+  </head>
+  <body>
+    <p>Demonstrate fadeToggle() with different speed parameters.</p>
+    <button>Click to fade in/out boxes</button>
+    <div class='box' id='div1' style='background-color:red;'></div>
+    <br />
+    <div class='box' id='div2' style='background-color:green;'></div>
+    <br />
+    <div class='box' id='div3' style='background-color:blue;'></div>
+    <br />
+  </body>
+</html>"""
 
-    assert_html_equal(out_file.read(), expected_page)
+    assert out_file.read() == expected_page

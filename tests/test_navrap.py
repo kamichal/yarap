@@ -10,7 +10,6 @@ import os
 import pytest
 
 from yawrap import NavedYawrap, EmbedCss, Doc
-from ._test_utils import assert_html_equal
 
 
 def flatten(nav_entry):
@@ -173,67 +172,60 @@ def test_simple_navrap(tmpdir):
 
     home.render_all_files()
 
-    assert_html_equal(out_file_1, """\
-    <!doctype html>
-    <html lang="en-US">
-      <head>
-        <meta charset="UTF-8" />
-        <title>Title Force One</title>
-        <style>
-          body {
-            margin: 16;
-            font-family: Verdana, sans-serif;
-        }</style>
-      </head>
-      <body>
-        <nav class="nav_main_panel">
-          <div class="nav_group_div active">
-            <div class="nav_page with_bookmarks">
-              <a href="nav01a.html" class="active">Title Force One</a>
-            </div>
-            <div class="nav_group_div">
-              <div class="nav_page">
-                <a href="nonexistent/path/nav01b.html" class="nav_page_link">Abouting</a>
-              </div>
-            </div>
-          </div>
-        </nav>
-        <main class="main_content_body">
-          <p>I'm home</p>
-        </main>
-      </body>
-    </html>\n""")
+    with open(out_file_1, "rt") as f:
+        assert f.read() == """\
+<!doctype html><html lang='en-US'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Title Force One</title>
+    <style>
 
-    assert_html_equal(out_file_2, """\
-    <!doctype html>
-    <html lang="en-US">
-      <head>
-        <meta charset="UTF-8" />
-        <title>Abouting</title>
-        <style>
-          body {
+        body {
             margin: 16;
             font-family: Verdana, sans-serif;
-        }</style>
-      </head>
-      <body>
-        <nav class="nav_main_panel">
-          <div class="nav_group_div">
-            <div class="nav_page">
-              <a href="../../nav01a.html" class="nav_page_link">Title Force One</a>
-            </div>
-            <div class="nav_group_div active">
-              <div class="nav_page with_bookmarks">
-                <a href="nav01b.html" class="active">Abouting</a>
-              </div>
-            </div>
+        }
+    </style>
+  </head>
+  <body>
+    <nav class='nav_main_panel'>
+      <div class='nav_group_div active'>
+        <div class='nav_page with_bookmarks'><a class='active' href='nav01a.html'>Title Force One</a></div>
+        <div class='nav_group_div'>
+          <div class='nav_page'>
+            <a class='nav_page_link' href='nonexistent/path/nav01b.html'>Abouting</a>
           </div>
-        </nav>
-        <main class="main_content_body">
-          <div>Always do the abouting!</div>
-        </main>
-      </body>
-    </html>""")
+        </div>
+      </div>
+    </nav>
+    <main class='main_content_body'><p>I'm home</p></main>
+  </body>
+</html>"""
+    with open(out_file_2, "rt") as f:
+        assert f.read() == """\
+<!doctype html><html lang='en-US'>
+  <head>
+    <meta charset='UTF-8' />
+    <title>Abouting</title>
+    <style>
+
+        body {
+            margin: 16;
+            font-family: Verdana, sans-serif;
+        }
+    </style>
+  </head>
+  <body>
+    <nav class='nav_main_panel'>
+      <div class='nav_group_div'>
+        <div class='nav_page'><a class='nav_page_link' href='../../nav01a.html'>Title Force One</a></div>
+        <div class='nav_group_div active'>
+          <div class='nav_page with_bookmarks'><a class='active' href='nav01b.html'>Abouting</a></div>
+        </div>
+      </div>
+    </nav>
+    <main class='main_content_body'><div>Always do the abouting!</div></main>
+  </body>
+</html>"""
 
 
 @contextmanager
