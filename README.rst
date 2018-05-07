@@ -1,20 +1,30 @@
-README
+Yawrap
 ======
 
-Yarap is a wrapper for yattag. Simplifies creation of static html reports.
-Makes navigation ultra-easy. Run pytest or tox and check the output.
+Yawrap is a powerful, lightweight  `pseudo-static HTML` builder working with:
+
+    - ``python2.7``,
+    - ``python3.4``-``python.3.6``
+    - ``pypy``.
+
+The name comes from something like `Yet Another Wrapper (of HTML code)`.
+
 
 ======== ======================================================
-resource link
+         link
 ======== ======================================================
-Repo:    https://bitbucket.org/gandowin/yarap
+Repo:    https://github.com/kamichal/yarap
+OldRepo: https://bitbucket.org/gandowin/yarap (goes obsolete)
 Docs:    http://yawrap.readthedocs.io
 Pypi:    https://pypi.python.org/pypi/yawrap
-email:   `Michał Kaczmarczyk <mailto:michal.skaczmarczy.k@gmail.com?Subject=Yawrap>`_
+Author:  Michał Kaczmarczyk from Poland
+Email:   `michal.skaczmarczy.k at gmail.com`
 ======== ======================================================
 
-The development status is beta: The assumed functionality works but minor things may be changed in the future.
-Until the documentation is not finished, please refer directly to the code tests or code itself.
+
+.. image:: https://travis-ci.org/kamichal/yarap.svg?branch=master
+    :target: https://travis-ci.org/kamichal/yarap
+    :alt: Build Status
 
 .. image:: https://readthedocs.org/projects/yawrap/badge/?version=latest
     :target: http://yawrap.readthedocs.io/en/latest/?badge=latest
@@ -23,11 +33,53 @@ Until the documentation is not finished, please refer directly to the code tests
 Yawrap features
 ---------------
 
-Here is a summary list of things that ``yawrap`` offers:
+* **Very nice syntax**
 
-* CSS & JavaScript & SVG support
-* Linking local files automatically apearing as relative path
-* Defining page style and scripts on python class level
-* Multiple-page, nested structure support
-* Automatically generated navigation for each page in documents' tree
-* Bookmarking
+    No more headache caused by closing and indentation of HTML elements!
+    Just write python code.
+
+    Yawrap reflects python scopes in HTML perfectly - with no mistakes and indents it natively for free.
+
+* :ref:`CSS <css-support>` & :ref:`JS <js-support>` support
+    Handle it how you like. JS and CSS can be sourced either:
+
+    - from local file
+    - from url
+    - from python string
+
+    And it can be placed either:
+    
+    - as internal content
+    - as external file
+    - as linked resource.
+
+    From single "All in one" HTML file to multi-page documents sharing CSS&JS resources. 
+    Yawrap takes care for handling them properly.
+
+* **SVG support**
+    Don't care about defining SVG structure, just write its main contents. Yawrap will take care about the whole rest.
+    Also typical SVG attributes which are problematic from python keyword-arguments point of view have it's
+    convenience feature.
+
+* **Linking local files**
+    You can reference local files by passing its absolute path on python side and it will appear under links 
+    relative to the current document. And you don't have to `calculate the paths`.  
+
+* :ref:`Defining page style and scripts on python class level <css-class-level>`
+    Page styles can be defined by deriving Yawrap classes. This makes possibility to get the styles 
+    shared / inherited / override in well known `pythonic` way.
+
+* :ref:`Multi-page structure <multi-page>`
+    Define multiple pages (even in complex directory structure) and don't care about the paths. 
+    Not existing directories will be automatically created, you just define the path of target file.
+
+* **Automatic navigation**
+    That's ultra-nice. **Probably the cutest yawrap's feature.** Create multiple pages and see how yawrap 
+    joins them in navigation panel created for each generated page. Everything happens behind the curtains. 
+
+    The only one thing you need to do is to care for the navigation's ``CSS`` style (if you don't like the
+    default navigation style provided by Yawrap).
+
+* **Bookmarking**
+    Create intra-page bookmarks with just one command during document definition and see how they are inserted 
+    in correct subsection of the page navigation.

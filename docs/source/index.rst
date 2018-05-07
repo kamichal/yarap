@@ -5,8 +5,13 @@
 Yawrap Documentation
 ====================
 
-Yawrap is a powerful, lightweight  `pseudo-static HTML` builder working with ``python2.7``,
-``python3.4``-``python.3.6`` and ``pypy``. The name comes from something like `Yet Another Wrapper (of HTML code)`.
+Yawrap is a powerful, lightweight  `pseudo-static HTML` builder working with:
+
+    - ``python2.7``,
+    - ``python3.4``-``python.3.6``
+    - ``pypy``.
+
+The name comes from something like `Yet Another Wrapper (of HTML code)`.
 
 
 ======== ======================================================
@@ -21,10 +26,13 @@ Email:   `michal.skaczmarczy.k at gmail.com`
 ======== ======================================================
 
 
+.. image:: https://travis-ci.org/kamichal/yarap.svg?branch=master
+    :target: https://travis-ci.org/kamichal/yarap
+    :alt: Build Status
+
 .. image:: https://readthedocs.org/projects/yawrap/badge/?version=latest
     :target: http://yawrap.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
-
 
 Yawrap features
 ---------------
@@ -94,7 +102,6 @@ Because a good example is worth more than thousand words.
     usage_03
 
 
-Contents
 Contents
 ========
 
