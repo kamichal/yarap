@@ -3,9 +3,8 @@
 Basic JS usage
 --------------
 
-More realistic usage. 
+It's an adaptation of following example:
 
-It's an adaptation of following example: 
 https://www.w3schools.com/jquery/tryit.asp?filename=tryjquery_fadetoggle
 
 .. literalinclude:: ../examples/test_usage_01.py

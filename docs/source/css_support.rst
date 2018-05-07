@@ -44,23 +44,17 @@ That outputs:
 
 .. testoutput::
 
-    <!doctype html>
-    <html lang="en-US">
+    <!doctype html><html lang='en-US'>
       <head>
-        <meta charset="UTF-8" />
+        <meta charset='UTF-8' />
         <style>
     .content { margin: 2px; }
     .content:hover {
        background-color: #DAF;
     }</style>
       </head>
-      <body>
-        <div class="content">
-          <span>CSS in yawrap.</span>
-        </div>
-      </body>
+      <body><div class='content'><span>CSS in yawrap.</span></div></body>
     </html>
-
 
 
 The method :func:`add` called with action :func:`EmbedCss` appends CSS definitions to page head section.
@@ -94,29 +88,26 @@ Will give:
 
 .. testoutput::
 
-    <!doctype html>
-    <html lang="en-US">
+    <!doctype html><html lang='en-US'>
       <head>
-        <meta charset="UTF-8" />
+        <meta charset='UTF-8' />
         <style>
     .content { margin: 2px; }
     .content:hover {
        background-color: #DAF;
     }</style>
         <style>
+
       .content {
         color: #321;
         padding: 1px 16px;
       }
       span {
         border: 1px solid black;
-      }</style>
+      }
+        </style>
       </head>
-      <body>
-        <div class="content">
-          <span>CSS in yawrap.</span>
-        </div>
-      </body>
+      <body><div class='content'><span>CSS in yawrap.</span></div></body>
     </html>
 
 
@@ -152,25 +143,19 @@ Using global CSS from some resources can be obtained by calling :func:`add` with
     jawrap.text('CSS from web.')
     jawrap.add(ExternalCss("https://www.w3schools.com/w3css/4/w3.css"))
     
-    jawrap.render()
-    file_content = open(out_file, 'rt').read()
-    
-    expected_result = """\
-    <!doctype html>
-    <html lang="en-US">
-      <head>
-        <meta charset="UTF-8" />
-        <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" type="text/css" />
-      </head>
-      <body>CSS from web.</body>
-    </html>"""
-
-    from bs4 import BeautifulSoup
-    print(BeautifulSoup(file_content, "html.parser") == BeautifulSoup(expected_result, "html.parser"))
+    html = jawrap.getvalue()
+    print(html)
 
 .. testoutput::
 
-    True
+    <!doctype html><html lang='en-US'>
+      <head>
+        <meta charset='UTF-8' />
+        <link type='text/css' href='https://www.w3schools.com/w3css/4/w3.css' rel='stylesheet' />
+      </head>
+      <body>CSS from web.</body>
+    </html>
+
 
 
 CSS defined on class level
@@ -185,7 +170,7 @@ in its subclasses. You have to define `css` class attribute either as a string o
     out_file = '/tmp/css_4.html'
 
     class MyStyledPage(Yawrap):
-        resources = [EmbedCss('''
+        resources = [EmbedCss('''\
             body { 
               margin: 0px;
               padding: 13px 14px;
@@ -208,10 +193,9 @@ Should give:
 
 .. testoutput::
 
-    <!doctype html>
-    <html lang="en-US">
+    <!doctype html><html lang='en-US'>
       <head>
-        <meta charset="UTF-8" />
+        <meta charset='UTF-8' />
         <style>
             body {
               margin: 0px;
@@ -220,12 +204,12 @@ Should give:
             .content {
                color: #BAC;
                margin: 2px;
-            }</style>
+            }
+        </style>
       </head>
-      <body>
-        <div class="content">Deriving CSS.</div>
-      </body>
+      <body><div class='content'>Deriving CSS.</div></body>
     </html>
+
 
 
 Adding CSS is still possible, but to instance of the derived class (to ``myStyled`` above), not 

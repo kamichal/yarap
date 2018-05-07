@@ -2,27 +2,26 @@ from yawrap import Yawrap
 
 
 def hello_yawrap():
-    jawrap = Yawrap("not/revelant/path.html", "The title")
+    doc = Yawrap("not/revelant/path.html", "The super title")
 
-    with jawrap.tag("div", klass="main_content"):
-        with jawrap.tag('h2'):
-            jawrap.text('Hello yawrap!')
+    with doc.tag("div", id="content", klass="main"):
+        with doc.tag('h2'):
+            doc.text('Hello yawrap!')
 
-        with jawrap.tag('p'):
-            jawrap.text('Could it be simpler?')
-    jawrap.comment("that's it")
-    return jawrap.getvalue()
+        with doc.tag('p'):
+            doc.text('Could it be simpler?')
 
+    doc.comment("that's it")
+    result = doc.getvalue()
 
-def test_that():
-    assert hello_yawrap() == """\
+    assert result == """\
 <!doctype html><html lang='en-US'>
   <head>
     <meta charset='UTF-8' />
-    <title>The title</title>
+    <title>The super title</title>
   </head>
   <body>
-    <div class='main_content'>
+    <div class='main'>
       <h2>Hello yawrap!</h2>
       <p>Could it be simpler?</p>
     </div>

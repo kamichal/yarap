@@ -5,7 +5,7 @@ from yawrap import Yawrap, ExternalJs, EmbedCss, EmbedJs, BODY_END
 class MyPageTemplate(Yawrap):
     resources = [
         ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"),
-        EmbedCss("""
+        EmbedCss("""\
         body {
             padding: 12px;
             font-family: helvetica, sans-serif;
@@ -17,15 +17,13 @@ class MyPageTemplate(Yawrap):
             margin: 8px;
             padding: 8px;
             width: 80px;
-        }
-        """),
-        EmbedJs("""
+        }"""),
+        EmbedJs("""\
         $("button").click(function(){
             $("#red-box").fadeToggle();
             $("#green-box").fadeToggle("slow");
             $("#blue-box").fadeToggle(3000);
-        });
-        """, placement=BODY_END),
+        });""", placement=BODY_END),
     ]
 
     def _create_box(self, name, color):
@@ -113,7 +111,6 @@ def test_that():
     <title>Name of the page</title>
     <script src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
     <style>
-
         body {
             padding: 12px;
             font-family: helvetica, sans-serif;
@@ -126,7 +123,6 @@ def test_that():
             padding: 8px;
             width: 80px;
         }
-        
     </style>
   </head>
   <body>
@@ -139,13 +135,11 @@ def test_that():
       <div class='box' id='blue-box' style='background-color:#0a1cf0;'>blue-box</div>
     </div>
     <script type='text/javascript'>
-
         $("button").click(function(){
             $("#red-box").fadeToggle();
             $("#green-box").fadeToggle("slow");
             $("#blue-box").fadeToggle(3000);
         });
-        
     </script>
   </body>
 </html>"""

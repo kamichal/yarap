@@ -4,15 +4,14 @@ long_description = open('README.rst').read()
 
 setup(
     name='yawrap',
-    version='0.3.0',
+    version='0.4.0',
     author='Michal Kaczmarczyk',
     author_email='michal.s.kaczmarczyk@gmail.com',
     maintainer='Michal Kaczmarczyk',
     maintainer_email='michal.s.kaczmarczyk@gmail.com',
     license='MIT license',
-    url='https://bitbucket.org/gandowin/yarap/',
-    description='yawrap: simple generator of complex '
-        'html reports, api compatible with yattag',
+    url='https://github.com/kamichal/yarap',
+    description='simple generator of complex html reports',
     long_description=long_description,
     packages=find_packages(),
     requires=[],
@@ -39,6 +38,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: Implementation :: PyPy',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: MIT License',
     ]

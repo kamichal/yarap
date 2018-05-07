@@ -25,21 +25,12 @@ page in a target file specified in `Yawrap` constructor:
 
 .. doctest::
 
-   >>> jawrap.render()
-   >>> print(open('/tmp/example_1.html', 'rt').read())
-   <!doctype html>
-   <html lang="en-US">
-     <head>
-       <meta charset="UTF-8" />
-       <title>the title</title>
-     </head>
-     <body>
-       <div>
-         <p>Nothing much here.</p>
-       </div>
-     </body>
-   </html>
-
-.. note::
-    That
-   
+    >>> jawrap.render()
+    >>> print(open('/tmp/example_1.html', 'rt').read())
+    <!doctype html><html lang='en-US'>
+      <head>
+        <meta charset='UTF-8' />
+        <title>the title</title>
+      </head>
+      <body><div><p>Nothing much here.</p></div></body>
+    </html>
