@@ -1,7 +1,7 @@
 Yawrap
 ======
 
-Yawrap is a powerful, lightweight  `pseudo-static HTML` builder working with:
+Yawrap is a powerful, lightweight, pythonic `pseudo-static HTML` builder that works with:
 
     - ``python2.7``,
     - ``python3.4``-``python.3.6``
@@ -40,15 +40,13 @@ Yawrap features
 
     Yawrap reflects python scopes in HTML perfectly - with no mistakes and indents it natively for free.
 
-* :ref:`CSS <css-support>` & :ref:`JS <js-support>` support
-    Handle it how you like. JS and CSS can be sourced either:
+* **Handle CSS and JS how you like. It can be sourced either**
 
     - from local file
     - from url
     - from python string
 
-    And it can be placed either:
-    
+    And it can be placed:
     - as internal content
     - as external file
     - as linked resource.
@@ -65,11 +63,11 @@ Yawrap features
     You can reference local files by passing its absolute path on python side and it will appear under links 
     relative to the current document. And you don't have to `calculate the paths`.  
 
-* :ref:`Defining page style and scripts on python class level <css-class-level>`
+* **Defining page style and scripts on python class level**
     Page styles can be defined by deriving Yawrap classes. This makes possibility to get the styles 
     shared / inherited / override in well known `pythonic` way.
 
-* :ref:`Multi-page structure <multi-page>`
+* **Multi-page structure**
     Define multiple pages (even in complex directory structure) and don't care about the paths. 
     Not existing directories will be automatically created, you just define the path of target file.
 

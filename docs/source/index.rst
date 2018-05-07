@@ -5,7 +5,7 @@
 Yawrap Documentation
 ====================
 
-Yawrap is a powerful, lightweight  `pseudo-static HTML` builder working with:
+Yawrap is a powerful, lightweight, pythonic `pseudo-static HTML` builder that works with:
 
     - ``python2.7``,
     - ``python3.4``-``python.3.6``
