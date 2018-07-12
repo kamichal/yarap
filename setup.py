@@ -10,7 +10,7 @@ setup(
     maintainer='Michal Kaczmarczyk',
     maintainer_email='michal.s.kaczmarczyk@gmail.com',
     license='MIT license',
-    url='https://github.com/kamichal/yarap',
+    url='https://gitlab.com/kamichal/yawrap',
     description='simple generator of complex html reports',
     long_description=long_description,
     packages=find_packages(),

@@ -45,7 +45,8 @@ The name comes from something like `Yet Another Wrapper (of HTML code)`.
 ======== ======================================================
          link
 ======== ======================================================
-Repo:    https://github.com/kamichal/yarap
+Repo:    https://gitlab.com/kamichal/yawrap
+OldRepo: https://github.com/kamichal/yarap
 OldRepo: https://bitbucket.org/gandowin/yarap (goes obsolete)
 Docs:    http://yawrap.readthedocs.io
 Pypi:    https://pypi.python.org/pypi/yawrap
