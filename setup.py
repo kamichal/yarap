@@ -4,7 +4,7 @@ long_description = open('README.rst').read()
 
 setup(
     name='yawrap',
-    version='0.4.2',
+    version='0.4.3',
     author='Michal Kaczmarczyk',
     author_email='michal.s.kaczmarczyk@gmail.com',
     maintainer='Michal Kaczmarczyk',
@@ -39,7 +39,9 @@ setup(
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: PyPy',
+        'Programming Language :: Python :: Implementation :: PyPy3',
         'Operating System :: OS Independent',
         'License :: OSI Approved :: MIT License',
     ]
