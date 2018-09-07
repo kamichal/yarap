@@ -5,4 +5,4 @@ git push --tags
 
 python setup.py sdist upload
 python setup.py bdist_wheel --universal
-twine upload dist/*
+twine upload --skip-existing dist/*

@@ -6,6 +6,7 @@ exclude docs/Makefile
 exclude docs/_config.yml
 exclude tests
 exclude tox.ini
+exclude .gitlab-ci.yml
 
 include setup.py
 include LICENSE
