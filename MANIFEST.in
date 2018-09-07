@@ -4,10 +4,10 @@ exclude distribute_info.txt
 exclude docs
 exclude docs/Makefile
 exclude docs/_config.yml
-exclude setup.py
 exclude tests
 exclude tox.ini
 
+include setup.py
 include LICENSE
 include README.rst
 
