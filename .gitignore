@@ -5,6 +5,7 @@
 .cache
 .coverage
 .installed.cfg
+.idea
 .project
 .pydevproject
 .pypirc
