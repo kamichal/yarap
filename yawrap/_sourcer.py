@@ -16,13 +16,12 @@
         2. embed it in the document (CSS in head, JS anywhere)
 """
 
-from contextlib import closing
 import os
 import posixpath
+from contextlib import closing
 
 from .six import urlopen, urlparse, str_types
-from .utils import make_place, is_url
-from yawrap.utils import form_css
+from .utils import form_css, make_place, is_url
 
 HEAD = "head"
 BODY_END = "body_end"
@@ -66,6 +65,7 @@ class _Resource(object):
 
         def read_method():
             return cls._read_file(file_path)
+
         assert issubclass(cls, _DocumentVisitor), "You messed up."
         return cls(read_method, placement, file_name)
 
@@ -102,6 +102,7 @@ class _DocumentVisitor(_Resource):
         if isinstance(read_function_or_str, str_types):
             def read_method():
                 return read_function_or_str
+
             return read_method
         else:
             return read_function_or_str
@@ -153,10 +154,12 @@ class _CssResource(_DocumentVisitor):
         if isinstance(function_or_str_or_dict, str_types):
             def read_method():
                 return function_or_str_or_dict
+
             return read_method
         elif isinstance(function_or_str_or_dict, dict):
             def read_method():
                 return form_css(function_or_str_or_dict)
+
             return read_method
         else:
             return function_or_str_or_dict

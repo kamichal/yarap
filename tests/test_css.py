@@ -1,9 +1,7 @@
+import pytest
 from bs4 import BeautifulSoup
 
-import pytest
-
 from yawrap import Yawrap, NavedYawrap, EmbedCss, LinkCss, ExternalCss
-
 
 CssStyle1 = '.some {margin: 2px;}'
 CssStyle2 = '.other {\n padding: 0;\n}'
@@ -63,7 +61,6 @@ def test_empty_doc(yawrap_class_with_naved):
 
 
 def test_class_defined_css(yawrap_class_with_naved):
-
     class JarapWCss(yawrap_class_with_naved):
         resources = [
             EmbedCss(CssStyle1)

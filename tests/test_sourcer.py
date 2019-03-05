@@ -1,17 +1,16 @@
-
-from bs4 import BeautifulSoup
-from itertools import product
+import os
 import posixpath
+from itertools import product
+
 import pytest
+from bs4 import BeautifulSoup
 
 from yawrap import Yawrap, NavedYawrap, ExternalJs, ExternalCss, EmbedJs, EmbedCss, LinkJs, LinkCss, BODY_BEGIN, \
     BODY_END, _sourcer
-from yawrap._sourcer import os, PLACEMENT_OPTIONS
 
 
 @pytest.fixture
 def mocked_urlopen(mocker):
-
     class MockedUrlopen(object):
         def __init__(self, url, *_, **__):
             self.url = url
@@ -37,8 +36,8 @@ def mocked_read_file(mocker):
             return " #%s {background: #AFE;}" % basename
         return "That's a dummy content of %s file." % file_path
 
-    mocker.patch.object(os.path, "isfile", return_value=True)
-    mocker.patch.object(os.path, "isdir", return_value=True)
+    mocker.patch.object(_sourcer.os.path, "isfile", return_value=True)
+    mocker.patch.object(_sourcer.os.path, "isdir", return_value=True)
     mocker.patch.object(_sourcer._Resource, "_read_file", side_effect=read_file_stub)
 
 
@@ -49,7 +48,6 @@ def mocked_save_file(mocker):
 
 
 def test_linking_external_resources_in_head():
-
     class MyRap(Yawrap):
         resources = [
             ExternalCss("https://www.css.com/css.css"),
@@ -71,7 +69,6 @@ def test_linking_external_resources_in_head():
 
 
 def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
-
     class MyRap(Yawrap):
         resources = [
             EmbedCss("head { background: #DAD; }"),
@@ -104,7 +101,6 @@ def test_embedding_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, t
 
 
 def test_embedding_in_body(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
-
     class MyRap(Yawrap):
         resources = [
             EmbedJs('console.log("alles klar in the body")', placement=BODY_BEGIN),
@@ -129,7 +125,6 @@ def test_embedding_in_body(mocked_urlopen, mocked_read_file, mocked_save_file, t
 
 
 def test_linking_local_files_in_head(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
-
     class MyRap(Yawrap):
         resources = [
             LinkCss("#nothing {}", file_name="that_new_style.css"),
@@ -193,9 +188,7 @@ def custom_link_dir():
 
 def test_linking_local_files_in_head_custom_loc(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir,
                                                 custom_link_dir):
-
     class MyRap(Yawrap):
-
         resources = [
             LinkCss("#nothing {}", file_name="that_new_style.css"),
             LinkCss.from_url("https://want.to/have/it/from_web.css"),
@@ -241,6 +234,7 @@ def test_cannot_link_css_in_body(placement):
     with pytest.raises(TypeError) as e:
         class MyRap(Yawrap):
             resources = [ExternalCss("http://the.org/file.css", placement=placement)]
+
         MyRap("that_file.html")._render_page()
     assert "Cannot place CSS out of head section" in str(e.value)
 
@@ -250,15 +244,17 @@ def test_cannot_link_css_in_body2(placement):
     with pytest.raises(TypeError) as e:
         class MyRap(Yawrap):
             resources = [ExternalCss.from_url("http://the.org/file.css", placement=placement)]
+
         MyRap("that_file.html")._render_page()
     assert "Cannot place CSS out of head section" in str(e.value)
 
 
-@pytest.mark.parametrize("placement", PLACEMENT_OPTIONS)
+@pytest.mark.parametrize("placement", _sourcer.PLACEMENT_OPTIONS)
 def test_have_to_provide_file_name(placement, mocked_save_file):
     with pytest.raises(ValueError) as e:
         class MyRap(Yawrap):
             resources = [LinkJs("script content", placement=placement)]
+
         MyRap("file.html")._render_page()
     assert "You need to provide filename in order to store the content for LinkJs operation." in str(e.value)
 
@@ -278,7 +274,6 @@ def test_read_file(tmpdir):
 
 
 def test_inheriting_local_files_linkage(mocked_urlopen, mocked_read_file, mocked_save_file, tmpdir):
-
     class Root(NavedYawrap):
         resources = [
             LinkCss("body { background: #DAD; }", file_name="common_style.css"),
@@ -311,6 +306,7 @@ def test_defining_css_as_a_dict(mocked_save_file):
             EmbedCss({"body": {"background": "#DAD"}}),
             LinkCss({"#that": {"color": "#DAD"}}, file_name="common_style.css"),
         ]
+
     root_doc = Root("one.html")
     root_doc.add(EmbedCss("div {padding: 0px;}"))
 

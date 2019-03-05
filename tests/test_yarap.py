@@ -1,11 +1,6 @@
-#!/usr/bin/python
-'''
-Created on 24 Sep 2017
-
-@author: kamichal
-'''
-from bs4 import BeautifulSoup
 import os
+
+from bs4 import BeautifulSoup
 
 from yawrap import Yawrap, ExternalJs, EmbedCss, EmbedJs
 
@@ -44,7 +39,6 @@ def test_basic(out_dir):
 
 
 def test_overloading(tmpdir):
-
     class MyRap(Yawrap):
         resources = [EmbedCss({'.content': {'color': '#daf'}})]
 
@@ -75,7 +69,6 @@ def test_overloading(tmpdir):
 
 
 def test_overloading_2(tmpdir):
-
     class MyJsPage(Yawrap):
         resources = [
             ExternalJs("https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"),

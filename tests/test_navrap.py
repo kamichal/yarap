@@ -1,13 +1,8 @@
-#!/usr/bin/python
-'''
-Created on 24 Sep 2017
-
-@author: kamichal
-'''
-from bs4 import BeautifulSoup
-from contextlib import contextmanager
 import os
+from contextlib import contextmanager
+
 import pytest
+from bs4 import BeautifulSoup
 
 from yawrap import NavedYawrap, EmbedCss, Doc
 
@@ -148,7 +143,6 @@ def draw_sample_svg(painter_doc, points="50,150 50,200 200,200 200,100"):
 
 
 def test_simple_navrap(tmpdir):
-
     out_file_1 = str(tmpdir.join("nav01a.html"))
     out_file_2 = str(tmpdir.join("nonexistent/path/nav01b.html"))
 
@@ -230,7 +224,6 @@ def test_simple_navrap(tmpdir):
 
 @contextmanager
 def add_tooltip(target_doc, popup_width=280, type_='span', *args, **kwargs):
-
     target_doc.add(EmbedCss({
         ".tooltip": {
             "position": "relative",
@@ -359,7 +352,6 @@ def insert_lorem_ipsums(target_doc, lorem_ipsums):
 
 @pytest.mark.parametrize('nav_class, style_name, root_dir_name', NAV_TEST_PARAMS)
 def test_navigation(nav_class, style_name, root_dir_name, out_dir, lorem_ipsums):
-
     test_out_dir = os.path.join(out_dir, root_dir_name)
     index_file = os.path.join(test_out_dir, 'index.html')
     subs_dir = 'test_subs_subdir'

@@ -1,13 +1,19 @@
+# -*- coding: utf-8 -*-
+
+import codecs
+
 from setuptools import setup, find_packages
 
-long_description = open('README.rst').read()
+with codecs.open("README.rst", encoding="utf-8") as f:
+    long_description = f.read()
+
 
 setup(
     name='yawrap',
-    version='0.4.4',
-    author='Michal Kaczmarczyk',
+    version='0.4.5',
+    author='Michał Kaczmarczyk',
     author_email='michal.s.kaczmarczyk@gmail.com',
-    maintainer='Michal Kaczmarczyk',
+    maintainer='Michał Kaczmarczyk',
     maintainer_email='michal.s.kaczmarczyk@gmail.com',
     license='MIT license',
     url='https://gitlab.com/kamichal/yawrap',
@@ -16,23 +22,16 @@ setup(
     packages=find_packages(),
     requires=[],
     install_requires=[],
-    keywords='static html generator',
+    keywords='html generator',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
-        'Intended Audience :: Telecommunications Industry',
         'Intended Audience :: Information Technology',
         'Intended Audience :: Science/Research',
         'Intended Audience :: System Administrators',
-        'Topic :: Database :: Front-Ends',
-        'Topic :: Documentation',
-        'Topic :: Internet :: WWW/HTTP',
-        'Topic :: Internet :: WWW/HTTP :: Browsers',
-        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
-        'Topic :: Scientific/Engineering :: Visualization',
-        'Topic :: Software Development :: Code Generators',
-        'Topic :: Utilities',
-        'Programming Language :: Python',
+        'Intended Audience :: Telecommunications Industry',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
@@ -41,7 +40,14 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: Implementation :: PyPy',
-        'Operating System :: OS Independent',
-        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python',
+        'Topic :: Database :: Front-Ends',
+        'Topic :: Documentation',
+        'Topic :: Internet :: WWW/HTTP :: Browsers',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: Scientific/Engineering :: Visualization',
+        'Topic :: Software Development :: Code Generators',
+        'Topic :: Utilities',
     ]
 )
