@@ -1,12 +1,7 @@
-#!/usr/bin/python
-'''
-Created on 24 Sep 2017
-
-@author: kamichal
-'''
 import os
-import pytest
 import shutil
+
+import pytest
 
 
 @pytest.fixture(scope='session')

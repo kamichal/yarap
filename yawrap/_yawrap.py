@@ -1,29 +1,23 @@
 #!/usr/bin/python
-'''
-Created on 23 Sep 2017
 
-@author: kamichal
-'''
-
-from contextlib import contextmanager
 import os
+from contextlib import contextmanager
 
 from yawrap._engine import Doc
 from yawrap._sourcer import HEAD, BODY_BEGIN, BODY_END, _Resource
 from yawrap.utils import assert_keys_not_in, make_place
-
 
 DEFAULT_SVG_TAG_ATTRIBUTES = dict(xmlns="http://www.w3.org/2000/svg", version="1.1")
 
 
 @contextmanager
 def svg_structure(painter,
-                  svg_tag_attributes=DEFAULT_SVG_TAG_ATTRIBUTES,
+                  svg_tag_attributes=None,
                   svg_styles_as_str="",
                   *args,
                   **kwargs):
 
-    kwargs.update(svg_tag_attributes)
+    kwargs.update(svg_tag_attributes or DEFAULT_SVG_TAG_ATTRIBUTES)
     with painter.tag('svg', *args, **kwargs):
         if svg_styles_as_str:
             with painter.tag('style', type="text/css"):
@@ -69,8 +63,9 @@ class Yawrap(Doc):
             yield
 
     def add(self, js_or_css_resource):
-        assert isinstance(js_or_css_resource, _Resource), "Bad ussage, expected CSS or JS"\
-            " resource definition, got %s." % type(js_or_css_resource).__name__
+        assert isinstance(js_or_css_resource, _Resource), "Bad ussage, expected CSS or JS" \
+                                                          " resource definition, got %s." % type(
+            js_or_css_resource).__name__
         self._additional_resources.append(js_or_css_resource)
 
     def _get_rel_path(self, target_local_file):

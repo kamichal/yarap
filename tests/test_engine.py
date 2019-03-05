@@ -20,16 +20,15 @@ class TestTag:
         assert Tag._form_attributes(attrs) == expected_result
 
     def test_badly_typed(self):
-        with pytest.raises(ValueError, match="Attribute argument must be tuple of 2 elements \(name, value\)."):
+        with pytest.raises(ValueError, match=r"Attribute argument must be tuple of 2 elements \(name, value\)."):
             Tag("name", ("bad", "number", "of elements"))
 
     def test_bad_types(self):
-        with pytest.raises(ValueError, match="Couldn't make an attribute & value pair out of <object object"):
+        with pytest.raises(ValueError, match=r"Couldn't make an attribute & value pair out of <object object"):
             Tag("name", object())
 
 
 def test_empty_doc():
-
     doc = Doc()
     assert doc.getvalue() == ""
     assert str(doc) == ""

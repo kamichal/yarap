@@ -1,16 +1,14 @@
-from collections import namedtuple
-from contextlib import contextmanager
 import os
 import weakref
+from collections import namedtuple
+from contextlib import contextmanager
 
 from ._engine import Doc
 from ._yawrap import Yawrap
 from .six import str_types
 from .utils import assert_keys_not_in
 
-
 NavEntry = namedtuple('NavEntry', 'element, bookmarks, children')
-
 
 BASIC_NAV_CSS = """\
 .nav_main_panel {

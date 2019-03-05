@@ -11,6 +11,7 @@ class Ya5(Doc):
         def create_contextual(elm):
             def _tag(*args, **kwargs):
                 return self.tag(elm.tag, *args, **kwargs)
+
             _tag.__name__ = elm.tag
             _tag.__doc__ = elm.info
 
@@ -19,6 +20,7 @@ class Ya5(Doc):
         def create_empty(elm):
             def _stag(*args, **kwargs):
                 return self.stag(elm.tag, *args, **kwargs)
+
             _stag.__name__ = elm.tag
             _stag.__doc__ = elm.info
 

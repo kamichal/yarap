@@ -1,10 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-'''
-Created on 30 wrz 2017
-
-@author: kamichal
-'''
 import os
 import re
 
@@ -31,8 +24,8 @@ def form_css(structured_css, indent_level=1):
     if isinstance(structured_css, str_types):
         return structured_css
 
-    assert isinstance(structured_css, dict), "Input CSS is supposed to "\
-        "be string or dict, got %s" % type(structured_css).__name__
+    assert isinstance(structured_css, dict), "Input CSS is supposed to " \
+                                             "be string or dict, got %s" % type(structured_css).__name__
     base_indent = ' ' * 2
     indent = base_indent * indent_level
 

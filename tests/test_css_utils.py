@@ -1,13 +1,4 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-'''
-Created on 30 wrz 2017
-
-@author: kamichal
-'''
-
 from yawrap.utils import form_css
-
 
 RAW_CSSs = """
       .a_div a {
@@ -80,6 +71,5 @@ def test_forming_css_with_empty_rule():
 
 
 def test_forming_css():
-
     result = form_css(STRUCTURIZED_CSS, indent_level=3)
     assert result == RAW_CSSs

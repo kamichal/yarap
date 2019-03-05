@@ -141,7 +141,7 @@ class SingleTag(Tag):
 
 
 class Text(object):
-    __slots__ = ("_text", )
+    __slots__ = ("_text",)
 
     def __init__(self, text):
         self._text = text
@@ -171,9 +171,8 @@ class CdataTag(PlainText):
 
 
 class Doc(object):
-
     class DocumentRootTag(object):
-        __slots__ = ("children", )
+        __slots__ = ("children",)
 
         def __init__(self):
             self.children = []
