@@ -10,7 +10,7 @@ with codecs.open("README.rst", encoding="utf-8") as f:
 
 setup(
     name='yawrap',
-    version='0.4.5',
+    version='0.4.6',
     author='Michał Kaczmarczyk',
     author_email='michal.s.kaczmarczyk@gmail.com',
     maintainer='Michał Kaczmarczyk',

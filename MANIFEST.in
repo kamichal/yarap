@@ -10,6 +10,7 @@ exclude .gitlab-ci.yml
 
 include setup.py
 include LICENSE
+include CHANGELOG.md
 include README.rst
 
 recursive-exclude docs *
