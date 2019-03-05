@@ -12,7 +12,7 @@ from .six import str_types
 
 
 def make_place(target_file):
-    dir_ = os.path.dirname(target_file)
+    dir_ = os.path.dirname(target_file) or os.getcwd()
     if not os.path.isdir(dir_):
         assert not os.path.isfile(dir_)
         os.makedirs(dir_)
