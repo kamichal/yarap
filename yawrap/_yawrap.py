@@ -37,7 +37,7 @@ class Yawrap(Doc):
         self._target_file = target_file
         self.title = title
         self._parent = parent
-        self._target_dir = os.path.dirname(target_file)
+        self._target_dir = os.path.dirname(target_file) or os.getcwd()
         self._additional_resources = []
 
     @contextmanager
