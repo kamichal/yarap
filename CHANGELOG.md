@@ -9,3 +9,6 @@
 ### 0.4.6 
 * fixing creation of new `html` files in `cwd`/`pwd` directory
 * starting this `CHANGELOG`
+
+### 0.4.7 
+* minor improvements for navigated yawrap

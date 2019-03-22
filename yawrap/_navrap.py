@@ -38,6 +38,11 @@ class NavedYawrap(Yawrap):
         self._subs.append(sub_)
         return sub_
 
+    def calc_rel_path(self, path_part, *path_parts):
+        """ returns path relative to target file of this instance """
+        target_dir = os.path.dirname(os.path.abspath(self._target_file))
+        return os.path.join(target_dir, path_part, *path_parts)
+
     @contextmanager
     def bookmark(self, id_, name_in_nav='', type_='div', *args, **kwargs):
         """ as regular doc.tag, but also manages navigation stuff """
