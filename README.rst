@@ -1,3 +1,15 @@
+Warning - the Yawrap project is discontinued
+==============================
+
+Yawrap project lost its developper years ago. 
+I figured out and developed a next generation of this project, called `airium`.
+Airium is a successor of Yawrap project.
+
+Sometimes a software delevoper decides to remove everything he wrote and then writes it once again.
+That happened to this project. I don't plan its maintenance anymore. 
+
+Please do not use yawrap in your projects. Switch to airium, which also generates HTML code, works faster and is also much less clunky.
+
 Yawrap
 ======
 
